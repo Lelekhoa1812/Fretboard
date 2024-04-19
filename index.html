@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="./styles.css">
+    <title>Fretboard Lookup</title>
+</head>
+<body>
+    <div class="settings">
+        <label for="instrument-selector">Selected instrument:</label>
+        <select name="instrument-selector" id="instrument-selector"></select>
+
+        <!-- Toggle amongst Search mode, Notes and Chords -->
+        <label for="search-by">Search by:</label>
+        <select name="search-by" id="search-by">
+            <option value="notes" selected>Notes</option>
+            <option value="chords">Chords</option>
+        </select>
+
+        <!-- Switch b and # -->
+        <div class="accidental-selector">
+            <input type="radio" class="acc-select" id="flats" name="accidentals" value="flats" checked>
+            <label for="flats">♭</label>
+            <input type="radio" class="acc-select" id="sharps" name="accidentals" value="sharps">
+            <label for="flats">♯</label>
+        </div>
+
+        <!-- Toggle amongst Major, Minor and more -->
+        <label for="scale" id="scale-label" style="display: none;">Scale </label>
+        <div class="scale-container" id="scale-container" style="display: none;">
+            <select name="scale" id="scale">
+                <option value="major" selected>major</option>
+                <option value="minor">minor</option>
+                <option value="7">7</option>
+                <option value="m7">m7</option>
+                <option value="maj7">maj7</option>
+                <option value="sus2">sus2</option>
+                <option value="sus4">sus4</option>
+                <option value="add9">add9</option>
+                <option value="m7b5">m7b5</option>
+            </select>
+        </div>
+
+        <label for="number-of-frets">Number of frets: </label>
+        <input type="number" id="number-of-frets" min="5" max="30" value="8">
+
+        <!-- Showing all notes on frame -->
+        <label for="show-all-notes" id="show-all-notes-label">Show all notes </label>
+        <div class="checkbox-container" id="show-all-notes-container">
+            <input type="checkbox" id="show-all-notes">
+        </div>
+
+        <!-- Showing multiple notes' position to that same note -->
+        <label for="show-multiple-notes" id="show-multiple-notes-label">Show multiple notes </label>
+        <div class="checkbox-container" id="show-multiple-notes-container">
+            <input type="checkbox" id="show-multiple-notes">
+        </div>
+
+    <!-- Show frame -->
+    </div>
+    <div class="fretboard">
+
+    <!-- Switch node / main node -->
+    </div>
+    <div class="note-name-section">
+
+    </div>
+    <!-- Functionality -->
+    <script src="./app.js"></script>
+</body>
+</html>
