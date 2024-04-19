@@ -1,5 +1,5 @@
 # Fretboard
-Lookup for Notes and Chords from guitar, bass and ukulele.
+Lookup for Notes and Chords from guitar, bass (4 and 5 strings) and ukulele.
 
 Features:
 Search for a specific notes' positions, spanding from 5 to 20 frets on the instrument.
