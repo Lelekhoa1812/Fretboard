@@ -3,8 +3,8 @@ Lookup for Notes, Chords and Scale from guitar, bass (4 and 5 strings) and ukule
 
 Features:
 Search for a specific notes' positions, spanding from 5 to 20 frets on the instrument.
-Search for all positions to a given chord (Selecting scale).
-Search for all positions to a given scale (Selecting major or minor).
+Search for all positions to a basic chord (Selecting scale).
+Search for all positions to a generic scale (Selecting major or minor).
 Expand all note's positions by different instruments.
 
 Hopefully this webpage will improve your progression to learn these stringed instruments.
