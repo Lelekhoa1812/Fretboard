@@ -12,11 +12,12 @@
         <label for="instrument-selector">Selected instrument:</label>
         <select name="instrument-selector" id="instrument-selector"></select>
 
-        <!-- Toggle amongst Search mode, Notes and Chords -->
+        <!-- Toggle amongst Search mode, Notes, Chords and Scales -->
         <label for="search-by">Search by:</label>
         <select name="search-by" id="search-by">
             <option value="notes" selected>Notes</option>
             <option value="chords">Chords</option>
+            <option value="scales">Scales</option>
         </select>
 
         <!-- Switch b and # -->
@@ -40,6 +41,15 @@
                 <option value="sus4">sus4</option>
                 <option value="add9">add9</option>
                 <option value="m7b5">m7b5</option>
+            </select>
+        </div>
+
+        <!-- Toggle amongst Major and Minor -->
+        <label for="scale-set" id="scale-set-label" style="display: none;">Scale </label>
+        <div class="scale-set-container" id="scale-set-container" style="display: none;">
+            <select name="scale-set" id="scale-set">
+                <option value="major" selected>major</option>
+                <option value="minor">minor</option>
             </select>
         </div>
 
