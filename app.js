@@ -4,6 +4,7 @@ const fretboard = document.querySelector('.fretboard');
 const instrumentSelector = document.querySelector('#instrument-selector');
 const searchSelector = document.querySelector('#search-by');
 const scaleSelector = document.querySelector('#scale');
+const scalesetSelector = document.querySelector('#scale-set');
 const accidentalSelector = document.querySelector('.accidental-selector');
 const numberOfFretsSelector = document.querySelector('#number-of-frets');
 const showAllNotesSelector = document.querySelector('#show-all-notes');
@@ -144,6 +145,34 @@ const chordm7b5Notes = {
     'A': ['A', 'C', 'Eb', 'G'],
     'Bb': ['Bb', 'Db', 'E', 'Ab'],
     'B': ['B', 'D', 'F', 'A']
+};
+const scaleMajor = {
+    'C': ['C', 'D', 'E', 'F', 'G', 'A', 'B'],
+    'Db': ['Db', 'Eb', 'F', 'Gb', 'Ab', 'Bb', 'C'],
+    'D': ['D', 'E', 'Gb', 'G', 'A', 'B', 'Db'],
+    'Eb': ['Eb', 'F', 'G', 'Ab', 'Bb', 'C', 'D'],
+    'E': ['E', "Gb", 'Ab', 'A', 'B', 'Db', 'Eb'],
+    'F': ['F', 'G', 'A', 'Bb', 'C', 'D', 'E'],
+    'Gb': ['Gb', 'Ab', 'Bb', 'Cb', 'Db', 'Eb', 'F'],
+    'G': ['G', 'A', 'B', 'C', 'D', 'E', 'Gb'],
+    'Ab': ['Ab', 'Bb', 'C', 'Db', 'Eb', 'F', 'G'],
+    'A': ['A', 'B', 'Db', 'D', 'E', 'Gb', 'Ab'],
+    'Bb': ['Bb', 'C', 'D', 'Eb', 'F', 'G', 'A'],
+    'B': ['B', 'Db', 'Eb', 'E', 'Gb', 'Ab', 'Bb']
+};
+const scaleMinor = {
+    'C': ['C', 'D', 'Eb', 'F', 'G', 'Ab', 'B'],
+    'Db': ['Db', 'Eb', 'E', 'Gb', 'Ab', 'A', 'C'],
+    'D': ['D', 'E', 'F', 'G', 'A', 'Bb', 'Db'],
+    'Eb': ['Eb', 'F', 'Gb', 'Ab', 'Bb', 'B', 'D'],
+    'E': ['E', "Gb", 'G', 'A', 'B', 'C', 'Eb'],
+    'F': ['F', 'G', 'Ab', 'Bb', 'C', 'Db', 'E'],
+    'Gb': ['Gb', 'Ab', 'A', 'Cb', 'Db', 'D', 'F'],
+    'G': ['G', 'A', 'Bb', 'C', 'D', 'Eb', 'Gb'],
+    'Ab': ['Ab', 'B', 'C', 'Db', 'Eb', 'E', 'G'],
+    'A': ['A', 'B', 'C', 'D', 'E', 'F', 'Ab'],
+    'Bb': ['Bb', 'C', 'Db', 'Eb', 'F', 'Gb', 'A'],
+    'B': ['B', 'Db', 'D', 'E', 'Gb', 'G', 'Bb']
 };
 
 let allNotes;
@@ -297,6 +326,24 @@ const app = {
                 }
             }
         }
+        else if (searchSelector.value === 'scales') {
+            if (scalesetSelector.value === "major")
+            {
+                for (let scale in scaleMajor) {
+                    let scaleMajorElement = tools.createElement('span', scale);
+                    scaleMajorElement.classList.add('scale-note');
+                    noteNameSection.appendChild(scaleMajorElement);
+                }
+            }
+            else if (scalesetSelector.value === "minor")
+            {
+                for (let scale in scaleMinor) {
+                    let scaleMinorElement = tools.createElement('span', scale);
+                    scaleMinorElement.classList.add('scale-note');
+                    noteNameSection.appendChild(scaleMinorElement);
+                }
+            }
+       }
     },
     toggleMultipleNotes(noteName, opacity) {
         for (let i = 0; i < allNotes.length; i++) {
@@ -424,6 +471,22 @@ const handlers = {
                 });
             }
         }
+        else if (searchSelector.value === 'scales') {
+            let scaleName = event.target.innerText;
+            if (scalesetSelector.value === "major"){
+                let scaleMajorArray = scaleMajor[scaleName];
+                scaleMajorArray.forEach((note) => {
+                    app.toggleMultipleNotes(note, 1);
+                });
+            }
+            else if (scalesetSelector.value === "minor"){
+                let scaleMinorArray = scaleMinor[scaleName];
+                scaleMinorArray.forEach((note) => {
+                    app.toggleMultipleNotes(note, 1);
+                });
+            }
+        }
+        
     },
     setNotesToHide(event) {
         if (!showAllNotes) {
@@ -487,6 +550,21 @@ const handlers = {
                     });
                 }
             }
+            else if (searchSelector.value === 'scales') {
+                let scaleName = event.target.innerText;
+                if (scalesetSelector.value === "major"){
+                    let scaleMajorArray = scaleMajor[scaleName];
+                    scaleMajorArray.forEach((note) => {
+                        app.toggleMultipleNotes(note, 0);
+                    });
+                }
+                else if (scalesetSelector.value === "minor"){
+                    let scaleMinorArray = scaleMinor[scaleName];
+                    scaleMinorArray.forEach((note) => {
+                        app.toggleMultipleNotes(note, 0);
+                    });
+                }
+            }
         }
     },
     setSearchBy(event) {
@@ -501,13 +579,27 @@ const handlers = {
             document.getElementById('show-multiple-notes-label').style.display = 'none';
             document.getElementById('scale-container').style.display = 'block';
             document.getElementById('scale-label').style.display = 'block';
-        } else {
+            document.getElementById('scale-set-container').style.display = 'none';
+            document.getElementById('scale-set-label').style.display = 'none';
+        } else if (selectedOption === 'notes') {
             document.getElementById('show-all-notes-container').style.display = 'block';
             document.getElementById('show-all-notes-label').style.display = 'block';
             document.getElementById('show-multiple-notes-container').style.display = 'block';
             document.getElementById('show-multiple-notes-label').style.display = 'block';
             document.getElementById('scale-container').style.display = 'none';
             document.getElementById('scale-label').style.display = 'none';
+            document.getElementById('scale-set-container').style.display = 'none';
+            document.getElementById('scale-set-label').style.display = 'none';
+        }
+        if (selectedOption === 'scales') {
+            document.getElementById('show-all-notes-container').style.display = 'none';
+            document.getElementById('show-all-notes-label').style.display = 'none';
+            document.getElementById('show-multiple-notes-container').style.display = 'none';
+            document.getElementById('show-multiple-notes-label').style.display = 'none';
+            document.getElementById('scale-container').style.display = 'none';
+            document.getElementById('scale-label').style.display = 'none';
+            document.getElementById('scale-set-container').style.display = 'block';
+            document.getElementById('scale-set-label').style.display = 'block';
         }
     },
     setupEventListeners() {
