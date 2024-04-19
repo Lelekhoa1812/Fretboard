@@ -456,12 +456,6 @@ const handlers = {
                         app.toggleMultipleNotes(note, 0);
                     });
                 }
-                else if (scaleSelector.value === "m7"){
-                    let chordm7NotesArray = chordm7Notes[chordName];
-                    chordm7NotesArray.forEach((note) => {
-                        app.toggleMultipleNotes(note, 0);
-                    });
-                }
                 else if (scaleSelector.value === "maj7"){
                     let chordmaj7NotesArray = chordmaj7Notes[chordName];
                     chordmaj7NotesArray.forEach((note) => {
