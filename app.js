@@ -160,7 +160,6 @@ const chord6Notes = {
     'Bb': ['Bb', 'D', 'F', 'G'],
     'B': ['B', 'Eb', 'Gb', 'Ab']
 };
-    };
 const chordm6Notes = {
     'C': ['C', 'Eb', 'G', 'A'],
     'Db': ['Db', 'E', 'Ab', 'Bb'],
