@@ -146,7 +146,7 @@ const chordm7b5Notes = {
     'Bb': ['Bb', 'Db', 'E', 'Ab'],
     'B': ['B', 'D', 'F', 'A']
 };
-    const chord6Notes = {
+const chord6Notes = {
     'C': ['C', 'E', 'G', 'A'],
     'Db': ['Db', 'F', 'Ab', 'Bb'],
     'D': ['D', 'Gb', 'A', 'B'],
@@ -161,7 +161,7 @@ const chordm7b5Notes = {
     'B': ['B', 'Eb', 'Gb', 'Ab']
 };
     };
-    const chordm6Notes = {
+const chordm6Notes = {
     'C': ['C', 'Eb', 'G', 'A'],
     'Db': ['Db', 'E', 'Ab', 'Bb'],
     'D': ['D', 'F', 'A', 'B'],
@@ -550,7 +550,7 @@ const handlers = {
                 });
             }
             else if (scaleSelector.value === "dim"){
-                let chorddimNotesArray = chorddimNotes[chordName];
+                let chorddimNotesArray = chorddimNotes[chordName];
                 chorddimNotesArray.forEach((note) => {
                     app.toggleMultipleNotes(note, 1);
                 });
