@@ -146,6 +146,49 @@ const chordm7b5Notes = {
     'Bb': ['Bb', 'Db', 'E', 'Ab'],
     'B': ['B', 'D', 'F', 'A']
 };
+    const chord6Notes = {
+    'C': ['C', 'E', 'G', 'A'],
+    'Db': ['Db', 'F', 'Ab', 'Bb'],
+    'D': ['D', 'Gb', 'A', 'B'],
+    'Eb': ['Eb', 'G', 'Bb', 'C'],
+    'E': ['E', 'Ab', 'B', 'Db'],
+    'F': ['F', 'A', 'C', 'D'],
+    'Gb': ['Gb', 'Bb', 'Db', 'Eb'],
+    'G': ['G', 'B', 'D', 'E'],
+    'Ab': ['Ab', 'C', 'Eb', 'F'],
+    'A': ['A', 'Db', 'E', 'Gb'],
+    'Bb': ['Bb', 'D', 'F', 'G'],
+    'B': ['B', 'Eb', 'Gb', 'Ab']
+};
+    };
+    const chordm6Notes = {
+    'C': ['C', 'Eb', 'G', 'A'],
+    'Db': ['Db', 'E', 'Ab', 'Bb'],
+    'D': ['D', 'F', 'A', 'B'],
+    'Eb': ['Eb', 'Gb', 'Bb', 'C'],
+    'E': ['E', 'G', 'B', 'Db'],
+    'F': ['F', 'Ab', 'C', 'D'],
+    'Gb': ['Gb', 'A', 'Db', 'Eb'],
+    'G': ['G', 'Bb', 'D', 'E'],
+    'Ab': ['Ab', 'B', 'Eb', 'F'],
+    'A': ['A', 'C', 'E', 'Gb'],
+    'Bb': ['Bb', 'Db', 'F', 'G'],
+    'B': ['B', 'D', 'Gb', 'Ab']
+};
+const chorddimNotes = {
+    'C': ['C', 'Eb', 'Gb'],
+    'Db': ['Db', 'E', 'G'],
+    'D': ['D', 'F', 'Ab'],
+    'Eb': ['Eb', 'Gb', 'A'],
+    'E': ['E', 'G', 'Bb'],
+    'F': ['F', 'Ab', 'B'],
+    'Gb': ['Gb', 'A', 'C'],
+    'G': ['G', 'Bb', 'Db'],
+    'Ab': ['Ab', 'B', 'D'],
+    'A': ['A', 'C', 'Eb'],
+    'Bb': ['Bb', 'Db', 'E'],
+    'B': ['B', 'D', 'F']
+};
 const scaleMajor = {
     'C': ['C', 'D', 'E', 'F', 'G', 'A', 'B'],
     'Db': ['Db', 'Eb', 'F', 'Gb', 'Ab', 'Bb', 'C'],
@@ -325,6 +368,30 @@ const app = {
                     noteNameSection.appendChild(chordm7b5NotesElement);
                 }
             }
+            else if (scaleSelector.value === "6")
+            {
+                for (let chord in chord6Notes) {
+                    let chord6NotesElement = tools.createElement('span', chord);
+                    chord6NotesElement.classList.add('chord-note');
+                    noteNameSection.appendChild(chord6NotesElement);
+                }
+            }
+            else if (scaleSelector.value === "m6")
+            {
+                for (let chord in chordm6Notes) {
+                    let chordm6NotesElement = tools.createElement('span', chord);
+                    chordm6NotesElement.classList.add('chord-note');
+                    noteNameSection.appendChild(chordm6NotesElement);
+                }
+            }
+            else if (scaleSelector.value === "dim")
+            {
+                for (let chord in chorddimNotes) {
+                    let chorddimNotesElement = tools.createElement('span', chord);
+                    chorddimNotesElement.classList.add('chord-note');
+                    noteNameSection.appendChild(chorddimNotesElement);
+                }
+            }
         }
         else if (searchSelector.value === 'scales') {
             if (scalesetSelector.value === "major")
@@ -470,6 +537,24 @@ const handlers = {
                     app.toggleMultipleNotes(note, 1);
                 });
             }
+            else if (scaleSelector.value === "6"){
+                let chord6NotesArray = chord6Notes[chordName];
+                chord6NotesArray.forEach((note) => {
+                    app.toggleMultipleNotes(note, 1);
+                });
+            }
+            else if (scaleSelector.value === "m6"){
+                let chordm6NotesArray = chordm6Notes[chordName];
+                chordm6NotesArray.forEach((note) => {
+                    app.toggleMultipleNotes(note, 1);
+                });
+            }
+            else if (scaleSelector.value === "dim"){
+                let chorddimNotesArray = chorddimNotes[chordName];
+                chorddimNotesArray.forEach((note) => {
+                    app.toggleMultipleNotes(note, 1);
+                });
+            }
         }
         else if (searchSelector.value === 'scales') {
             let scaleName = event.target.innerText;
@@ -514,7 +599,7 @@ const handlers = {
                     });
                 }
                 else if (scaleSelector.value === "m7"){
-                    let chordm7NotesArray = chord7Notes[chordName];
+                    let chordm7NotesArray = chordm7Notes[chordName];
                     chordm7NotesArray.forEach((note) => {
                         app.toggleMultipleNotes(note, 0);
                     });
@@ -546,6 +631,24 @@ const handlers = {
                 else if (scaleSelector.value === "m7b5"){
                     let chordm7b5NotesArray = chordm7b5Notes[chordName];
                     chordm7b5NotesArray.forEach((note) => {
+                        app.toggleMultipleNotes(note, 0);
+                    });
+                }
+                else if (scaleSelector.value === "6"){
+                    let chord6NotesArray = chord6Notes[chordName];
+                    chord6NotesArray.forEach((note) => {
+                        app.toggleMultipleNotes(note, 0);
+                    });
+                }
+                else if (scaleSelector.value === "m6"){
+                    let chordm6NotesArray = chordm6Notes[chordName];
+                    chordm6NotesArray.forEach((note) => {
+                        app.toggleMultipleNotes(note, 0);
+                    });
+                }
+                else if (scaleSelector.value === "dim"){
+                    let chorddimNotesArray = chorddimNotes[chordName];
+                    chorddimNotesArray.forEach((note) => {
                         app.toggleMultipleNotes(note, 0);
                     });
                 }
