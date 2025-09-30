@@ -60,18 +60,32 @@ function getSelectedChordMap() {
       q === 'maj7' ? chordmaj7Notes :
       q === 'sus2' ? chordsus2Notes :
       q === 'sus4' ? chordsus4Notes :
+      q === '7sus4' ? chord7sus4Notes :
+      q === '9sus4' ? chord9sus4Notes :
+      q === '5' ? chord5Notes :
       q === 'add9' ? chordadd9Notes :
+      q === 'add11' ? chordadd11Notes :
+      q === 'add13' ? chordadd13Notes :
       q === 'm7b5' ? chordm7b5Notes :
       q === '6' ? chord6Notes :
       q === 'm6' ? chordm6Notes :
+      q === '6add9' ? chord69Notes :
+      q === 'm6add9' ? chordm69Notes :
       q === 'dim' ? chorddimNotes :
       q === 'aug' ? chordaugNotes :
       q === 'dim7' ? chorddim7Notes :
       q === '9' ? chord9Notes :
       q === 'm9' ? chordm9Notes :
       q === 'maj9' ? chordmaj9Notes :
+      q === 'm11' ? chordm11Notes :
       q === '11' ? chord11Notes :
+      q === 'm13' ? chordm13Notes :
       q === '13' ? chord13Notes :
+      q === '7b9' ? chord7b9Notes :
+      q === '7#9' ? chord7sharp9Notes :
+      q === '7#11' ? chord7sharp11Notes :
+      q === '7b13' ? chord7b13Notes :
+      q === 'maj7#11' ? chordmaj7sharp11Notes :
       chordmajorNotes
     );
 }
@@ -334,6 +348,21 @@ const chordmaj9Notes = {
 // Dominant 11 and 13 (b7)
 const chord11Notes = buildMapForIntervals([0, 4, 7, 10, 14, 17], 'flats');
 const chord13Notes = buildMapForIntervals([0, 4, 7, 10, 14, 17, 21], 'flats');
+// Additional common chord qualities (generated for all roots)
+const chord5Notes = buildMapForIntervals([0, 7], 'flats');
+const chordadd11Notes = buildMapForIntervals([0, 4, 7, 17], 'flats');
+const chordadd13Notes = buildMapForIntervals([0, 4, 7, 21], 'flats');
+const chord69Notes = buildMapForIntervals([0, 4, 7, 9, 14], 'flats'); // 6add9
+const chordm69Notes = buildMapForIntervals([0, 3, 7, 9, 14], 'flats');
+const chord7sus4Notes = buildMapForIntervals([0, 5, 7, 10], 'flats');
+const chord9sus4Notes = buildMapForIntervals([0, 5, 7, 10, 14], 'flats');
+const chord7b9Notes = buildMapForIntervals([0, 4, 7, 10, 13], 'flats');
+const chord7sharp9Notes = buildMapForIntervals([0, 4, 7, 10, 15], 'flats');
+const chord7sharp11Notes = buildMapForIntervals([0, 4, 7, 10, 18], 'flats');
+const chord7b13Notes = buildMapForIntervals([0, 4, 7, 10, 20], 'flats');
+const chordmaj7sharp11Notes = buildMapForIntervals([0, 4, 7, 11, 18], 'flats');
+const chordm11Notes = buildMapForIntervals([0, 3, 7, 10, 14, 17], 'flats');
+const chordm13Notes = buildMapForIntervals([0, 3, 7, 10, 14, 17, 21], 'flats');
 const scaleMajor = {
     'C': ['C', 'D', 'E', 'F', 'G', 'A', 'B'],
     'Db': ['Db', 'Eb', 'F', 'Gb', 'Ab', 'Bb', 'C'],

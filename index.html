@@ -40,25 +40,53 @@
             <label for="scale" id="scale-label" style="display: none;">Chord quality</label>
             <div class="scale-container" id="scale-container" style="display: none;">
                 <select name="scale" id="scale">
-                <option value="major" selected>major</option>
-                <option value="minor">minor</option>
-                <option value="dim">dim</option>
-                <option value="aug">aug</option>
-                <option value="sus2">sus2</option>
-                <option value="sus4">sus4</option>
-                <option value="6">6</option>
-                <option value="m6">m6</option>
-                <option value="7">7</option>
-                <option value="m7">m7</option>
-                <option value="maj7">maj7</option>
-                <option value="dim7">dim7</option>
-                <option value="add9">add9</option>
-                <option value="9">9</option>
-                <option value="m9">m9</option>
-                <option value="maj9">maj9</option>
-                <option value="11">11</option>
-                <option value="13">13</option>
-                <option value="m7b5">m7b5</option>
+                    <optgroup label="Triads & Power">
+                        <option value="major" selected>major</option>
+                        <option value="minor">minor</option>
+                        <option value="dim">dim</option>
+                        <option value="aug">aug</option>
+                        <option value="5">5 (power)</option>
+                    </optgroup>
+                    <optgroup label="Suspended">
+                        <option value="sus2">sus2</option>
+                        <option value="sus4">sus4</option>
+                        <option value="7sus4">7sus4</option>
+                        <option value="9sus4">9sus4</option>
+                    </optgroup>
+                    <optgroup label="Sixths">
+                        <option value="6">6</option>
+                        <option value="m6">m6</option>
+                        <option value="6add9">6add9</option>
+                        <option value="m6add9">m6add9</option>
+                    </optgroup>
+                    <optgroup label="Sevenths">
+                        <option value="7">7</option>
+                        <option value="m7">m7</option>
+                        <option value="maj7">maj7</option>
+                        <option value="dim7">dim7</option>
+                        <option value="m7b5">m7b5</option>
+                    </optgroup>
+                    <optgroup label="Add9/Add11/Add13">
+                        <option value="add9">add9</option>
+                        <option value="add11">add11</option>
+                        <option value="add13">add13</option>
+                    </optgroup>
+                    <optgroup label="Extensions">
+                        <option value="9">9</option>
+                        <option value="m9">m9</option>
+                        <option value="maj9">maj9</option>
+                        <option value="m11">m11</option>
+                        <option value="11">11</option>
+                        <option value="m13">m13</option>
+                        <option value="13">13</option>
+                    </optgroup>
+                    <optgroup label="Altered Dominants">
+                        <option value="7b9">7b9</option>
+                        <option value="7#9">7#9</option>
+                        <option value="7#11">7#11</option>
+                        <option value="7b13">7b13</option>
+                        <option value="maj7#11">maj7#11</option>
+                    </optgroup>
                 </select>
             </div>
 
