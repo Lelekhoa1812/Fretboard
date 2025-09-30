@@ -8,7 +8,36 @@
     <title>Fretboard Lookup</title>
 </head>
 <body>
-    <div class="settings">
+    <section id="hero">
+        <div class="hero-inner">
+            <h1>Fretboard Lookup</h1>
+            <p class="lead" id="hero-typed" data-text="Visualize notes, chords, and scales on guitar, bass, and ukulele. Choose a mode, hover a root, see every position instantly."> </p>
+            <div class="hero-grid">
+                <div class="card slide-in">
+                    <strong>Notes</strong>
+                    <p>Hover any note name to light up all fret positions. Toggle multiple to compare.</p>
+                    <img src="https://images.unsplash.com/photo-1510915361894-db8b60106cb1?q=80&w=1200&auto=format&fit=crop" alt="Guitar neck">
+                </div>
+                <div class="card slide-in">
+                    <strong>Chords</strong>
+                    <p>Pick a chord quality, hover a root to see chord tones and try Hand Position presets.</p>
+                    <img src="https://artiumacademy.mo.cloudinary.net/v1n/blogs/how-to-read-guitar-chord-charts-a-simple-guide.webp?q=80&w=1200&auto=format&fit=crop" alt="Chord shapes">
+                </div>
+                <div class="card slide-in">
+                    <strong>Scales</strong>
+                    <p>Choose a family (major/minor, pentatonic, blues, modes) and hover a root to light up scale tones.</p>
+                    <img src="https://nationalguitaracademy.com/wp-content/uploads/2020/03/4-guitar-scales-charts.jpg?q=80&w=1400&auto=format&fit=crop" alt="Scales walkthrough">
+                </div>
+                <div class="card slide-in">
+                    <strong>Help</strong>
+                    <p>Use the controls below to switch mode, root, and qualities. Hand Position shows 5 fret windows.</p>
+                    <img src="https://images.unsplash.com/photo-1511379938547-c1f69419868d?q=80&w=1200&auto=format&fit=crop" alt="Getting started">
+                </div>
+            </div>
+            <button id="start-app">Start Exploring</button>
+        </div>
+    </section>
+    <div class="settings" id="app-root">
         <div class="controls-row">
             <div class="control">
                 <label for="instrument-selector">Selected instrument:</label>

@@ -416,6 +416,33 @@ const app = {
      this.setupinstrumentSelector();
      this.setupNoteNameSection();
      handlers.setupEventListeners();
+     // Smooth scroll from hero to app controls
+     const cta = document.getElementById('start-app');
+     const appRoot = document.getElementById('app-root');
+     if (cta && appRoot) {
+         cta.addEventListener('click', () => {
+             appRoot.scrollIntoView({ behavior: 'smooth', block: 'start' });
+         });
+     }
+     // Stagger slide-in cards
+     const cards = document.querySelectorAll('#hero .card');
+     let delay = 0;
+     cards.forEach((c) => {
+         setTimeout(() => c.classList.add('visible'), delay);
+         delay += 180;
+     });
+     // Typing effect for lead paragraph
+     const typed = document.getElementById('hero-typed');
+     if (typed) {
+         const text = typed.getAttribute('data-text') || '';
+         typed.textContent = '';
+         let i = 0;
+         const speed = 14;
+         const timer = setInterval(() => {
+             typed.textContent = text.slice(0, i++);
+             if (i > text.length) clearInterval(timer);
+         }, speed);
+     }
     },
     setupFretboard() {
         fretboard.innerHTML = '';
