@@ -5,6 +5,12 @@ const instrumentSelector = document.querySelector('#instrument-selector');
 const searchSelector = document.querySelector('#search-by');
 const scaleSelector = document.querySelector('#scale');
 const scalesetSelector = document.querySelector('#scale-set');
+const stringSetSelector = document.querySelector('#string-set');
+const minFretInput = document.querySelector('#min-fret');
+const maxFretInput = document.querySelector('#max-fret');
+const handPositionsCheckbox = document.querySelector('#hand-positions');
+const handPositionPicker = document.querySelector('#hand-position-picker');
+const handPositionIndexSelect = document.querySelector('#hand-position-index');
 const accidentalSelector = document.querySelector('.accidental-selector');
 const numberOfFretsSelector = document.querySelector('#number-of-frets');
 const showAllNotesSelector = document.querySelector('#show-all-notes');
@@ -14,6 +20,54 @@ const singleFretMarkPositions = [3, 5, 7, 9, 15, 17, 19, 21];
 const doubleFretMarkPositions = [12, 24];
 const notesFlat = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
 const notesSharp = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+const enharmonicToFlats = {"C#":"Db","D#":"Eb","F#":"Gb","G#":"Ab","A#":"Bb"};
+const enharmonicToSharps = {"Db":"C#","Eb":"D#","Gb":"F#","Ab":"G#","Bb":"A#"};
+function toPreferredAccidental(root, acc) {
+    return acc === 'sharps' ? (enharmonicToSharps[root] || root) : (enharmonicToFlats[root] || root);
+}
+function resolveRootInMap(root, map) {
+    if (map[root]) return root;
+    if (map[enharmonicToFlats[root]]) return enharmonicToFlats[root];
+    if (map[enharmonicToSharps[root]]) return enharmonicToSharps[root];
+    return undefined;
+}
+function getSelectedChordMap() {
+    const q = scaleSelector.value;
+    return (
+      q === 'major' ? chordmajorNotes :
+      q === 'minor' ? chordminorNotes :
+      q === '7' ? chord7Notes :
+      q === 'm7' ? chordm7Notes :
+      q === 'maj7' ? chordmaj7Notes :
+      q === 'sus2' ? chordsus2Notes :
+      q === 'sus4' ? chordsus4Notes :
+      q === 'add9' ? chordadd9Notes :
+      q === 'm7b5' ? chordm7b5Notes :
+      q === '6' ? chord6Notes :
+      q === 'm6' ? chordm6Notes :
+      q === 'dim' ? chorddimNotes :
+      q === 'aug' ? chordaugNotes :
+      q === 'dim7' ? chorddim7Notes :
+      q === '9' ? chord9Notes :
+      q === 'm9' ? chordm9Notes :
+      q === 'maj9' ? chordmaj9Notes :
+      q === '11' ? chord11Notes :
+      q === '13' ? chord13Notes :
+      chordmajorNotes
+    );
+}
+function getSelectedScaleMap() {
+    const s = scalesetSelector.value;
+    return (
+      s === 'major' ? scaleMajor :
+      s === 'minor' ? scaleMinor :
+      s === 'modes' ? scaleModes :
+      s === 'pentatonicMajor' ? scalePentatonicMajor :
+      s === 'pentatonicMinor' ? scalePentatonicMinor :
+      s === 'blues' ? scaleBlues :
+      scaleMajor
+    );
+}
 const instrumentTuningPresets = {
     'Guitar': [4, 11, 7, 2, 9, 4],
     'Bass (4 strings)': [7, 2, 9, 4],
@@ -188,6 +242,83 @@ const chorddimNotes = {
     'Bb': ['Bb', 'Db', 'E'],
     'B': ['B', 'D', 'F']
 };
+const chordaugNotes = {
+    'C': ['C', 'E', 'G#'],
+    'Db': ['Db', 'F', 'A'],
+    'D': ['D', 'F#', 'A#'],
+    'Eb': ['Eb', 'G', 'B'],
+    'E': ['E', 'G#', 'C'],
+    'F': ['F', 'A', 'C#'],
+    'Gb': ['Gb', 'Bb', 'D'],
+    'G': ['G', 'B', 'D#'],
+    'Ab': ['Ab', 'C', 'E'],
+    'A': ['A', 'C#', 'F'],
+    'Bb': ['Bb', 'D', 'F#'],
+    'B': ['B', 'D#', 'G']
+};
+const chorddim7Notes = {
+    'C': ['C', 'Eb', 'Gb', 'A'],
+    'Db': ['Db', 'E', 'G', 'Bb'],
+    'D': ['D', 'F', 'Ab', 'B'],
+    'Eb': ['Eb', 'Gb', 'A', 'C'],
+    'E': ['E', 'G', 'Bb', 'Db'],
+    'F': ['F', 'Ab', 'B', 'D'],
+    'Gb': ['Gb', 'A', 'C', 'Eb'],
+    'G': ['G', 'Bb', 'Db', 'E'],
+    'Ab': ['Ab', 'B', 'D', 'F'],
+    'A': ['A', 'C', 'Eb', 'Gb'],
+    'Bb': ['Bb', 'Db', 'E', 'G'],
+    'B': ['B', 'D', 'F', 'Ab']
+};
+const chord9Notes = {
+    'C': ['C', 'E', 'G', 'Bb', 'D'],
+    'Db': ['Db', 'F', 'Ab', 'B', 'Eb'],
+    'D': ['D', 'F#', 'A', 'C', 'E'],
+    'Eb': ['Eb', 'G', 'Bb', 'Db', 'F'],
+    'E': ['E', 'G#', 'B', 'D', 'F#'],
+    'F': ['F', 'A', 'C', 'Eb', 'G'],
+    'Gb': ['Gb', 'Bb', 'Db', 'E', 'Ab'],
+    'G': ['G', 'B', 'D', 'F', 'A'],
+    'Ab': ['Ab', 'C', 'Eb', 'Gb', 'Bb'],
+    'A': ['A', 'C#', 'E', 'G', 'B'],
+    'Bb': ['Bb', 'D', 'F', 'Ab', 'C'],
+    'B': ['B', 'D#', 'F#', 'A', 'C#']
+};
+const chordm9Notes = {
+    'C': ['C', 'Eb', 'G', 'Bb', 'D'],
+    'Db': ['Db', 'E', 'Ab', 'B', 'Eb'],
+    'D': ['D', 'F', 'A', 'C', 'E'],
+    'Eb': ['Eb', 'Gb', 'Bb', 'Db', 'F'],
+    'E': ['E', 'G', 'B', 'D', 'F#'],
+    'F': ['F', 'Ab', 'C', 'Eb', 'G'],
+    'Gb': ['Gb', 'A', 'Db', 'E', 'Ab'],
+    'G': ['G', 'Bb', 'D', 'F', 'A'],
+    'Ab': ['Ab', 'B', 'Eb', 'Gb', 'Bb'],
+    'A': ['A', 'C', 'E', 'G', 'B'],
+    'Bb': ['Bb', 'Db', 'F', 'Ab', 'C'],
+    'B': ['B', 'D', 'F#', 'A', 'C#']
+};
+const chordmaj9Notes = {
+    'C': ['C', 'E', 'G', 'B', 'D'],
+    'Db': ['Db', 'F', 'Ab', 'C', 'Eb'],
+    'D': ['D', 'F#', 'A', 'C#', 'E'],
+    'Eb': ['Eb', 'G', 'Bb', 'D', 'F'],
+    'E': ['E', 'G#', 'B', 'D#', 'F#'],
+    'F': ['F', 'A', 'C', 'E', 'G'],
+    'Gb': ['Gb', 'Bb', 'Db', 'F', 'Ab'],
+    'G': ['G', 'B', 'D', 'F#', 'A'],
+    'Ab': ['Ab', 'C', 'Eb', 'G', 'Bb'],
+    'A': ['A', 'C#', 'E', 'G#', 'B'],
+    'Bb': ['Bb', 'D', 'F', 'A', 'C'],
+    'B': ['B', 'D#', 'F#', 'A#', 'C#']
+};
+const chord11Notes = {
+    'C': ['C', 'E', 'G', 'Bb', 'D', 'F'],
+    // Other roots can be derived similarly if needed
+};
+const chord13Notes = {
+    'C': ['C', 'E', 'G', 'Bb', 'D', 'F', 'A'],
+};
 const scaleMajor = {
     'C': ['C', 'D', 'E', 'F', 'G', 'A', 'B'],
     'Db': ['Db', 'Eb', 'F', 'Gb', 'Ab', 'Bb', 'C'],
@@ -216,6 +347,20 @@ const scaleMinor = {
     'Bb': ['Bb', 'C', 'Db', 'Eb', 'F', 'Gb', 'A'],
     'B': ['B', 'Db', 'D', 'E', 'Gb', 'G', 'Bb']
 };
+// Additional scale sets
+const scaleModes = {
+    'C': ['C', 'D', 'E', 'F', 'G', 'A', 'B'], // Ionian
+};
+const scalePentatonicMajor = {
+    'C': ['C', 'D', 'E', 'G', 'A'],
+};
+const scalePentatonicMinor = {
+    'A': ['A', 'C', 'D', 'E', 'G'],
+};
+const scaleBlues = {
+    'A': ['A', 'C', 'D', 'Eb', 'E', 'G'],
+    'E': ['E', 'G', 'A', 'Bb', 'B', 'D']
+};
 
 let allNotes;
 let showMultipleNotes = false;
@@ -224,6 +369,9 @@ let numberOfFrets = 8;
 let accidentals = 'flats';
 let selectedInstrument = 'Guitar';
 let numberOfStrings = instrumentTuningPresets[selectedInstrument].length;
+let stringSet = 'any';
+let minFret = 0;
+let maxFret = 24;
 
 const app = {
     init() {
@@ -249,6 +397,8 @@ const app = {
                 
                 let noteName = this.generateNoteNames((fret + instrumentTuningPresets[selectedInstrument][i]), accidentals);
                 noteFret.setAttribute('data-note', noteName);
+                noteFret.setAttribute('data-string-index', i + 1);
+                noteFret.setAttribute('data-fret-index', fret);
                 
                 // Add single fret marks
                 if (i === 0 && singleFretMarkPositions.indexOf(fret) !== -1) {
@@ -295,127 +445,32 @@ const app = {
                 noteNameSection.appendChild(noteNameElement);
             });
         } else if (searchSelector.value === 'chords') {
-            if (scaleSelector.value === "major")
-            {
-                for (let chord in chordmajorNotes) {
-                    let chordmajorNotesElement = tools.createElement('span', chord);
-                    chordmajorNotesElement.classList.add('chord-note');
-                    noteNameSection.appendChild(chordmajorNotesElement);
-                }
-            }
-            else if (scaleSelector.value === "minor")
-            {
-                for (let chord in chordminorNotes) {
-                    let chordminorNotesElement = tools.createElement('span', chord);
-                    chordminorNotesElement.classList.add('chord-note');
-                    noteNameSection.appendChild(chordminorNotesElement);
-                }
-            }
-            else if (scaleSelector.value === "7")
-            {
-                for (let chord in chord7Notes) {
-                    let chord7NotesElement = tools.createElement('span', chord);
-                    chord7NotesElement.classList.add('chord-note');
-                    noteNameSection.appendChild(chord7NotesElement);
-                }
-            }
-            else if (scaleSelector.value === "m7")
-            {
-                for (let chord in chordm7Notes) {
-                    let chordm7NotesElement = tools.createElement('span', chord);
-                    chordm7NotesElement.classList.add('chord-note');
-                    noteNameSection.appendChild(chordm7NotesElement);
-                }
-            }
-            else if (scaleSelector.value === "maj7")
-            {
-                for (let chord in chordmaj7Notes) {
-                    let chordmaj7NotesElement = tools.createElement('span', chord);
-                    chordmaj7NotesElement.classList.add('chord-note');
-                    noteNameSection.appendChild(chordmaj7NotesElement);
-                }
-            }
-            else if (scaleSelector.value === "sus2")
-            {
-                for (let chord in chordsus2Notes) {
-                    let chordsus2NotesElement = tools.createElement('span', chord);
-                    chordsus2NotesElement.classList.add('chord-note');
-                    noteNameSection.appendChild(chordsus2NotesElement);
-                }
-            }
-            else if (scaleSelector.value === "sus4")
-            {
-                for (let chord in chordsus4Notes) {
-                    let chordsus4NotesElement = tools.createElement('span', chord);
-                    chordsus4NotesElement.classList.add('chord-note');
-                    noteNameSection.appendChild(chordsus4NotesElement);
-                }
-            }
-            else if (scaleSelector.value === "add9")
-            {
-                for (let chord in chordadd9Notes) {
-                    let chordadd9NotesElement = tools.createElement('span', chord);
-                    chordadd9NotesElement.classList.add('chord-note');
-                    noteNameSection.appendChild(chordadd9NotesElement);
-                }
-            }
-            else if (scaleSelector.value === "m7b5")
-            {
-                for (let chord in chordm7b5Notes) {
-                    let chordm7b5NotesElement = tools.createElement('span', chord);
-                    chordm7b5NotesElement.classList.add('chord-note');
-                    noteNameSection.appendChild(chordm7b5NotesElement);
-                }
-            }
-            else if (scaleSelector.value === "6")
-            {
-                for (let chord in chord6Notes) {
-                    let chord6NotesElement = tools.createElement('span', chord);
-                    chord6NotesElement.classList.add('chord-note');
-                    noteNameSection.appendChild(chord6NotesElement);
-                }
-            }
-            else if (scaleSelector.value === "m6")
-            {
-                for (let chord in chordm6Notes) {
-                    let chordm6NotesElement = tools.createElement('span', chord);
-                    chordm6NotesElement.classList.add('chord-note');
-                    noteNameSection.appendChild(chordm6NotesElement);
-                }
-            }
-            else if (scaleSelector.value === "dim")
-            {
-                for (let chord in chorddimNotes) {
-                    let chorddimNotesElement = tools.createElement('span', chord);
-                    chorddimNotesElement.classList.add('chord-note');
-                    noteNameSection.appendChild(chorddimNotesElement);
-                }
-            }
+            // Show root names according to accidental preference
+            noteNames.forEach((root) => {
+                let el = tools.createElement('span', root);
+                el.classList.add('chord-note');
+                noteNameSection.appendChild(el);
+            });
         }
         else if (searchSelector.value === 'scales') {
-            if (scalesetSelector.value === "major")
-            {
-                for (let scale in scaleMajor) {
-                    let scaleMajorElement = tools.createElement('span', scale);
-                    scaleMajorElement.classList.add('scale-note');
-                    noteNameSection.appendChild(scaleMajorElement);
-                }
-            }
-            else if (scalesetSelector.value === "minor")
-            {
-                for (let scale in scaleMinor) {
-                    let scaleMinorElement = tools.createElement('span', scale);
-                    scaleMinorElement.classList.add('scale-note');
-                    noteNameSection.appendChild(scaleMinorElement);
-                }
-            }
+            const map = getSelectedScaleMap();
+            noteNames.forEach((root) => {
+                const resolved = resolveRootInMap(root, map);
+                if (!resolved) return;
+                let el = tools.createElement('span', root);
+                el.classList.add('scale-note');
+                noteNameSection.appendChild(el);
+            });
        }
     },
     toggleMultipleNotes(noteName, opacity) {
         for (let i = 0; i < allNotes.length; i++) {
-            if (allNotes[i].dataset.note === noteName) {
-                allNotes[i].style.setProperty('--noteDotOpacity', opacity);
-            }
+            const el = allNotes[i];
+            if (el.dataset.note !== noteName) continue;
+            const stringIndex = parseInt(el.getAttribute('data-string-index'));
+            const fretIndex = parseInt(el.getAttribute('data-fret-index'));
+            if (!handlers.filterByStringAndFret(stringIndex, fretIndex)) continue;
+            el.style.setProperty('--noteDotOpacity', opacity);
         }
     }
 }
@@ -476,99 +531,31 @@ const handlers = {
     setShowMultipleNotes() {
         showMultipleNotes = !showMultipleNotes;
     },
+    filterByStringAndFret(stringIndex, fretIndex) {
+        if (fretIndex < minFret || fretIndex > maxFret) return false;
+        if (stringSet === 'any') return true;
+        const [start, end] = stringSet.split('-').map(Number);
+        return stringIndex >= start && stringIndex <= end;
+    },
     setNotesToShow(event) {
         if (searchSelector.value === 'notes') {
             let noteToShow = event.target.innerText;
             app.toggleMultipleNotes(noteToShow, 1);
         } else if (searchSelector.value === 'chords') {
-            let chordName = event.target.innerText;
-            if (scaleSelector.value === "major"){
-                let chordmajorNotesArray = chordmajorNotes[chordName];
-                chordmajorNotesArray.forEach((note) => {
-                    app.toggleMultipleNotes(note, 1);
-                });
-            }
-            else if (scaleSelector.value === "minor"){
-                let chordminorNotesArray = chordminorNotes[chordName];
-                chordminorNotesArray.forEach((note) => {
-                    app.toggleMultipleNotes(note, 1);
-                });
-            }
-            else if (scaleSelector.value === "7"){
-                let chord7NotesArray = chord7Notes[chordName];
-                chord7NotesArray.forEach((note) => {
-                    app.toggleMultipleNotes(note, 1);
-                });
-            }
-            else if (scaleSelector.value === "m7"){
-                let chordm7NotesArray = chordm7Notes[chordName];
-                chordm7NotesArray.forEach((note) => {
-                    app.toggleMultipleNotes(note, 1);
-                });
-            }
-            else if (scaleSelector.value === "maj7"){
-                let chordmaj7NotesArray = chordmaj7Notes[chordName];
-                chordmaj7NotesArray.forEach((note) => {
-                    app.toggleMultipleNotes(note, 1);
-                });
-            }
-            else if (scaleSelector.value === "sus2"){
-                let chordsus2NotesArray = chordsus2Notes[chordName];
-                chordsus2NotesArray.forEach((note) => {
-                    app.toggleMultipleNotes(note, 1);
-                });
-            }
-            else if (scaleSelector.value === "sus4"){
-                let chordsus4NotesArray = chordsus4Notes[chordName];
-                chordsus4NotesArray.forEach((note) => {
-                    app.toggleMultipleNotes(note, 1);
-                });
-            }
-            else if (scaleSelector.value === "add9"){
-                let chordadd9NotesArray = chordadd9Notes[chordName];
-                chordadd9NotesArray.forEach((note) => {
-                    app.toggleMultipleNotes(note, 1);
-                });
-            }
-            else if (scaleSelector.value === "m7b5"){
-                let chordm7b5NotesArray = chordm7b5Notes[chordName];
-                chordm7b5NotesArray.forEach((note) => {
-                    app.toggleMultipleNotes(note, 1);
-                });
-            }
-            else if (scaleSelector.value === "6"){
-                let chord6NotesArray = chord6Notes[chordName];
-                chord6NotesArray.forEach((note) => {
-                    app.toggleMultipleNotes(note, 1);
-                });
-            }
-            else if (scaleSelector.value === "m6"){
-                let chordm6NotesArray = chordm6Notes[chordName];
-                chordm6NotesArray.forEach((note) => {
-                    app.toggleMultipleNotes(note, 1);
-                });
-            }
-            else if (scaleSelector.value === "dim"){
-                let chorddimNotesArray = chorddimNotes[chordName];
-                chorddimNotesArray.forEach((note) => {
-                    app.toggleMultipleNotes(note, 1);
-                });
-            }
+            const displayedRoot = event.target.innerText;
+            const map = getSelectedChordMap();
+            const key = resolveRootInMap(displayedRoot, map);
+            if (!key) return;
+            const tones = map[key];
+            tones && tones.forEach((note) => { app.toggleMultipleNotes(note, 1); });
         }
         else if (searchSelector.value === 'scales') {
-            let scaleName = event.target.innerText;
-            if (scalesetSelector.value === "major"){
-                let scaleMajorArray = scaleMajor[scaleName];
-                scaleMajorArray.forEach((note) => {
-                    app.toggleMultipleNotes(note, 1);
-                });
-            }
-            else if (scalesetSelector.value === "minor"){
-                let scaleMinorArray = scaleMinor[scaleName];
-                scaleMinorArray.forEach((note) => {
-                    app.toggleMultipleNotes(note, 1);
-                });
-            }
+            const displayedRoot = event.target.innerText;
+            const map = getSelectedScaleMap();
+            const key = resolveRootInMap(displayedRoot, map);
+            if (!key) return;
+            const tones = map[key];
+            tones && tones.forEach((note) => { app.toggleMultipleNotes(note, 1); });
         }
         
     },
@@ -683,6 +670,7 @@ const handlers = {
             document.getElementById('scale-label').style.display = 'block';
             document.getElementById('scale-set-container').style.display = 'none';
             document.getElementById('scale-set-label').style.display = 'none';
+            document.getElementById('voicing-controls').style.display = 'flex';
         } else if (selectedOption === 'notes') {
             document.getElementById('show-all-notes-container').style.display = 'block';
             document.getElementById('show-all-notes-label').style.display = 'block';
@@ -692,6 +680,7 @@ const handlers = {
             document.getElementById('scale-label').style.display = 'none';
             document.getElementById('scale-set-container').style.display = 'none';
             document.getElementById('scale-set-label').style.display = 'none';
+            document.getElementById('voicing-controls').style.display = 'none';
         }
         if (selectedOption === 'scales') {
             document.getElementById('show-all-notes-container').style.display = 'none';
@@ -702,6 +691,7 @@ const handlers = {
             document.getElementById('scale-label').style.display = 'none';
             document.getElementById('scale-set-container').style.display = 'block';
             document.getElementById('scale-set-label').style.display = 'block';
+            document.getElementById('voicing-controls').style.display = 'none';
         }
     },
     setupEventListeners() {
@@ -715,6 +705,41 @@ const handlers = {
         noteNameSection.addEventListener('mouseover', this.setNotesToShow);
         noteNameSection.addEventListener('mouseout', this.setNotesToHide);
         searchSelector.addEventListener('change', this.setSearchBy);
+        stringSetSelector && stringSetSelector.addEventListener('change', (e) => { stringSet = e.target.value; });
+        minFretInput && minFretInput.addEventListener('change', (e) => { minFret = parseInt(e.target.value || 0); });
+        maxFretInput && maxFretInput.addEventListener('change', (e) => { maxFret = parseInt(e.target.value || 24); });
+        // Hand positions presets
+        if (handPositionsCheckbox && handPositionPicker && handPositionIndexSelect) {
+            const presets = [
+                { label: 'Open (0–3)', min: 0, max: 3 },
+                { label: 'I (3–5)', min: 3, max: 5 },
+                { label: 'II (5–7)', min: 5, max: 7 },
+                { label: 'III (7–9)', min: 7, max: 9 },
+                { label: 'IV (9–12)', min: 9, max: 12 }
+            ];
+            handPositionsCheckbox.addEventListener('change', (e) => {
+                const enabled = e.target.checked;
+                handPositionPicker.style.display = enabled ? 'inline-flex' : 'none';
+                if (enabled) {
+                    handPositionIndexSelect.innerHTML = '';
+                    presets.forEach((p, idx) => {
+                        const opt = document.createElement('option');
+                        opt.value = String(idx);
+                        opt.textContent = p.label;
+                        handPositionIndexSelect.appendChild(opt);
+                    });
+                    const apply = () => {
+                        const i = parseInt(handPositionIndexSelect.value || '0');
+                        const p = presets[i];
+                        minFret = p.min; maxFret = p.max;
+                        if (minFretInput) minFretInput.value = String(minFret);
+                        if (maxFretInput) maxFretInput.value = String(maxFret);
+                    };
+                    handPositionIndexSelect.addEventListener('change', apply);
+                    apply();
+                }
+            });
+        }
     }
 }
 

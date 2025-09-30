@@ -20,13 +20,36 @@ body {
     background: #01011e;
     font-family: Lato, sans-serif;
 }
-.settings {
-    display: flex;
-    color: #fff;
-    padding: 20px;
-    border-bottom: 1px solid #444;
-    background: #282828;
+.fade-in {
+    animation: fadein 300ms ease-out;
 }
+@keyframes fadein {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.settings {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    color: #fff;
+    padding: 12px 20px;
+    border-bottom: 1px solid #3a3a3a;
+    background: rgba(24,24,24,0.9);
+    backdrop-filter: blur(4px);
+}
+.controls-row {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+}
+.control {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+.control label, .control .control-label { font-size: 14px; color: #ddd; }
 .accidental-selector {
     margin-left: 20px;
 }
@@ -91,7 +114,9 @@ label {
     z-index: 2;
     color: #eee;
     opacity: var(--noteDotOpacity);
+    transition: opacity 180ms ease;
 }
+
 
 .single-fretmark:after, .double-fretmark:before, .double-fretmark:after {
     content: "";
@@ -130,4 +155,18 @@ label {
 }
 .note-name-section span:hover {
     color: #00baba;
+}
+
+/* Controls layout */
+.voicing-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 20px;
+}
+.hand-position-controls {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    margin-bottom: 10px;
 }

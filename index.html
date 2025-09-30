@@ -9,29 +9,37 @@
 </head>
 <body>
     <div class="settings">
-        <label for="instrument-selector">Selected instrument:</label>
-        <select name="instrument-selector" id="instrument-selector"></select>
-
-        <!-- Toggle amongst Search mode, Notes, Chords and Scales -->
-        <label for="search-by">Search by:</label>
-        <select name="search-by" id="search-by">
-            <option value="notes" selected>Notes</option>
-            <option value="chords">Chords</option>
-            <option value="scales">Scales</option>
-        </select>
-
-        <!-- Switch b and # -->
-        <div class="accidental-selector">
-            <input type="radio" class="acc-select" id="flats" name="accidentals" value="flats" checked>
-            <label for="flats">♭</label>
-            <input type="radio" class="acc-select" id="sharps" name="accidentals" value="sharps">
-            <label for="flats">♯</label>
+        <div class="controls-row">
+            <div class="control">
+                <label for="instrument-selector">Selected instrument:</label>
+                <select name="instrument-selector" id="instrument-selector"></select>
+            </div>
+            <div class="control">
+                <label for="search-by">Search by:</label>
+                <select name="search-by" id="search-by">
+                    <option value="notes" selected>Notes</option>
+                    <option value="chords">Chords</option>
+                    <option value="scales">Scales</option>
+                </select>
+            </div>
+            <div class="control accidental-selector">
+                <span class="control-label">Accidentals</span>
+                <input type="radio" class="acc-select" id="flats" name="accidentals" value="flats" checked>
+                <label for="flats">♭</label>
+                <input type="radio" class="acc-select" id="sharps" name="accidentals" value="sharps">
+                <label for="flats">♯</label>
+            </div>
+            <div class="control">
+                <label for="number-of-frets">Number of frets: </label>
+                <input type="number" id="number-of-frets" min="5" max="30" value="8">
+            </div>
         </div>
 
         <!-- Toggle amongst Major, Minor and more -->
-        <label for="scale" id="scale-label" style="display: none;">Scale </label>
-        <div class="scale-container" id="scale-container" style="display: none;">
-            <select name="scale" id="scale">
+        <div class="controls-row">
+            <label for="scale" id="scale-label" style="display: none;">Chord quality</label>
+            <div class="scale-container" id="scale-container" style="display: none;">
+                <select name="scale" id="scale">
                 <option value="major" selected>major</option>
                 <option value="minor">minor</option>
                 <option value="7">7</option>
@@ -44,31 +52,75 @@
                 <option value="6">6</option>
                 <option value="m6">m6</option>
                 <option value="dim">dim</option>
-            </select>
+                <option value="aug">aug</option>
+                <option value="dim7">dim7</option>
+                <option value="9">9</option>
+                <option value="m9">m9</option>
+                <option value="maj9">maj9</option>
+                <option value="11">11</option>
+                <option value="13">13</option>
+                </select>
+            </div>
+
+            <!-- Toggle amongst Major and Minor -->
+            <label for="scale-set" id="scale-set-label" style="display: none;">Scale family</label>
+            <div class="scale-set-container" id="scale-set-container" style="display: none;">
+                <select name="scale-set" id="scale-set">
+                    <option value="major" selected>major</option>
+                    <option value="minor">minor</option>
+                    <option value="modes">modes (church)</option>
+                    <option value="pentatonicMajor">pentatonic major</option>
+                    <option value="pentatonicMinor">pentatonic minor</option>
+                    <option value="blues">blues</option>
+                </select>
+            </div>
         </div>
 
-        <!-- Toggle amongst Major and Minor -->
-        <label for="scale-set" id="scale-set-label" style="display: none;">Scale </label>
-        <div class="scale-set-container" id="scale-set-container" style="display: none;">
-            <select name="scale-set" id="scale-set">
-                <option value="major" selected>major</option>
-                <option value="minor">minor</option>
-            </select>
+        <!-- Chord voicing and filtering -->
+        <div class="voicing-controls" id="voicing-controls" style="display: none;">
+            <div class="control">
+                <label for="string-set">Strings</label>
+                <select name="string-set" id="string-set">
+                    <option value="any" selected>any</option>
+                    <option value="1-3">1-3</option>
+                    <option value="2-4">2-4</option>
+                    <option value="3-5">3-5</option>
+                    <option value="4-6">4-6</option>
+                </select>
+            </div>
+            <div class="control">
+                <label for="min-fret">Fret range</label>
+                <input type="number" id="min-fret" min="0" max="24" value="0">
+                <span>to</span>
+                <input type="number" id="max-fret" min="0" max="24" value="24">
+            </div>
         </div>
 
-        <label for="number-of-frets">Number of frets: </label>
-        <input type="number" id="number-of-frets" min="5" max="30" value="8">
-
-        <!-- Showing all notes on frame -->
-        <label for="show-all-notes" id="show-all-notes-label">Show all notes </label>
-        <div class="checkbox-container" id="show-all-notes-container">
-            <input type="checkbox" id="show-all-notes">
+        <!-- Hand positions (voicing windows) -->
+        <div class="hand-position-controls" id="hand-position-controls" style="display: none;">
+            <div class="control">
+                <label for="hand-positions">Hand Position</label>
+                <input type="checkbox" id="hand-positions">
+            </div>
+            <div class="control" id="hand-position-picker" style="display: none;">
+                <label for="hand-position-index" id="hand-position-index-label">Position</label>
+                <select id="hand-position-index"></select>
+            </div>
         </div>
 
-        <!-- Showing multiple notes' position to that same note -->
-        <label for="show-multiple-notes" id="show-multiple-notes-label">Show multiple notes </label>
-        <div class="checkbox-container" id="show-multiple-notes-container">
-            <input type="checkbox" id="show-multiple-notes">
+        <div class="controls-row">
+            <div class="control">
+                <label for="show-all-notes" id="show-all-notes-label">Show all notes </label>
+                <div class="checkbox-container" id="show-all-notes-container">
+                    <input type="checkbox" id="show-all-notes">
+                </div>
+            </div>
+            <div class="control">
+                <label for="show-multiple-notes" id="show-multiple-notes-label">Show multiple notes </label>
+                <div class="checkbox-container" id="show-multiple-notes-container">
+                    <input type="checkbox" id="show-multiple-notes">
+                </div>
+            </div>
         </div>
 
     <!-- Show frame -->
