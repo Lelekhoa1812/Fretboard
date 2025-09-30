@@ -31,6 +31,25 @@ function resolveRootInMap(root, map) {
     if (map[enharmonicToSharps[root]]) return enharmonicToSharps[root];
     return undefined;
 }
+// Helpers for generating tone maps
+function getNoteIndexByName(name) {
+    let idx = notesFlat.indexOf(name);
+    if (idx !== -1) return idx;
+    return notesSharp.indexOf(name);
+}
+function getNoteNameByIndex(idx, acc) {
+    idx = ((idx % 12) + 12) % 12;
+    return acc === 'sharps' ? notesSharp[idx] : notesFlat[idx];
+}
+function buildMapForIntervals(intervals, acc = 'flats') {
+    const roots = acc === 'sharps' ? notesSharp : notesFlat;
+    const map = {};
+    roots.forEach((root) => {
+        const rootIdx = getNoteIndexByName(root);
+        map[root] = intervals.map(semi => getNoteNameByIndex(rootIdx + semi, acc));
+    });
+    return map;
+}
 function getSelectedChordMap() {
     const q = scaleSelector.value;
     return (
@@ -237,7 +256,7 @@ const chorddimNotes = {
     'F': ['F', 'Ab', 'B'],
     'Gb': ['Gb', 'A', 'C'],
     'G': ['G', 'Bb', 'Db'],
-    'Ab': ['Ab', 'B', 'D'],
+    'Ab': ['Ab', 'B', 'D'],
     'A': ['A', 'C', 'Eb'],
     'Bb': ['Bb', 'Db', 'E'],
     'B': ['B', 'D', 'F']
@@ -312,13 +331,9 @@ const chordmaj9Notes = {
     'Bb': ['Bb', 'D', 'F', 'A', 'C'],
     'B': ['B', 'D#', 'F#', 'A#', 'C#']
 };
-const chord11Notes = {
-    'C': ['C', 'E', 'G', 'Bb', 'D', 'F'],
-    // Other roots can be derived similarly if needed
-};
-const chord13Notes = {
-    'C': ['C', 'E', 'G', 'Bb', 'D', 'F', 'A'],
-};
+// Dominant 11 and 13 (b7)
+const chord11Notes = buildMapForIntervals([0, 4, 7, 10, 14, 17], 'flats');
+const chord13Notes = buildMapForIntervals([0, 4, 7, 10, 14, 17, 21], 'flats');
 const scaleMajor = {
     'C': ['C', 'D', 'E', 'F', 'G', 'A', 'B'],
     'Db': ['Db', 'Eb', 'F', 'Gb', 'Ab', 'Bb', 'C'],
@@ -348,19 +363,12 @@ const scaleMinor = {
     'B': ['B', 'Db', 'D', 'E', 'Gb', 'G', 'Bb']
 };
 // Additional scale sets
-const scaleModes = {
-    'C': ['C', 'D', 'E', 'F', 'G', 'A', 'B'], // Ionian
-};
-const scalePentatonicMajor = {
-    'C': ['C', 'D', 'E', 'G', 'A'],
-};
-const scalePentatonicMinor = {
-    'A': ['A', 'C', 'D', 'E', 'G'],
-};
-const scaleBlues = {
-    'A': ['A', 'C', 'D', 'Eb', 'E', 'G'],
-    'E': ['E', 'G', 'A', 'Bb', 'B', 'D']
-};
+// Scale families across all roots
+// modes default to Ionian (major) for now
+const scaleModes = buildMapForIntervals([0, 2, 4, 5, 7, 9, 11], 'flats');
+const scalePentatonicMajor = buildMapForIntervals([0, 2, 4, 7, 9], 'flats');
+const scalePentatonicMinor = buildMapForIntervals([0, 3, 5, 7, 10], 'flats');
+const scaleBlues = buildMapForIntervals([0, 3, 5, 6, 7, 10], 'flats');
 
 let allNotes;
 let showMultipleNotes = false;
@@ -547,7 +555,7 @@ const handlers = {
             const key = resolveRootInMap(displayedRoot, map);
             if (!key) return;
             const tones = map[key];
-            tones && tones.forEach((note) => { app.toggleMultipleNotes(note, 1); });
+            tones && tones.forEach((note) => { app.toggleMultipleNotes(toPreferredAccidental(note, accidentals), 1); });
         }
         else if (searchSelector.value === 'scales') {
             const displayedRoot = event.target.innerText;
@@ -555,7 +563,7 @@ const handlers = {
             const key = resolveRootInMap(displayedRoot, map);
             if (!key) return;
             const tones = map[key];
-            tones && tones.forEach((note) => { app.toggleMultipleNotes(note, 1); });
+            tones && tones.forEach((note) => { app.toggleMultipleNotes(toPreferredAccidental(note, accidentals), 1); });
         }
         
     },
@@ -565,94 +573,20 @@ const handlers = {
                 let noteToHide = event.target.innerText;
                 app.toggleMultipleNotes(noteToHide, 0);
             } else if (searchSelector.value === 'chords') {
-                let chordName = event.target.innerText;
-                if (scaleSelector.value === "major"){
-                    let chordmajorNotesArray = chordmajorNotes[chordName];
-                    chordmajorNotesArray.forEach((note) => {
-                        app.toggleMultipleNotes(note, 0);
-                    });
-                }
-                else if (scaleSelector.value === "minor"){
-                    let chordminorNotesArray = chordminorNotes[chordName];
-                    chordminorNotesArray.forEach((note) => {
-                        app.toggleMultipleNotes(note, 0);
-                    });
-                }
-                else if (scaleSelector.value === "7"){
-                    let chord7NotesArray = chord7Notes[chordName];
-                    chord7NotesArray.forEach((note) => {
-                        app.toggleMultipleNotes(note, 0);
-                    });
-                }
-                else if (scaleSelector.value === "m7"){
-                    let chordm7NotesArray = chordm7Notes[chordName];
-                    chordm7NotesArray.forEach((note) => {
-                        app.toggleMultipleNotes(note, 0);
-                    });
-                }
-                else if (scaleSelector.value === "maj7"){
-                    let chordmaj7NotesArray = chordmaj7Notes[chordName];
-                    chordmaj7NotesArray.forEach((note) => {
-                        app.toggleMultipleNotes(note, 0);
-                    });
-                }
-                else if (scaleSelector.value === "sus2"){
-                    let chordsus2NotesArray = chordsus2Notes[chordName];
-                    chordsus2NotesArray.forEach((note) => {
-                        app.toggleMultipleNotes(note, 0);
-                    });
-                }
-                else if (scaleSelector.value === "sus4"){
-                    let chordsus4NotesArray = chordsus4Notes[chordName];
-                    chordsus4NotesArray.forEach((note) => {
-                        app.toggleMultipleNotes(note, 0);
-                    });
-                }
-                else if (scaleSelector.value === "add9"){
-                    let chordadd9NotesArray = chordadd9Notes[chordName];
-                    chordadd9NotesArray.forEach((note) => {
-                        app.toggleMultipleNotes(note, 0);
-                    });
-                }
-                else if (scaleSelector.value === "m7b5"){
-                    let chordm7b5NotesArray = chordm7b5Notes[chordName];
-                    chordm7b5NotesArray.forEach((note) => {
-                        app.toggleMultipleNotes(note, 0);
-                    });
-                }
-                else if (scaleSelector.value === "6"){
-                    let chord6NotesArray = chord6Notes[chordName];
-                    chord6NotesArray.forEach((note) => {
-                        app.toggleMultipleNotes(note, 0);
-                    });
-                }
-                else if (scaleSelector.value === "m6"){
-                    let chordm6NotesArray = chordm6Notes[chordName];
-                    chordm6NotesArray.forEach((note) => {
-                        app.toggleMultipleNotes(note, 0);
-                    });
-                }
-                else if (scaleSelector.value === "dim"){
-                    let chorddimNotesArray = chorddimNotes[chordName];
-                    chorddimNotesArray.forEach((note) => {
-                        app.toggleMultipleNotes(note, 0);
-                    });
-                }
+                const displayedRoot = event.target.innerText;
+                const map = getSelectedChordMap();
+                const key = resolveRootInMap(displayedRoot, map);
+                if (!key) return;
+                const tones = map[key];
+                tones && tones.forEach((note) => { app.toggleMultipleNotes(toPreferredAccidental(note, accidentals), 0); });
             }
             else if (searchSelector.value === 'scales') {
-                let scaleName = event.target.innerText;
-                if (scalesetSelector.value === "major"){
-                    let scaleMajorArray = scaleMajor[scaleName];
-                    scaleMajorArray.forEach((note) => {
-                        app.toggleMultipleNotes(note, 0);
-                    });
-                }
-                else if (scalesetSelector.value === "minor"){
-                    let scaleMinorArray = scaleMinor[scaleName];
-                    scaleMinorArray.forEach((note) => {
-                        app.toggleMultipleNotes(note, 0);
-                    });
-                }
+                const displayedRoot = event.target.innerText;
+                const map = getSelectedScaleMap();
+                const key = resolveRootInMap(displayedRoot, map);
+                if (!key) return;
+                const tones = map[key];
+                tones && tones.forEach((note) => { app.toggleMultipleNotes(toPreferredAccidental(note, accidentals), 0); });
             }
         }
     },
