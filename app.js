@@ -633,7 +633,8 @@ const handlers = {
             document.getElementById('scale-label').style.display = 'block';
             document.getElementById('scale-set-container').style.display = 'none';
             document.getElementById('scale-set-label').style.display = 'none';
-            document.getElementById('voicing-controls').style.display = 'flex';
+            // document.getElementById('voicing-controls').style.display = 'flex'; // disabled
+            document.getElementById('hand-position-controls').style.display = 'flex';
         } else if (selectedOption === 'notes') {
             document.getElementById('show-all-notes-container').style.display = 'block';
             document.getElementById('show-all-notes-label').style.display = 'block';
@@ -643,7 +644,8 @@ const handlers = {
             document.getElementById('scale-label').style.display = 'none';
             document.getElementById('scale-set-container').style.display = 'none';
             document.getElementById('scale-set-label').style.display = 'none';
-            document.getElementById('voicing-controls').style.display = 'none';
+            // document.getElementById('voicing-controls').style.display = 'none';
+            document.getElementById('hand-position-controls').style.display = 'none';
         }
         if (selectedOption === 'scales') {
             document.getElementById('show-all-notes-container').style.display = 'none';
@@ -654,7 +656,8 @@ const handlers = {
             document.getElementById('scale-label').style.display = 'none';
             document.getElementById('scale-set-container').style.display = 'block';
             document.getElementById('scale-set-label').style.display = 'block';
-            document.getElementById('voicing-controls').style.display = 'none';
+            // document.getElementById('voicing-controls').style.display = 'none';
+            document.getElementById('hand-position-controls').style.display = 'none';
         }
     },
     setupEventListeners() {
