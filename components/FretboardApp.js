@@ -43,7 +43,35 @@ export default function FretboardApp() {
         }, 500);
       }, 1500);
     }
+
+    // Initialize animations
+    initializeAnimations();
   }, []);
+
+  // Initialize animations like the original app
+  const initializeAnimations = () => {
+    // Add slide-in animation to cards
+    const cards = document.querySelectorAll('.card');
+    cards.forEach((card, index) => {
+      card.style.animationDelay = `${index * 0.1}s`;
+      card.classList.add('slide-in');
+    });
+
+    // Add typing effect to hero text
+    const heroTyped = document.getElementById('hero-typed');
+    if (heroTyped) {
+      const text = heroTyped.getAttribute('data-text');
+      let i = 0;
+      const typeWriter = () => {
+        if (i < text.length) {
+          heroTyped.textContent += text.charAt(i);
+          i++;
+          setTimeout(typeWriter, 50);
+        }
+      };
+      setTimeout(typeWriter, 1000);
+    }
+  };
 
   return (
     <div className="app-container">
