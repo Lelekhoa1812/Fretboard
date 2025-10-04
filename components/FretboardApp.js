@@ -6,7 +6,7 @@ export default function FretboardApp() {
   const [currentMode, setCurrentMode] = useState('notes');
   const [selectedChords, setSelectedChords] = useState([]);
   const [selectedScales, setSelectedScales] = useState([]);
-  const [showMainApp, setShowMainApp] = useState(true);
+  const [showMainApp, setShowMainApp] = useState(false);
   const [showHelpModal, setShowHelpModal] = useState(false);
   
   // App state
