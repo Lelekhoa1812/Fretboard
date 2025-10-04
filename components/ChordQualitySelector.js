@@ -203,7 +203,7 @@ export default function ChordQualitySelector({
 
         {/* Help Text */}
         <div className="chord-quality-help">
-          <p>💡 <strong>Tip:</strong> Click any quality to instantly change your chord. Try different qualities to hear how they sound!</p>
+          <p>💡 <strong>Tip:</strong> Click any quality to instantly change your chord. Use Shift+click on chord names to open this selector anytime!</p>
         </div>
       </div>
 

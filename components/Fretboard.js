@@ -179,7 +179,7 @@ export default function Fretboard({
         });
 
         // Add tooltip for chord quality selection
-        span.title = `Click to select ${root} ${chordQuality} chord. Ctrl+click to choose chord quality.`;
+        span.title = `Click to select ${root} ${chordQuality} chord. Shift+click to choose chord quality.`;
 
         // Add click handler
         span.addEventListener('click', (e) => handleNoteClick(root, e));
@@ -260,8 +260,8 @@ export default function Fretboard({
       
       if (currentMode === 'chords') {
         // Show quality selector for chords
-        if (event && event.ctrlKey) {
-          // Ctrl+click to show quality selector
+        if (event && event.shiftKey) {
+          // Shift+click to show quality selector
           const rect = event.target.getBoundingClientRect();
           setQualitySelectorPosition({
             x: rect.left + rect.width / 2,
@@ -506,7 +506,7 @@ export default function Fretboard({
         }
         
         .chord-note:hover::after {
-          content: 'Ctrl+click for quality';
+          content: 'Shift+click for quality';
           position: absolute;
           bottom: -25px;
           left: 50%;

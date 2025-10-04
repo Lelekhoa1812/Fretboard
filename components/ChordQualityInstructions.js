@@ -52,8 +52,8 @@ export default function ChordQualityInstructions({ isVisible, onClose }) {
           <div className="instruction-step">
             <div className="step-number">2</div>
             <div className="step-content">
-              <strong>Ctrl + Click:</strong> Choose chord quality
-              <div className="step-example">Ctrl+Click "C" → Opens quality selector</div>
+              <strong>Shift + Click:</strong> Choose chord quality
+              <div className="step-example">Shift+Click "C" → Opens quality selector</div>
             </div>
           </div>
 
@@ -129,7 +129,7 @@ export default function ChordQualityInstructions({ isVisible, onClose }) {
         .instructions-close {
           background: none;
           border: none;
-          color: #b7c4d6;
+          color: white;
           font-size: 28px;
           cursor: pointer;
           padding: 5px;
@@ -174,10 +174,11 @@ export default function ChordQualityInstructions({ isVisible, onClose }) {
 
         .step-content {
           flex: 1;
+          color: white;
         }
 
         .step-content strong {
-          color: #00baba;
+          color: white;
           font-size: 16px;
           display: block;
           margin-bottom: 8px;
@@ -188,7 +189,7 @@ export default function ChordQualityInstructions({ isVisible, onClose }) {
           border: 1px solid rgba(0, 186, 186, 0.2);
           border-radius: 8px;
           padding: 8px 12px;
-          color: #b7c4d6;
+          color: white;
           font-size: 14px;
           font-family: 'Courier New', monospace;
           margin-top: 5px;
