@@ -48,6 +48,12 @@ export default function FretboardApp() {
     initializeAnimations();
   }, []);
 
+  // Reset selections when mode changes
+  useEffect(() => {
+    setSelectedChords([]);
+    setSelectedScales([]);
+  }, [currentMode]);
+
   // Initialize animations like the original app
   const initializeAnimations = () => {
     // Add slide-in animation to cards
@@ -439,16 +445,21 @@ export default function FretboardApp() {
         </div>
       )}
 
-      {/* AI Assistant */}
-      <AIAssistant 
-        currentMode={currentMode}
-        selectedChords={selectedChords}
-        selectedScales={selectedScales}
-        onSuggestion={(suggestion) => {
-          // Handle AI suggestions
-          console.log('AI Suggestion:', suggestion);
-        }}
-      />
+      {/* AI Assistant - Only show when main app is visible */}
+      {showMainApp && (
+        <AIAssistant 
+          currentMode={currentMode}
+          selectedChords={selectedChords}
+          selectedScales={selectedScales}
+          instrument={instrument}
+          accidentals={accidentals}
+          onSuggestion={(suggestion) => {
+            // Handle AI suggestions
+            console.log('AI Suggestion:', suggestion);
+            // You can add more sophisticated suggestion handling here
+          }}
+        />
+      )}
     </div>
   );
 }

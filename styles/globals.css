@@ -294,6 +294,16 @@ label {
     color: #00baba;
 }
 
+.note-name-section .chord-note:hover {
+    color: #00baba;
+    background-color: rgba(0, 186, 186, 0.2);
+}
+
+.note-name-section .scale-note:hover {
+    color: #00baba;
+    background-color: rgba(0, 186, 186, 0.2);
+}
+
 /* Controls layout */
 .voicing-controls {
     display: flex;

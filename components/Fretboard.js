@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { 
   notesFlat, 
   notesSharp, 
@@ -9,7 +9,8 @@ import {
   getSelectedScaleMap,
   toPreferredAccidental,
   getNoteIndexByName,
-  getNoteNameByIndex
+  getNoteNameByIndex,
+  resolveRootInMap
 } from '../lib/music-data';
 
 export default function Fretboard({ 
@@ -33,8 +34,8 @@ export default function Fretboard({
   const [hoveredNote, setHoveredNote] = useState(null);
   const [selectedRoot, setSelectedRoot] = useState(null);
 
-  // Get the appropriate note map based on current mode
-  const getNotesForMode = () => {
+  // Memoized note map calculation for performance
+  const notesForMode = useMemo(() => {
     if (currentMode === 'chords') {
       return getSelectedChordMap(chordQuality, accidentals);
     } else if (currentMode === 'scales') {
@@ -48,7 +49,7 @@ export default function Fretboard({
       });
       return map;
     }
-  };
+  }, [currentMode, chordQuality, scaleFamily, accidentals]);
 
   const generateFretboard = () => {
     if (!fretboardRef.current) return;
@@ -109,35 +110,102 @@ export default function Fretboard({
     noteNameSection.innerHTML = '';
 
     const notes = accidentals === 'sharps' ? notesSharp : notesFlat;
-    const notesForMode = getNotesForMode();
 
-    notes.forEach(note => {
-      const span = document.createElement('span');
-      span.textContent = note;
-      span.style.cursor = 'pointer';
-      span.style.padding = '10px';
-      span.style.margin = '5px';
-      span.style.borderRadius = '8px';
-      span.style.transition = 'all 0.3s ease';
-      
-      // Add hover effect
-      span.addEventListener('mouseenter', () => {
-        span.style.backgroundColor = 'rgba(0, 186, 186, 0.2)';
-        span.style.color = '#00baba';
-        handleNoteHover(note, true);
-      });
-      
-      span.addEventListener('mouseleave', () => {
-        span.style.backgroundColor = 'transparent';
-        span.style.color = '#fff';
-        handleNoteHover(note, false);
-      });
+    if (currentMode === 'notes') {
+      // Notes mode - show all note names
+      notes.forEach(noteName => {
+        const span = document.createElement('span');
+        span.textContent = noteName;
+        span.style.cursor = 'pointer';
+        span.style.padding = '10px';
+        span.style.margin = '5px';
+        span.style.borderRadius = '8px';
+        span.style.transition = 'all 0.3s ease';
+        
+        // Add hover effect
+        span.addEventListener('mouseenter', () => {
+          span.style.backgroundColor = 'rgba(0, 186, 186, 0.2)';
+          span.style.color = '#00baba';
+          handleNoteHover(noteName, true);
+        });
+        
+        span.addEventListener('mouseleave', () => {
+          span.style.backgroundColor = 'transparent';
+          span.style.color = '#fff';
+          handleNoteHover(noteName, false);
+        });
 
-      // Add click handler
-      span.addEventListener('click', () => handleNoteClick(note));
-      
-      noteNameSection.appendChild(span);
-    });
+        // Add click handler
+        span.addEventListener('click', () => handleNoteClick(noteName));
+        
+        noteNameSection.appendChild(span);
+      });
+    } else if (currentMode === 'chords') {
+      // Chords mode - show root names with chord-note class
+      const chordMap = getSelectedChordMap(chordQuality, accidentals);
+      notes.forEach(root => {
+        const span = document.createElement('span');
+        span.textContent = root;
+        span.className = 'chord-note';
+        span.style.cursor = 'pointer';
+        span.style.padding = '10px';
+        span.style.margin = '5px';
+        span.style.borderRadius = '8px';
+        span.style.transition = 'all 0.3s ease';
+        
+        // Add hover effect
+        span.addEventListener('mouseenter', () => {
+          span.style.backgroundColor = 'rgba(0, 186, 186, 0.2)';
+          span.style.color = '#00baba';
+          handleNoteHover(root, true);
+        });
+        
+        span.addEventListener('mouseleave', () => {
+          span.style.backgroundColor = 'transparent';
+          span.style.color = '#fff';
+          handleNoteHover(root, false);
+        });
+
+        // Add click handler
+        span.addEventListener('click', () => handleNoteClick(root));
+        
+        noteNameSection.appendChild(span);
+      });
+    } else if (currentMode === 'scales') {
+      // Scales mode - show root names with scale-note class
+      const scaleMap = getSelectedScaleMap(scaleFamily, accidentals);
+      notes.forEach(root => {
+        const resolved = resolveRootInMap(root, scaleMap);
+        if (!resolved) return;
+        
+        const span = document.createElement('span');
+        span.textContent = root;
+        span.className = 'scale-note';
+        span.style.cursor = 'pointer';
+        span.style.padding = '10px';
+        span.style.margin = '5px';
+        span.style.borderRadius = '8px';
+        span.style.transition = 'all 0.3s ease';
+        
+        // Add hover effect
+        span.addEventListener('mouseenter', () => {
+          span.style.backgroundColor = 'rgba(0, 186, 186, 0.2)';
+          span.style.color = '#00baba';
+          handleNoteHover(root, true);
+        });
+        
+        span.addEventListener('mouseleave', () => {
+          span.style.backgroundColor = 'transparent';
+          span.style.color = '#fff';
+          handleNoteHover(root, false);
+        });
+
+        // Add click handler
+        span.addEventListener('click', () => handleNoteClick(root));
+        
+        noteNameSection.appendChild(span);
+      });
+    }
   };
 
   const handleFretClick = (noteName, fret, stringIndex) => {
@@ -203,44 +271,80 @@ export default function Fretboard({
     }
   };
 
-  const highlightNotes = () => {
+  const toggleMultipleNotes = (noteName, opacity) => {
+    if (!fretboardRef.current) return;
+    
+    const frets = fretboardRef.current.querySelectorAll('.note-fret');
+    frets.forEach(fret => {
+      if (fret.getAttribute('data-note') === noteName) {
+        const stringIndex = parseInt(fret.getAttribute('data-string-index'));
+        const fretIndex = parseInt(fret.getAttribute('data-fret-index'));
+        
+        // Apply hand position filtering if enabled
+        if (handPositions) {
+          const handPositionRanges = [
+            { min: 0, max: 4 },
+            { min: 1, max: 5 },
+            { min: 2, max: 6 },
+            { min: 3, max: 7 },
+            { min: 4, max: 8 }
+          ];
+          const range = handPositionRanges[handPositionIndex];
+          if (fretIndex < range.min || fretIndex > range.max) return;
+        }
+        
+        fret.style.setProperty('--noteDotOpacity', opacity);
+      }
+    });
+  };
+
+  const highlightNotes = useCallback(() => {
     if (!fretboardRef.current) return;
 
     const frets = fretboardRef.current.querySelectorAll('.note-fret');
-    const notesForMode = getNotesForMode();
     let notesToHighlight = [];
 
     if (currentMode === 'notes') {
       if (showAllNotes) {
         // Show all notes
         notesToHighlight = accidentals === 'sharps' ? notesSharp : notesFlat;
+        frets.forEach(fret => {
+          const noteName = fret.getAttribute('data-note');
+          const shouldHighlight = notesToHighlight.includes(noteName);
+          fret.style.setProperty('--noteDotOpacity', shouldHighlight ? '1' : '0');
+        });
       } else {
-        notesToHighlight = hoveredNote ? [hoveredNote] : selectedNotes;
+        // Handle individual note highlighting
+        if (hoveredNote) {
+          toggleMultipleNotes(hoveredNote, 1);
+        } else if (selectedNotes.length > 0) {
+          selectedNotes.forEach(note => {
+            toggleMultipleNotes(note, 1);
+          });
+        } else {
+          // Clear all highlights
+          frets.forEach(fret => {
+            fret.style.setProperty('--noteDotOpacity', '0');
+          });
+        }
       }
     } else if (currentMode === 'chords' || currentMode === 'scales') {
-      // For chords and scales, highlight based on hovered root note
+      // Use memoized notesForMode for better performance
       if (hoveredNote && notesForMode[hoveredNote]) {
         notesToHighlight = notesForMode[hoveredNote];
       } else if (selectedRoot && notesForMode[selectedRoot]) {
         notesToHighlight = notesForMode[selectedRoot];
       }
+      
+      frets.forEach(fret => {
+        const noteName = fret.getAttribute('data-note');
+        const shouldHighlight = notesToHighlight.includes(noteName);
+        fret.style.setProperty('--noteDotOpacity', shouldHighlight ? '1' : '0');
+      });
     }
+  }, [currentMode, accidentals, showAllNotes, hoveredNote, selectedNotes, selectedRoot, notesForMode, handPositions, handPositionIndex]);
 
-    frets.forEach(fret => {
-      const noteName = fret.getAttribute('data-note');
-      const shouldHighlight = notesToHighlight.includes(noteName);
-
-      if (shouldHighlight) {
-        fret.style.setProperty('--noteDotOpacity', '1');
-        fret.classList.add('highlighted');
-      } else {
-        fret.style.setProperty('--noteDotOpacity', '0');
-        fret.classList.remove('highlighted');
-      }
-    });
-  };
-
-  // Effects
+  // Effects with optimized dependencies
   useEffect(() => {
     generateFretboard();
   }, [instrument, numberOfFrets, accidentals]);
@@ -251,13 +355,32 @@ export default function Fretboard({
 
   useEffect(() => {
     highlightNotes();
-  }, [selectedNotes, hoveredNote, selectedRoot, currentMode, chordQuality, scaleFamily, accidentals]);
+  }, [highlightNotes]);
 
   // Reset selected root when mode changes
   useEffect(() => {
     setSelectedRoot(null);
     setSelectedNotes([]);
   }, [currentMode, chordQuality, scaleFamily]);
+
+  // Cleanup effect for event listeners
+  useEffect(() => {
+    return () => {
+      // Cleanup any remaining event listeners
+      if (fretboardRef.current) {
+        const frets = fretboardRef.current.querySelectorAll('.note-fret');
+        frets.forEach(fret => {
+          fret.replaceWith(fret.cloneNode(true));
+        });
+      }
+      if (noteNameSectionRef.current) {
+        const spans = noteNameSectionRef.current.querySelectorAll('span');
+        spans.forEach(span => {
+          span.replaceWith(span.cloneNode(true));
+        });
+      }
+    };
+  }, []);
 
   return (
     <>
