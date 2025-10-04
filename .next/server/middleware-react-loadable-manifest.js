@@ -1,0 +1,1 @@
+self.__REACT_LOADABLE_MANIFEST="{\"pages/index.js -> ../components/FretboardApp\":{\"id\":\"pages/index.js -> ../components/FretboardApp\",\"files\":[\"static/chunks/components_FretboardApp_js.js\"]}}"
