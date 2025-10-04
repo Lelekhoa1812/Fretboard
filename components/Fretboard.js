@@ -148,7 +148,7 @@ export default function Fretboard({
         });
 
         // Add click handler
-        span.addEventListener('click', () => handleNoteClick(noteName));
+        span.addEventListener('click', (e) => handleNoteClick(noteName, e));
         
         noteNameSection.appendChild(span);
       });
@@ -179,7 +179,7 @@ export default function Fretboard({
         });
 
         // Add click handler
-        span.addEventListener('click', () => handleNoteClick(root));
+        span.addEventListener('click', (e) => handleNoteClick(root, e));
         
         noteNameSection.appendChild(span);
       });
@@ -213,7 +213,7 @@ export default function Fretboard({
         });
 
         // Add click handler
-        span.addEventListener('click', () => handleNoteClick(root));
+        span.addEventListener('click', (e) => handleNoteClick(root, e));
         
         noteNameSection.appendChild(span);
       });
@@ -239,7 +239,7 @@ export default function Fretboard({
     }
   };
 
-  const handleNoteClick = (noteName) => {
+  const handleNoteClick = (noteName, event) => {
     if (currentMode === 'notes') {
       if (showMultipleNotes) {
         setSelectedNotes(prev => {
@@ -254,9 +254,29 @@ export default function Fretboard({
     } else if (currentMode === 'chords' || currentMode === 'scales') {
       // For chords and scales, set the root note
       setSelectedRoot(noteName);
-      if (onChordSelect && currentMode === 'chords') {
-        onChordSelect(noteName);
+      
+      if (currentMode === 'chords') {
+        // Show quality selector for chords
+        if (event && event.ctrlKey) {
+          // Ctrl+click to show quality selector
+          const rect = event.target.getBoundingClientRect();
+          setQualitySelectorPosition({
+            x: rect.left + rect.width / 2,
+            y: rect.top - 10
+          });
+          setSelectedChordForQuality({
+            root: noteName,
+            quality: chordQuality
+          });
+          setShowQualitySelector(true);
+        } else {
+          // Regular click - select chord with current quality
+          if (onChordSelect) {
+            onChordSelect(noteName);
+          }
+        }
       }
+      
       if (onScaleSelect && currentMode === 'scales') {
         onScaleSelect(noteName);
       }
@@ -281,6 +301,22 @@ export default function Fretboard({
     } else {
       setHoveredNote(null);
     }
+  };
+
+  // Handle chord quality change
+  const handleQualityChange = (quality) => {
+    if (selectedChordForQuality && onChordSelect) {
+      // Update the chord quality and select the chord
+      const chordName = `${selectedChordForQuality.root}${quality.symbol}`;
+      onChordSelect(selectedChordForQuality.root, quality.id);
+    }
+    setShowQualitySelector(false);
+  };
+
+  // Close quality selector
+  const handleCloseQualitySelector = () => {
+    setShowQualitySelector(false);
+    setSelectedChordForQuality(null);
   };
 
   const toggleMultipleNotes = (noteName, opacity) => {
@@ -451,6 +487,15 @@ export default function Fretboard({
     <>
       <div className="fretboard" ref={fretboardRef}></div>
       <div className="note-name-section" ref={noteNameSectionRef}></div>
+      
+      {/* Chord Quality Selector */}
+      <ChordQualitySelector
+        selectedChord={selectedChordForQuality}
+        onQualityChange={handleQualityChange}
+        isVisible={showQualitySelector}
+        position={qualitySelectorPosition}
+        onClose={handleCloseQualitySelector}
+      />
     </>
   );
 }

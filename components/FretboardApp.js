@@ -449,9 +449,10 @@ export default function FretboardApp() {
             onNoteClick={(note, fret, string) => {
               console.log('Note clicked:', note, fret, string);
             }}
-            onChordSelect={(rootNote) => {
-              console.log('Chord selected:', rootNote, chordQuality);
-              setSelectedChords(prev => [...prev, { root: rootNote, quality: chordQuality }]);
+            onChordSelect={(rootNote, quality) => {
+              const selectedQuality = quality || chordQuality;
+              console.log('Chord selected:', rootNote, selectedQuality);
+              setSelectedChords(prev => [...prev, { root: rootNote, quality: selectedQuality }]);
             }}
             onScaleSelect={(rootNote) => {
               console.log('Scale selected:', rootNote, scaleFamily);
