@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import AIAssistant from './AIAssistant';
 import Fretboard from './Fretboard';
+import ChordQualityInstructions from './ChordQualityInstructions';
 
 export default function FretboardApp() {
   const [currentMode, setCurrentMode] = useState('notes');
@@ -460,6 +461,14 @@ export default function FretboardApp() {
             }}
           />
         </div>
+      )}
+
+      {/* Chord Quality Instructions - Show when in chord mode */}
+      {showMainApp && currentMode === 'chords' && (
+        <ChordQualityInstructions 
+          isVisible={true}
+          onClose={() => {}}
+        />
       )}
 
       {/* AI Assistant - Only show when main app is visible */}

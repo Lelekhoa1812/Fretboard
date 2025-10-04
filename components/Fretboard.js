@@ -178,6 +178,9 @@ export default function Fretboard({
           handleNoteHover(root, false);
         });
 
+        // Add tooltip for chord quality selection
+        span.title = `Click to select ${root} ${chordQuality} chord. Ctrl+click to choose chord quality.`;
+
         // Add click handler
         span.addEventListener('click', (e) => handleNoteClick(root, e));
         
@@ -496,6 +499,34 @@ export default function Fretboard({
         position={qualitySelectorPosition}
         onClose={handleCloseQualitySelector}
       />
+
+      <style jsx>{`
+        .chord-note {
+          position: relative;
+        }
+        
+        .chord-note:hover::after {
+          content: 'Ctrl+click for quality';
+          position: absolute;
+          bottom: -25px;
+          left: 50%;
+          transform: translateX(-50%);
+          background: rgba(0, 0, 0, 0.8);
+          color: #00baba;
+          padding: 4px 8px;
+          border-radius: 4px;
+          font-size: 11px;
+          white-space: nowrap;
+          z-index: 1000;
+          pointer-events: none;
+          animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateX(-50%) translateY(-5px); }
+          to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+      `}</style>
     </>
   );
 }
