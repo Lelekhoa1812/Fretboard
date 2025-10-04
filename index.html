@@ -106,7 +106,7 @@
                     </div>
                     <strong>Scales</strong>
                     <p>Choose a family (major/minor, pentatonic, blues, modes) and hover a root to light up scale tones.</p>
-                    <img src="<img decoding="async" width="1200" height="363" src="https://appliedguitartheory.com/wp-content/uploads/2020/07/minor-scale-structure-intervals-fretboard.png" data-src="https://appliedguitartheory.com/wp-content/uploads/2020/07/minor-scale-structure-intervals-fretboard.png" alt="Minor scale whole step half step pattern on guitar fretboard" class="wp-image-4439 lazyloaded" data-jpibfi-post-excerpt="What is the minor scale? What makes it minor vs major? In this lesson we'll break down the natural minor scale and it's qualities and take a look at how it is applied to the fretboard." data-jpibfi-post-url="https://appliedguitartheory.com/lessons/natural-minor-scale/" data-jpibfi-post-title="Minor Scale on Guitar: Patterns, Positions &amp; Theory" data-jpibfi-src="https://appliedguitartheory.com/wp-content/uploads/2020/07/minor-scale-structure-intervals-fretboard.png" data-srcset="https://appliedguitartheory.com/wp-content/uploads/2020/07/minor-scale-structure-intervals-fretboard.png 1200w, https://appliedguitartheory.com/wp-content/uploads/2020/07/minor-scale-structure-intervals-fretboard-600x182.png 600w, https://appliedguitartheory.com/wp-content/uploads/2020/07/minor-scale-structure-intervals-fretboard-300x91.png 300w, https://appliedguitartheory.com/wp-content/uploads/2020/07/minor-scale-structure-intervals-fretboard-1024x310.png 1024w, https://appliedguitartheory.com/wp-content/uploads/2020/07/minor-scale-structure-intervals-fretboard-768x232.png 768w" sizes="(max-width: 1200px) 100vw, 1200px" srcset="https://appliedguitartheory.com/wp-content/uploads/2020/07/minor-scale-structure-intervals-fretboard.png 1200w, https://appliedguitartheory.com/wp-content/uploads/2020/07/minor-scale-structure-intervals-fretboard-600x182.png 600w, https://appliedguitartheory.com/wp-content/uploads/2020/07/minor-scale-structure-intervals-fretboard-300x91.png 300w, https://appliedguitartheory.com/wp-content/uploads/2020/07/minor-scale-structure-intervals-fretboard-1024x310.png 1024w, https://appliedguitartheory.com/wp-content/uploads/2020/07/minor-scale-structure-intervals-fretboard-768x232.png?q=80&w=1200&auto=format&fit=crop" alt="Chord shapes">
+                    <img src="https://appliedguitartheory.com/wp-content/uploads/2020/07/minor-scale-structure-intervals-fretboard.png?q=80&w=1200&auto=format&fit=crop" alt="Scales walkthrough">
                     <div class="card-overlay">
                         <span class="card-action">Master Scales →</span>
                     </div>
@@ -127,11 +127,19 @@
                     </div>
                 </div>
             </div>
-            <button id="start-app">Start Exploring</button>
+            <!-- <button id="start-app">Start Exploring</button> -->
             <div class="scroll-indicator"></div>
         </div>
     </section>
     <div class="settings" id="app-root">
+        <div class="app-header">
+            <button id="back-to-landing" class="back-button">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M19 12H5M12 19L5 12L12 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Back to Landing
+            </button>
+        </div>
         <div class="controls-row">
             <div class="control">
                 <label for="instrument-selector">Selected instrument:</label>
@@ -275,14 +283,11 @@
                 </div>
             </div>
         </div>
+        <!-- Show frame -->
+        <div class="fretboard"></div>
+        <!-- Switch node / main node -->
+        <div class="note-name-section"></div>
 
-    <!-- Show frame -->
-    </div>
-    <div class="fretboard">
-
-    <!-- Switch node / main node -->
-    </div>
-    <div class="note-name-section">
 
     </div>
     <!-- Functionality -->

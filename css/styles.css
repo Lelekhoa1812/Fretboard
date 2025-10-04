@@ -59,14 +59,33 @@ body {
 
 /* Page transition effects */
 .page-transition {
-    opacity: 0;
-    transform: translateY(20px);
+    opacity: 1;
+    transform: translateY(0);
     transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .page-transition.loaded {
     opacity: 1;
     transform: translateY(0);
+}
+
+/* Hide main app initially, show after card click */
+#app-root {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+}
+
+#app-root.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 20px 0;
 }
 .fade-in {
     animation: fadein 300ms ease-out;
@@ -86,14 +105,40 @@ body {
     backdrop-filter: blur(4px);
 }
 
-/* Main app container */
-#app-root {
-    min-height: 100vh;
+.app-header {
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: 20px 0;
+    justify-content: flex-start;
+    margin-bottom: 16px;
 }
+
+.back-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0,186,186,0.1);
+    border: 1px solid rgba(0,186,186,0.3);
+    color: #00baba;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.back-button:hover {
+    background: rgba(0,186,186,0.2);
+    border-color: rgba(0,186,186,0.5);
+    color: #ffffff;
+    transform: translateX(-2px);
+}
+
+.back-button svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Main app container - moved to page transition section above */
 .controls-row {
     display: flex;
     gap: 16px;
@@ -121,6 +166,8 @@ label {
     display: flex;
     flex-direction: column;
     background: #be975b url(../img/wp.jpeg);
+    background-size: cover;
+    background-position: center;
     width: 100%;
     min-width: 0;
     height: calc(var(--fretboard-height) * 1px);
@@ -129,6 +176,8 @@ label {
     overflow-x: auto;
     border-radius: 12px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    opacity: 1;
+    visibility: visible;
 }
 .string {
     width: 100%;

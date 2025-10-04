@@ -423,6 +423,8 @@ const app = {
          this.setupNoteNameSection();
          handlers.setupEventListeners();
          this.initializeAnimations();
+         // Set initial fretboard visibility
+         this.initializeFretboardVisibility();
      }, 1500);
     },
     
@@ -531,16 +533,43 @@ const app = {
      
      // Setup modal functionality
      this.setupModal();
+     
+     // Setup back button functionality
+     this.setupBackButton();
+    },
+    
+    setupBackButton() {
+        const backButton = document.getElementById('back-to-landing');
+        const appRoot = document.getElementById('app-root');
+        const hero = document.getElementById('hero');
+        
+        if (backButton) {
+            backButton.addEventListener('click', () => {
+                // Hide main app
+                if (appRoot) {
+                    appRoot.classList.remove('visible');
+                }
+                
+                // Show hero section
+                if (hero) {
+                    hero.style.display = 'block';
+                    hero.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        }
     },
     
     handleCardClick(feature) {
         const appRoot = document.getElementById('app-root');
+        const hero = document.getElementById('hero');
+        
+        console.log('Card clicked:', feature);
         
         if (feature === 'help') {
             // Open help modal
             this.openModal();
         } else {
-            // Set the search mode and scroll to app
+            // Set the search mode
             if (searchSelector) {
                 searchSelector.value = feature;
                 // Trigger the change event to update the UI
@@ -548,9 +577,17 @@ const app = {
                 searchSelector.dispatchEvent(event);
             }
             
-            // Scroll to the main app
+            // Show the main app and hide hero
             if (appRoot) {
+                console.log('Adding visible class to app-root');
+                appRoot.classList.add('visible');
+                // Scroll to the main app
                 appRoot.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+            
+            // Optionally hide the hero section
+            if (hero) {
+                hero.style.display = 'none';
             }
         }
     },
@@ -595,6 +632,11 @@ const app = {
             modal.classList.remove('active');
             document.body.style.overflow = ''; // Restore scrolling
         }
+    },
+    
+    initializeFretboardVisibility() {
+        // Set initial fretboard dot opacity to make it visible
+        root.style.setProperty('--noteDotOpacity', 0.3);
     },
     setupFretboard() {
         fretboard.innerHTML = '';
@@ -740,7 +782,7 @@ const handlers = {
             root.style.setProperty('--noteDotOpacity', 1);
             app.setupFretboard();
         } else {
-            root.style.setProperty('--noteDotOpacity', 0);
+            root.style.setProperty('--noteDotOpacity', 0.3);
             app.setupFretboard();
         }
     },
