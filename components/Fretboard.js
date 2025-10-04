@@ -57,6 +57,9 @@ export default function Fretboard({
     const fretboard = fretboardRef.current;
     fretboard.innerHTML = '';
 
+    // Set CSS variable for number of strings
+    document.documentElement.style.setProperty('--number-of-strings', tuning.length);
+
     tuning.forEach((openNote, stringIndex) => {
       const stringDiv = document.createElement('div');
       stringDiv.className = 'string';
@@ -70,9 +73,9 @@ export default function Fretboard({
         fretDiv.className = 'note-fret';
         
         // Add fret marks
-        if (singleFretMarkPositions.includes(fret)) {
+        if (stringIndex === 0 && singleFretMarkPositions.includes(fret)) {
           fretDiv.classList.add('single-fretmark');
-        } else if (doubleFretMarkPositions.includes(fret)) {
+        } else if (stringIndex === 0 && doubleFretMarkPositions.includes(fret)) {
           fretDiv.classList.add('double-fretmark');
         }
         
@@ -82,6 +85,8 @@ export default function Fretboard({
         fretDiv.setAttribute('data-note', noteName);
         fretDiv.setAttribute('data-fret', fret);
         fretDiv.setAttribute('data-string', stringIndex);
+        fretDiv.setAttribute('data-string-index', stringIndex + 1);
+        fretDiv.setAttribute('data-fret-index', fret);
         
         // Add click handler
         fretDiv.addEventListener('click', () => handleFretClick(noteName, fret, stringIndex));
@@ -206,7 +211,12 @@ export default function Fretboard({
     let notesToHighlight = [];
 
     if (currentMode === 'notes') {
-      notesToHighlight = hoveredNote ? [hoveredNote] : selectedNotes;
+      if (showAllNotes) {
+        // Show all notes
+        notesToHighlight = accidentals === 'sharps' ? notesSharp : notesFlat;
+      } else {
+        notesToHighlight = hoveredNote ? [hoveredNote] : selectedNotes;
+      }
     } else if (currentMode === 'chords' || currentMode === 'scales') {
       // For chords and scales, highlight based on hovered root note
       if (hoveredNote && notesForMode[hoveredNote]) {

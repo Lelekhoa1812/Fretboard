@@ -172,7 +172,7 @@ label {
 .fretboard {
     display: flex;
     flex-direction: column;
-    background: #be975b url(/img/wp.jpeg);
+    background: #be975b url('/img/wp.jpeg');
     background-size: cover;
     background-position: center;
     width: 100%;
