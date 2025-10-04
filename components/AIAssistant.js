@@ -141,6 +141,92 @@ export default function AIAssistant({
     // Update UI with technique feedback
   };
 
+  // Start audio analysis
+  const startAudioAnalysis = async () => {
+    try {
+      setIsAnalyzing(true);
+      audioAnalyzer.startAnalysis();
+      await sendMessage('🎵 Started real-time audio analysis! Play your guitar and I\'ll provide feedback on your playing.');
+    } catch (error) {
+      console.error('Failed to start audio analysis:', error);
+      await sendMessage('Sorry, I couldn\'t start audio analysis. Please check your microphone permissions.');
+    }
+  };
+
+  // Stop audio analysis
+  const stopAudioAnalysis = () => {
+    audioAnalyzer.stopAnalysis();
+    setIsAnalyzing(false);
+    sendMessage('🎵 Stopped audio analysis. Great practice session!');
+  };
+
+  // Generate backing track
+  const generateBackingTrack = async () => {
+    try {
+      if (selectedChords.length === 0) {
+        await sendMessage('Please select some chords first to generate a backing track!');
+        return;
+      }
+
+      const chordNames = selectedChords.map(c => `${c.root}${c.quality}`);
+      await sendMessage(`🎶 Generating a backing track for: ${chordNames.join(' - ')}...`);
+      
+      const backingTrack = await musicGenerator.generateBackingTrack(chordNames, {
+        style: 'pop',
+        tempo: 120,
+        duration: 60
+      });
+
+      if (backingTrack) {
+        await sendMessage(`🎶 Backing track generated! I've created a ${backingTrack.options.style} track at ${backingTrack.options.tempo} BPM. You can now play along with it!`);
+      }
+    } catch (error) {
+      console.error('Failed to generate backing track:', error);
+      await sendMessage('Sorry, I couldn\'t generate a backing track right now. Please try again later.');
+    }
+  };
+
+  // Show progress
+  const showProgress = async () => {
+    try {
+      const progress = progressTracker.getProgressSummary(userId);
+      const insights = progressTracker.getUserInsights(userId);
+      
+      if (progress) {
+        let progressMessage = `📊 **Your Progress Summary:**\n\n`;
+        progressMessage += `🎸 **Practice Stats:**\n`;
+        progressMessage += `• Total Practice Time: ${Math.round(progress.totalPracticeTime)} minutes\n`;
+        progressMessage += `• Sessions Completed: ${progress.sessionsCompleted}\n`;
+        progressMessage += `• Current Streak: ${progress.currentStreak} days\n`;
+        progressMessage += `• Longest Streak: ${progress.longestStreak} days\n\n`;
+        
+        progressMessage += `🎵 **Learning Progress:**\n`;
+        progressMessage += `• Chords Learned: ${progress.chordsLearned}\n`;
+        progressMessage += `• Scales Learned: ${progress.scalesLearned}\n`;
+        progressMessage += `• Songs Completed: ${progress.songsCompleted}\n\n`;
+        
+        progressMessage += `⭐ **Performance:**\n`;
+        progressMessage += `• Average Accuracy: ${Math.round(progress.averageAccuracy * 100)}%\n`;
+        progressMessage += `• Average Speed: ${Math.round(progress.averageSpeed * 100)}%\n`;
+        progressMessage += `• Average Technique: ${Math.round(progress.averageTechnique * 100)}%\n\n`;
+        
+        progressMessage += `🏆 **Achievements:**\n`;
+        progressMessage += `• Milestones: ${progress.milestones}\n`;
+
+        if (insights && insights.insights) {
+          progressMessage += `\n💡 **AI Insights:**\n${insights.insights}`;
+        }
+
+        await sendMessage(progressMessage);
+      } else {
+        await sendMessage('📊 No progress data available yet. Start practicing to see your progress!');
+      }
+    } catch (error) {
+      console.error('Failed to show progress:', error);
+      await sendMessage('Sorry, I couldn\'t retrieve your progress data right now.');
+    }
+  };
+
   const sendMessage = async (message) => {
     if (!message.trim()) return;
 
@@ -247,6 +333,9 @@ export default function AIAssistant({
           model: result.model
         };
         setMessages(prev => [...prev, aiMessage]);
+
+        // Track progress and update gamification
+        trackUserActivity(message, result.data);
       } else {
         console.error('🤖 AI Assistant: API returned success=false:', result);
         throw new Error(result.message || 'Analysis failed');
@@ -272,6 +361,70 @@ export default function AIAssistant({
     if (input.trim() && !loading) {
       sendMessage(input);
       setInput('');
+    }
+  };
+
+  // Track user activity for progress and gamification
+  const trackUserActivity = async (message, response) => {
+    try {
+      // Extract activity data from message and response
+      const activityData = {
+        duration: 5, // Default session duration
+        context: 'ai_interaction',
+        timestamp: new Date()
+      };
+
+      // Check if message contains learning activities
+      if (message.toLowerCase().includes('chord')) {
+        activityData.chordsLearned = selectedChords.map(c => `${c.root}${c.quality}`);
+      }
+
+      if (message.toLowerCase().includes('scale')) {
+        activityData.scalesLearned = selectedScales.map(s => `${s.root} ${s.family}`);
+      }
+
+      if (message.toLowerCase().includes('practice')) {
+        activityData.duration = 30; // Practice session
+      }
+
+      // Update progress tracker
+      progressTracker.trackActivity(userId, activityData);
+
+      // Update gamification
+      const gamificationResult = gamificationEngine.updateUserStats(userId, activityData);
+      
+      if (gamificationResult.newAchievements.length > 0) {
+        const achievementMessage = `🏆 **New Achievement${gamificationResult.newAchievements.length > 1 ? 's' : ''} Unlocked!**\n\n`;
+        const achievementsText = gamificationResult.newAchievements
+          .map(achievement => `• ${achievement.icon} **${achievement.name}** - ${achievement.description} (+${achievement.points} points)`)
+          .join('\n');
+        
+        await sendMessage(achievementMessage + achievementsText);
+      }
+
+      if (gamificationResult.newBadges.length > 0) {
+        const badgeMessage = `🎖️ **New Badge${gamificationResult.newBadges.length > 1 ? 's' : ''} Earned!**\n\n`;
+        const badgesText = gamificationResult.newBadges
+          .map(badge => `• ${badge.icon} **${badge.name}** - ${badge.description}`)
+          .join('\n');
+        
+        await sendMessage(badgeMessage + badgesText);
+      }
+
+      // Update user stats
+      setUserStats(gamificationResult.updatedStats);
+
+      // Generate AI encouragement
+      const encouragement = await gamificationEngine.generateEncouragement(userId, activityData);
+      if (encouragement && encouragement !== "Keep up the great work!") {
+        // Only show encouragement occasionally to avoid spam
+        if (Math.random() < 0.3) {
+          await sendMessage(encouragement);
+        }
+      }
+
+    } catch (error) {
+      console.error('Failed to track user activity:', error);
     }
   };
 
@@ -340,7 +493,18 @@ export default function AIAssistant({
       {isOpen && (
         <div className="ai-assistant-panel">
           <div className="ai-assistant-header">
-            <h3>AI Music Theory Assistant</h3>
+            <div className="ai-header-content">
+              <h3>AI Music Theory Assistant</h3>
+              <div className="ai-status-indicators">
+                {isListening && <span className="status-indicator listening">🎤 Listening</span>}
+                {isAnalyzing && <span className="status-indicator analyzing">🎵 Analyzing</span>}
+                {userStats && (
+                  <span className="status-indicator stats">
+                    Level {userStats.level} • {userStats.totalPoints} pts
+                  </span>
+                )}
+              </div>
+            </div>
             <button 
               className="ai-assistant-close"
               onClick={() => setIsOpen(false)}
@@ -501,10 +665,57 @@ export default function AIAssistant({
           border-bottom: 1px solid rgba(255,255,255,0.1);
         }
 
+        .ai-header-content {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+
         .ai-assistant-header h3 {
           color: #00baba;
           margin: 0;
           font-size: 18px;
+        }
+
+        .ai-status-indicators {
+          display: flex;
+          gap: 8px;
+          flex-wrap: wrap;
+        }
+
+        .status-indicator {
+          background: rgba(0,186,186,0.1);
+          border: 1px solid rgba(0,186,186,0.3);
+          color: #00baba;
+          padding: 2px 8px;
+          border-radius: 10px;
+          font-size: 11px;
+          font-weight: 500;
+        }
+
+        .status-indicator.listening {
+          background: rgba(255,193,7,0.1);
+          border-color: rgba(255,193,7,0.3);
+          color: #ffc107;
+          animation: pulse 2s infinite;
+        }
+
+        .status-indicator.analyzing {
+          background: rgba(40,167,69,0.1);
+          border-color: rgba(40,167,69,0.3);
+          color: #28a745;
+          animation: pulse 2s infinite;
+        }
+
+        .status-indicator.stats {
+          background: rgba(108,117,125,0.1);
+          border-color: rgba(108,117,125,0.3);
+          color: #6c757d;
+        }
+
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.7; }
         }
 
         .ai-assistant-close {
