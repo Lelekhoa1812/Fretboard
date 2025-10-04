@@ -34,6 +34,8 @@ export default function AIAssistant({
     setLoading(true);
 
     try {
+      console.log('🤖 AI Assistant: Starting analysis...', { message, selectedChords, selectedScales, currentMode });
+      
       // Determine analysis type based on context
       let analysisType = 'ask-question';
       let data = { question: message };
@@ -53,6 +55,8 @@ export default function AIAssistant({
         };
       }
 
+      console.log('🤖 AI Assistant: Analysis type determined:', { analysisType, data });
+
       const response = await fetch('/api/music-analysis', {
         method: 'POST',
         headers: {
@@ -65,7 +69,16 @@ export default function AIAssistant({
         }),
       });
 
+      console.log('🤖 AI Assistant: API response status:', response.status);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('🤖 AI Assistant: API error response:', errorText);
+        throw new Error(`API request failed with status ${response.status}: ${errorText}`);
+      }
+
       const result = await response.json();
+      console.log('🤖 AI Assistant: API result:', result);
 
       if (result.success) {
         const aiMessage = {
@@ -76,13 +89,16 @@ export default function AIAssistant({
         };
         setMessages(prev => [...prev, aiMessage]);
       } else {
+        console.error('🤖 AI Assistant: API returned success=false:', result);
         throw new Error(result.message || 'Analysis failed');
       }
     } catch (error) {
-      console.error('AI Assistant Error:', error);
+      console.error('🤖 AI Assistant Error:', error);
+      console.error('🤖 AI Assistant Error Stack:', error.stack);
+      
       const errorMessage = {
         role: 'assistant',
-        content: 'Sorry, I encountered an error. Please try again.',
+        content: `Sorry, I encountered an error: ${error.message}. Please check the console for more details.`,
         timestamp: new Date().toISOString(),
         isError: true
       };

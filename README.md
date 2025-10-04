@@ -34,4 +34,5 @@ Interactive fretboard explorer for guitar, bass (4/5), and ukulele. Visualize no
 
 ## Demo
 
-Live: https://lelekhoa1812.github.io/Fretboard/legacy/
+[V1.0](https://lelekhoa1812.github.io/Fretboard/legacy/)  
+[V2.0](https://fretboard-ten.vercel.app/)
