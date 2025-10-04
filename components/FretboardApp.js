@@ -33,6 +33,9 @@ export default function FretboardApp() {
 
   // Initialize app
   useEffect(() => {
+    // Only run on client side
+    if (typeof window === 'undefined') return;
+    
     // Show loading screen initially
     const loadingScreen = document.getElementById('loading-screen');
     if (loadingScreen) {
@@ -56,6 +59,9 @@ export default function FretboardApp() {
 
   // Initialize animations like the original app
   const initializeAnimations = () => {
+    // Only run on client side
+    if (typeof window === 'undefined') return;
+    
     // Add slide-in animation to cards
     const cards = document.querySelectorAll('.card');
     cards.forEach((card, index) => {

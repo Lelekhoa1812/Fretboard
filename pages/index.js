@@ -5,12 +5,30 @@ import dynamic from 'next/dynamic';
 // Dynamically import the main app to avoid SSR issues
 const FretboardApp = dynamic(() => import('../components/FretboardApp'), {
   ssr: false,
-  loading: () => <div className="loading-screen">
-    <div className="loading-spinner"></div>
-  </div>
+  loading: () => (
+    <div className="loading-screen" id="loading-screen">
+      <div className="loading-spinner"></div>
+      <p style={{ color: '#00baba', marginTop: '20px' }}>Loading Fretboard App...</p>
+    </div>
+  )
 });
 
 export default function Home() {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) {
+    return (
+      <div className="loading-screen" id="loading-screen">
+        <div className="loading-spinner"></div>
+        <p style={{ color: '#00baba', marginTop: '20px' }}>Initializing...</p>
+      </div>
+    );
+  }
+
   return (
     <>
       <Head>
