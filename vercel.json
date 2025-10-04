@@ -4,18 +4,6 @@
       "maxDuration": 30
     }
   },
-  "env": {
-    "NVIDIA_API_1": "NVIDIA_API_1",
-    "NVIDIA_API_2": "NVIDIA_API_2", 
-    "NVIDIA_API_3": "NVIDIA_API_3",
-    "NVIDIA_API_4": "NVIDIA_API_4",
-    "NVIDIA_API_5": "NVIDIA_API_5",
-    "NVIDIA_API_6": "NVIDIA_API_6",
-    "NVIDIA_SMALL": "NVIDIA_SMALL",
-    "NVIDIA_MEDIUM": "NVIDIA_MEDIUM",
-    "NVIDIA_LARGE": "NVIDIA_LARGE",
-    "NVIDIA_RERANK": "NVIDIA_RERANK"
-  },
   "build": {
     "env": {
       "NODE_ENV": "production"
