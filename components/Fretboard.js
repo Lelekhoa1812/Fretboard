@@ -53,7 +53,6 @@ export default function Fretboard({
 
   const generateFretboard = () => {
     if (!fretboardRef.current) {
-      console.log('Fretboard ref not available');
       return;
     }
 
@@ -61,18 +60,13 @@ export default function Fretboard({
     const fretboard = fretboardRef.current;
     fretboard.innerHTML = '';
 
-    console.log('Generating fretboard for instrument:', instrument, 'tuning:', tuning);
 
     // Set CSS variable for number of strings
     document.documentElement.style.setProperty('--number-of-strings', tuning.length);
     
     // Set initial note dot opacity to make fretboard visible
-    document.documentElement.style.setProperty('--noteDotOpacity', '0.3');
+    document.documentElement.style.setProperty('--noteDotOpacity', '0.1');
     
-    console.log('CSS variables set:', {
-      numberOfStrings: document.documentElement.style.getPropertyValue('--number-of-strings'),
-      noteDotOpacity: document.documentElement.style.getPropertyValue('--noteDotOpacity')
-    });
 
     tuning.forEach((openNote, stringIndex) => {
       const stringDiv = document.createElement('div');
@@ -115,8 +109,6 @@ export default function Fretboard({
       fretboard.appendChild(stringDiv);
     });
     
-    console.log('Fretboard generated with', fretboard.children.length, 'strings');
-    console.log('Fretboard element:', fretboard);
   };
 
   const generateNoteNames = () => {
@@ -314,6 +306,42 @@ export default function Fretboard({
     });
   };
 
+  const highlightSingleNote = (noteName) => {
+    if (!fretboardRef.current) return;
+    
+    const frets = fretboardRef.current.querySelectorAll('.note-fret');
+    frets.forEach(fret => {
+      if (fret.getAttribute('data-note') === noteName) {
+        const stringIndex = parseInt(fret.getAttribute('data-string-index'));
+        const fretIndex = parseInt(fret.getAttribute('data-fret-index'));
+        
+        // Apply hand position filtering if enabled
+        if (handPositions) {
+          const handPositionRanges = [
+            { min: 0, max: 4 },
+            { min: 1, max: 5 },
+            { min: 2, max: 6 },
+            { min: 3, max: 7 },
+            { min: 4, max: 8 }
+          ];
+          const range = handPositionRanges[handPositionIndex];
+          if (fretIndex < range.min || fretIndex > range.max) return;
+        }
+        
+        fret.style.setProperty('--noteDotOpacity', '1');
+      }
+    });
+  };
+
+  const clearAllHighlights = () => {
+    if (!fretboardRef.current) return;
+    
+    const frets = fretboardRef.current.querySelectorAll('.note-fret');
+    frets.forEach(fret => {
+      fret.style.setProperty('--noteDotOpacity', '0.1');
+    });
+  };
+
   const highlightNotes = useCallback(() => {
     if (!fretboardRef.current) return;
 
@@ -327,24 +355,32 @@ export default function Fretboard({
         frets.forEach(fret => {
           const noteName = fret.getAttribute('data-note');
           const shouldHighlight = notesToHighlight.includes(noteName);
-          fret.style.setProperty('--noteDotOpacity', shouldHighlight ? '1' : '0.3');
+          fret.style.setProperty('--noteDotOpacity', shouldHighlight ? '1' : '0.1');
         });
       } else {
+        // First clear all highlights
+        clearAllHighlights();
+        
         // Handle individual note highlighting
         if (hoveredNote) {
-          toggleMultipleNotes(hoveredNote, 1);
+          // Only highlight on hover if showMultipleNotes is enabled
+          if (showMultipleNotes) {
+            toggleMultipleNotes(hoveredNote, 1);
+          } else {
+            // For single note mode, just highlight the hovered note without adding to selection
+            highlightSingleNote(hoveredNote);
+          }
         } else if (selectedNotes.length > 0) {
+          // Show selected notes
           selectedNotes.forEach(note => {
             toggleMultipleNotes(note, 1);
-          });
-        } else {
-          // Clear all highlights but keep base visibility
-          frets.forEach(fret => {
-            fret.style.setProperty('--noteDotOpacity', '0.3');
           });
         }
       }
     } else if (currentMode === 'chords' || currentMode === 'scales') {
+      // First clear all highlights
+      clearAllHighlights();
+      
       // Use memoized notesForMode for better performance
       if (hoveredNote && notesForMode[hoveredNote]) {
         notesToHighlight = notesForMode[hoveredNote];
@@ -355,14 +391,13 @@ export default function Fretboard({
       frets.forEach(fret => {
         const noteName = fret.getAttribute('data-note');
         const shouldHighlight = notesToHighlight.includes(noteName);
-        fret.style.setProperty('--noteDotOpacity', shouldHighlight ? '1' : '0.3');
+        fret.style.setProperty('--noteDotOpacity', shouldHighlight ? '1' : '0.1');
       });
     }
-  }, [currentMode, accidentals, showAllNotes, hoveredNote, selectedNotes, selectedRoot, notesForMode, handPositions, handPositionIndex]);
+  }, [currentMode, accidentals, showAllNotes, hoveredNote, selectedNotes, selectedRoot, notesForMode, handPositions, handPositionIndex, showMultipleNotes]);
 
   // Initial mount effect
   useEffect(() => {
-    console.log('Component mounted, generating initial fretboard...');
     setTimeout(() => {
       generateFretboard();
     }, 100);
@@ -370,8 +405,6 @@ export default function Fretboard({
 
   // Effects with optimized dependencies
   useEffect(() => {
-    console.log('useEffect triggered for fretboard generation:', { instrument, numberOfFrets, accidentals });
-    // Add a small delay to ensure the component is fully mounted
     setTimeout(() => {
       generateFretboard();
     }, 100);

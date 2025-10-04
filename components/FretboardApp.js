@@ -22,14 +22,11 @@ export default function FretboardApp() {
 
   // Card click handler
   const handleCardClick = (feature) => {
-    console.log('Card clicked:', feature);
     if (feature === 'help') {
       setShowHelpModal(true);
     } else {
       // Set the search mode and show main app
-      console.log('Setting current mode to:', feature);
       setCurrentMode(feature);
-      console.log('Setting showMainApp to true');
       setShowMainApp(true);
     }
   };
@@ -234,7 +231,6 @@ export default function FretboardApp() {
       {/* Main App */}
       {showMainApp && (
         <div className="settings visible" id="app-root">
-          {console.log('Rendering main app with showMainApp:', showMainApp)}
           <div className="app-header">
             <div className="header-logo">
               <img src="/logo.svg" alt="Fretboard Lookup Logo" className="header-logo-img" />
