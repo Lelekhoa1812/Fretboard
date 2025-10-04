@@ -4,37 +4,83 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="./styles.css">
+    <link rel="stylesheet" href="./css/styles.css">
     <title>Fretboard Lookup</title>
 </head>
 <body>
-    <section id="hero">
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loading-screen">
+        <div class="loading-spinner"></div>
+    </div>
+    
+    <section id="hero" class="page-transition">
         <div class="hero-inner">
             <h1>Fretboard Lookup</h1>
             <p class="lead" id="hero-typed" data-text="Visualize notes, chords, and scales on guitar, bass, and ukulele. Choose a mode, hover a root, see every position instantly."> </p>
             <div class="hero-grid">
-                <div class="card slide-in">
+                <div class="card slide-in" data-feature="notes">
+                    <div class="card-icon">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 3V21M8 7L12 3L16 7M8 17L12 21L16 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </div>
                     <strong>Notes</strong>
                     <p>Hover any note name to light up all fret positions. Toggle multiple to compare.</p>
                     <img src="https://images.unsplash.com/photo-1510915361894-db8b60106cb1?q=80&w=1200&auto=format&fit=crop" alt="Guitar neck">
+                    <div class="card-overlay">
+                        <span class="card-action">Explore Notes →</span>
+                    </div>
                 </div>
-                <div class="card slide-in">
+                <div class="card slide-in" data-feature="chords">
+                    <div class="card-icon">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 12L9 6L15 12L21 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M3 18L9 12L15 18L21 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="6" cy="9" r="2" fill="currentColor"/>
+                            <circle cx="12" cy="15" r="2" fill="currentColor"/>
+                            <circle cx="18" cy="9" r="2" fill="currentColor"/>
+                        </svg>
+                    </div>
                     <strong>Chords</strong>
                     <p>Pick a chord quality, hover a root to see chord tones and try Hand Position presets.</p>
                     <img src="https://artiumacademy.mo.cloudinary.net/v1n/blogs/how-to-read-guitar-chord-charts-a-simple-guide.webp?q=80&w=1200&auto=format&fit=crop" alt="Chord shapes">
+                    <div class="card-overlay">
+                        <span class="card-action">Learn Chords →</span>
+                    </div>
                 </div>
-                <div class="card slide-in">
+                <div class="card slide-in" data-feature="scales">
+                    <div class="card-icon">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 3L21 21M9 9L15 15M9 15L15 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M12 2L14 8L20 8L15 12L17 18L12 14L7 18L9 12L4 8L10 8L12 2Z" fill="currentColor"/>
+                        </svg>
+                    </div>
                     <strong>Scales</strong>
                     <p>Choose a family (major/minor, pentatonic, blues, modes) and hover a root to light up scale tones.</p>
                     <img src="https://nationalguitaracademy.com/wp-content/uploads/2020/03/4-guitar-scales-charts.jpg?q=80&w=1400&auto=format&fit=crop" alt="Scales walkthrough">
+                    <div class="card-overlay">
+                        <span class="card-action">Master Scales →</span>
+                    </div>
                 </div>
-                <div class="card slide-in">
-                    <strong>Help</strong>
+                <div class="card slide-in" data-feature="help">
+                    <div class="card-icon">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                            <path d="M9.09 9C9.3251 8.33167 9.78915 7.76811 10.4 7.40913C11.0108 7.05016 11.7289 6.91894 12.4272 7.03871C13.1255 7.15849 13.7588 7.52152 14.2151 8.06353C14.6713 8.60553 14.9211 9.29152 14.92 10C14.92 12 11.92 13 11.92 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12 17H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <strong>Controls</strong>
                     <p>Use the controls below to switch mode, root, and qualities. Hand Position shows 5 fret windows.</p>
                     <img src="https://images.unsplash.com/photo-1511379938547-c1f69419868d?q=80&w=1200&auto=format&fit=crop" alt="Getting started">
+                    <div class="card-overlay">
+                        <span class="card-action">Get Started →</span>
+                    </div>
                 </div>
             </div>
             <button id="start-app">Start Exploring</button>
+            <div class="scroll-indicator"></div>
         </div>
     </section>
     <div class="settings" id="app-root">
@@ -192,6 +238,6 @@
 
     </div>
     <!-- Functionality -->
-    <script src="./app.js"></script>
+    <script src="./js/app.js"></script>
 </body>
 </html>

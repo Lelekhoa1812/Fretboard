@@ -412,10 +412,44 @@ let maxFret = 24;
 
 const app = {
     init() {
-     this.setupFretboard();
-     this.setupinstrumentSelector();
-     this.setupNoteNameSection();
-     handlers.setupEventListeners();
+     // Show loading screen initially
+     this.showLoadingScreen();
+     
+     // Initialize app after a short delay to show loading
+     setTimeout(() => {
+         this.hideLoadingScreen();
+         this.setupFretboard();
+         this.setupinstrumentSelector();
+         this.setupNoteNameSection();
+         handlers.setupEventListeners();
+         this.initializeAnimations();
+     }, 1500);
+    },
+    
+    showLoadingScreen() {
+        const loadingScreen = document.getElementById('loading-screen');
+        if (loadingScreen) {
+            loadingScreen.style.display = 'flex';
+        }
+    },
+    
+    hideLoadingScreen() {
+        const loadingScreen = document.getElementById('loading-screen');
+        const hero = document.getElementById('hero');
+        
+        if (loadingScreen) {
+            loadingScreen.classList.add('fade-out');
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+            }, 500);
+        }
+        
+        if (hero) {
+            hero.classList.add('loaded');
+        }
+    },
+    
+    initializeAnimations() {
      // Smooth scroll from hero to app controls
      const cta = document.getElementById('start-app');
      const appRoot = document.getElementById('app-root');
@@ -424,25 +458,72 @@ const app = {
              appRoot.scrollIntoView({ behavior: 'smooth', block: 'start' });
          });
      }
-     // Stagger slide-in cards
+     
+     // Enhanced stagger slide-in cards with intersection observer
      const cards = document.querySelectorAll('#hero .card');
      let delay = 0;
-     cards.forEach((c) => {
-         setTimeout(() => c.classList.add('visible'), delay);
-         delay += 180;
+     cards.forEach((c, index) => {
+         // Add staggered delay based on position
+         setTimeout(() => {
+             c.classList.add('visible');
+             // Add a subtle bounce effect
+             setTimeout(() => {
+                 c.style.transform = 'translateY(-2px) scale(1.01)';
+                 setTimeout(() => {
+                     c.style.transform = 'translateY(0) scale(1)';
+                 }, 150);
+             }, 200);
+         }, delay);
+         delay += 200;
      });
-     // Typing effect for lead paragraph
+     
+     // Enhanced typing effect for lead paragraph
      const typed = document.getElementById('hero-typed');
      if (typed) {
          const text = typed.getAttribute('data-text') || '';
          typed.textContent = '';
          let i = 0;
-         const speed = 14;
+         const speed = 20;
          const timer = setInterval(() => {
              typed.textContent = text.slice(0, i++);
-             if (i > text.length) clearInterval(timer);
+             if (i > text.length) {
+                 clearInterval(timer);
+                 // Add a subtle pulse effect when typing is complete
+                 typed.style.animation = 'textPulse 2s ease-in-out infinite';
+             }
          }, speed);
      }
+     
+     // Add card click interactions
+     cards.forEach((card, index) => {
+         card.addEventListener('click', () => {
+             // Add ripple effect
+             const ripple = document.createElement('div');
+             ripple.style.cssText = `
+                 position: absolute;
+                 border-radius: 50%;
+                 background: rgba(255,255,255,0.3);
+                 transform: scale(0);
+                 animation: ripple 0.6s linear;
+                 pointer-events: none;
+                 top: 50%;
+                 left: 50%;
+                 width: 20px;
+                 height: 20px;
+                 margin-left: -10px;
+                 margin-top: -10px;
+             `;
+             card.style.position = 'relative';
+             card.appendChild(ripple);
+             
+             setTimeout(() => {
+                 ripple.remove();
+             }, 600);
+         });
+     });
+     
+     // Add smooth scroll behavior for better UX
+     document.documentElement.style.scrollBehavior = 'smooth';
     },
     setupFretboard() {
         fretboard.innerHTML = '';
