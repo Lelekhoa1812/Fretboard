@@ -1,9 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
 
 export default function AIAssistant({ 
   currentMode, 
   selectedChords = [], 
   selectedScales = [],
+  instrument = 'Guitar',
+  accidentals = 'flats',
   onSuggestion 
 }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -36,23 +39,58 @@ export default function AIAssistant({
     try {
       console.log('🤖 AI Assistant: Starting analysis...', { message, selectedChords, selectedScales, currentMode });
       
-      // Determine analysis type based on context
-      let analysisType = 'ask-question';
-      let data = { question: message };
+      // Build rich context for the AI
+      const context = {
+        instrument,
+        accidentals,
+        currentMode,
+        selectedChords: selectedChords.map(chord => `${chord.root}${chord.quality}`),
+        selectedScales: selectedScales.map(scale => `${scale.root} ${scale.family}`),
+        fretboardState: {
+          hasChords: selectedChords.length > 0,
+          hasScales: selectedScales.length > 0,
+          chordCount: selectedChords.length,
+          scaleCount: selectedScales.length
+        }
+      };
 
-      if (selectedChords.length > 0 && message.toLowerCase().includes('chord')) {
+      // Determine analysis type based on context and message content
+      let analysisType = 'ask-question';
+      let data = { 
+        question: message,
+        context: `You are helping a user with a ${instrument} fretboard in ${currentMode} mode. ` +
+                `Current selections: ${selectedChords.length} chords, ${selectedScales.length} scales. ` +
+                `Instrument: ${instrument}, Accidentals: ${accidentals}. ` +
+                `Selected chords: ${context.selectedChords.join(', ')}. ` +
+                `Selected scales: ${context.selectedScales.join(', ')}.`
+      };
+
+      // Enhanced analysis type detection
+      if (selectedChords.length > 0 && (message.toLowerCase().includes('chord') || message.toLowerCase().includes('progression'))) {
         analysisType = 'chord-progression';
-        data = { chords: selectedChords };
+        data = { 
+          chords: context.selectedChords,
+          context: data.context
+        };
       } else if (selectedScales.length > 0 && message.toLowerCase().includes('scale')) {
         analysisType = 'scale-analysis';
-        data = { scale: selectedScales[0], key: 'C' };
+        data = { 
+          scale: selectedScales[0].family, 
+          key: selectedScales[0].root,
+          context: data.context
+        };
       } else if (message.toLowerCase().includes('practice')) {
         analysisType = 'practice-plan';
         data = { 
           skillLevel: 'intermediate', 
           timeAvailable: 30, 
-          focusArea: currentMode 
+          focusArea: currentMode,
+          context: data.context
         };
+      } else if (message.toLowerCase().includes('select') || message.toLowerCase().includes('chord') || message.toLowerCase().includes('help')) {
+        // For general questions about selecting chords or getting help
+        analysisType = 'ask-question';
+        data.context += ' The user is asking for guidance on chord selection and fretboard interaction.';
       }
 
       console.log('🤖 AI Assistant: Analysis type determined:', { analysisType, data });
@@ -197,7 +235,30 @@ export default function AIAssistant({
             {messages.map((message, index) => (
               <div key={index} className={`ai-message ${message.role}`}>
                 <div className="ai-message-content">
-                  {message.content}
+                  {message.role === 'assistant' ? (
+                    <ReactMarkdown 
+                      components={{
+                        h1: ({children}) => <h1 className="markdown-h1">{children}</h1>,
+                        h2: ({children}) => <h2 className="markdown-h2">{children}</h2>,
+                        h3: ({children}) => <h3 className="markdown-h3">{children}</h3>,
+                        h4: ({children}) => <h4 className="markdown-h4">{children}</h4>,
+                        p: ({children}) => <p className="markdown-p">{children}</p>,
+                        ul: ({children}) => <ul className="markdown-ul">{children}</ul>,
+                        ol: ({children}) => <ol className="markdown-ol">{children}</ol>,
+                        li: ({children}) => <li className="markdown-li">{children}</li>,
+                        strong: ({children}) => <strong className="markdown-strong">{children}</strong>,
+                        em: ({children}) => <em className="markdown-em">{children}</em>,
+                        code: ({children}) => <code className="markdown-code">{children}</code>,
+                        blockquote: ({children}) => <blockquote className="markdown-blockquote">{children}</blockquote>,
+                        hr: () => <hr className="markdown-hr" />,
+                        a: ({href, children}) => <a href={href} className="markdown-link" target="_blank" rel="noopener noreferrer">{children}</a>
+                      }}
+                    >
+                      {message.content}
+                    </ReactMarkdown>
+                  ) : (
+                    message.content
+                  )}
                 </div>
                 <div className="ai-message-meta">
                   {message.timestamp && new Date(message.timestamp).toLocaleTimeString()}
@@ -396,6 +457,102 @@ export default function AIAssistant({
           font-size: 14px;
           line-height: 1.5;
           max-width: 85%;
+        }
+
+        /* Markdown Styling */
+        .markdown-h1 {
+          color: #00baba;
+          font-size: 20px;
+          font-weight: bold;
+          margin: 15px 0 10px 0;
+          border-bottom: 2px solid rgba(0,186,186,0.3);
+          padding-bottom: 5px;
+        }
+
+        .markdown-h2 {
+          color: #00d4d4;
+          font-size: 18px;
+          font-weight: bold;
+          margin: 12px 0 8px 0;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .markdown-h3 {
+          color: #4dd0e1;
+          font-size: 16px;
+          font-weight: 600;
+          margin: 10px 0 6px 0;
+        }
+
+        .markdown-h4 {
+          color: #81d4fa;
+          font-size: 15px;
+          font-weight: 600;
+          margin: 8px 0 4px 0;
+        }
+
+        .markdown-p {
+          margin: 8px 0;
+          line-height: 1.6;
+        }
+
+        .markdown-ul, .markdown-ol {
+          margin: 8px 0;
+          padding-left: 20px;
+        }
+
+        .markdown-li {
+          margin: 4px 0;
+          line-height: 1.5;
+        }
+
+        .markdown-strong {
+          color: #00baba;
+          font-weight: bold;
+        }
+
+        .markdown-em {
+          color: #4dd0e1;
+          font-style: italic;
+        }
+
+        .markdown-code {
+          background: rgba(0,186,186,0.1);
+          color: #00d4d4;
+          padding: 2px 6px;
+          border-radius: 4px;
+          font-family: 'Courier New', monospace;
+          font-size: 13px;
+        }
+
+        .markdown-blockquote {
+          border-left: 4px solid #00baba;
+          background: rgba(0,186,186,0.05);
+          padding: 10px 15px;
+          margin: 10px 0;
+          border-radius: 0 8px 8px 0;
+          font-style: italic;
+        }
+
+        .markdown-hr {
+          border: none;
+          height: 2px;
+          background: linear-gradient(90deg, transparent, #00baba, transparent);
+          margin: 15px 0;
+        }
+
+        .markdown-link {
+          color: #4dd0e1;
+          text-decoration: none;
+          border-bottom: 1px dotted #4dd0e1;
+          transition: all 0.3s ease;
+        }
+
+        .markdown-link:hover {
+          color: #00d4d4;
+          border-bottom-color: #00d4d4;
         }
 
         .ai-message.user .ai-message-content {
