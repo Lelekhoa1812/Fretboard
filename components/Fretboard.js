@@ -35,7 +35,6 @@ export default function Fretboard({
   const [hoveredNote, setHoveredNote] = useState(null);
   const [selectedRoot, setSelectedRoot] = useState(null);
   const [showQualitySelector, setShowQualitySelector] = useState(false);
-  const [qualitySelectorPosition, setQualitySelectorPosition] = useState({ x: 0, y: 0 });
   const [selectedChordForQuality, setSelectedChordForQuality] = useState(null);
 
   // Memoized note map calculation for performance
@@ -262,11 +261,6 @@ export default function Fretboard({
         // Show quality selector for chords
         if (event && event.shiftKey) {
           // Shift+click to show quality selector
-          const rect = event.target.getBoundingClientRect();
-          setQualitySelectorPosition({
-            x: rect.left + rect.width / 2,
-            y: rect.top - 10
-          });
           setSelectedChordForQuality({
             root: noteName,
             quality: chordQuality
@@ -496,7 +490,6 @@ export default function Fretboard({
         selectedChord={selectedChordForQuality}
         onQualityChange={handleQualityChange}
         isVisible={showQualitySelector}
-        position={qualitySelectorPosition}
         onClose={handleCloseQualitySelector}
       />
 

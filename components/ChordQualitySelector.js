@@ -9,15 +9,17 @@ export default function ChordQualitySelector({
 }) {
   const [selectedQuality, setSelectedQuality] = useState('major');
 
-  // Chord quality definitions with descriptions
+  // Chord quality definitions with descriptions - Expanded collection
   const chordQualities = [
+    // Basic Triads
     {
       id: 'major',
       name: 'Major',
       symbol: '',
       description: 'Happy, bright sound',
       color: '#4CAF50',
-      examples: ['C', 'G', 'F']
+      examples: ['C', 'G', 'F'],
+      category: 'Basic Triads'
     },
     {
       id: 'minor',
@@ -25,63 +27,46 @@ export default function ChordQualitySelector({
       symbol: 'm',
       description: 'Sad, melancholic sound',
       color: '#2196F3',
-      examples: ['Am', 'Em', 'Dm']
+      examples: ['Am', 'Em', 'Dm'],
+      category: 'Basic Triads'
     },
     {
-      id: 'major7',
-      name: 'Major 7th',
-      symbol: 'maj7',
-      description: 'Jazzy, sophisticated',
-      color: '#9C27B0',
-      examples: ['Cmaj7', 'Gmaj7', 'Fmaj7']
-    },
-    {
-      id: 'minor7',
-      name: 'Minor 7th',
-      symbol: 'm7',
-      description: 'Smooth, jazzy minor',
-      color: '#673AB7',
-      examples: ['Am7', 'Em7', 'Dm7']
-    },
-    {
-      id: 'dominant7',
-      name: 'Dominant 7th',
-      symbol: '7',
-      description: 'Bluesy, resolves tension',
-      color: '#FF9800',
-      examples: ['C7', 'G7', 'F7']
-    },
-    {
-      id: 'minor7b5',
-      name: 'Minor 7♭5',
-      symbol: 'm7♭5',
-      description: 'Diminished, tense',
-      color: '#795548',
-      examples: ['Bm7♭5', 'F#m7♭5']
-    },
-    {
-      id: 'diminished',
+      id: 'dim',
       name: 'Diminished',
       symbol: 'dim',
       description: 'Very tense, unstable',
       color: '#607D8B',
-      examples: ['Bdim', 'F#dim']
+      examples: ['Bdim', 'F#dim'],
+      category: 'Basic Triads'
     },
     {
-      id: 'augmented',
+      id: 'aug',
       name: 'Augmented',
       symbol: 'aug',
       description: 'Bright, mysterious',
       color: '#E91E63',
-      examples: ['Caug', 'Gaug']
+      examples: ['Caug', 'Gaug'],
+      category: 'Basic Triads'
     },
+    {
+      id: '5',
+      name: 'Power Chord',
+      symbol: '5',
+      description: 'Rock, punk sound',
+      color: '#FF5722',
+      examples: ['C5', 'G5', 'F5'],
+      category: 'Basic Triads'
+    },
+    
+    // Suspended Chords
     {
       id: 'sus2',
       name: 'Sus2',
       symbol: 'sus2',
       description: 'Open, suspended',
       color: '#00BCD4',
-      examples: ['Csus2', 'Gsus2']
+      examples: ['Csus2', 'Gsus2'],
+      category: 'Suspended'
     },
     {
       id: 'sus4',
@@ -89,23 +74,256 @@ export default function ChordQualitySelector({
       symbol: 'sus4',
       description: 'Suspended, unresolved',
       color: '#009688',
-      examples: ['Csus4', 'Gsus4']
+      examples: ['Csus4', 'Gsus4'],
+      category: 'Suspended'
     },
+    {
+      id: '7sus4',
+      name: '7Sus4',
+      symbol: '7sus4',
+      description: 'Jazzy suspended',
+      color: '#4DB6AC',
+      examples: ['C7sus4', 'G7sus4'],
+      category: 'Suspended'
+    },
+    {
+      id: '9sus4',
+      name: '9Sus4',
+      symbol: '9sus4',
+      description: 'Extended suspended',
+      color: '#26A69A',
+      examples: ['C9sus4', 'G9sus4'],
+      category: 'Suspended'
+    },
+    
+    // Sixth Chords
+    {
+      id: '6',
+      name: 'Major 6th',
+      symbol: '6',
+      description: 'Sweet, jazzy major',
+      color: '#8BC34A',
+      examples: ['C6', 'G6', 'F6'],
+      category: 'Sixths'
+    },
+    {
+      id: 'm6',
+      name: 'Minor 6th',
+      symbol: 'm6',
+      description: 'Melancholic, jazzy',
+      color: '#689F38',
+      examples: ['Am6', 'Em6'],
+      category: 'Sixths'
+    },
+    {
+      id: '6add9',
+      name: '6Add9',
+      symbol: '6add9',
+      description: 'Extended major 6th',
+      color: '#9CCC65',
+      examples: ['C6add9', 'G6add9'],
+      category: 'Sixths'
+    },
+    {
+      id: 'm6add9',
+      name: 'm6Add9',
+      symbol: 'm6add9',
+      description: 'Extended minor 6th',
+      color: '#7CB342',
+      examples: ['Am6add9', 'Em6add9'],
+      category: 'Sixths'
+    },
+    
+    // Seventh Chords
+    {
+      id: 'maj7',
+      name: 'Major 7th',
+      symbol: 'maj7',
+      description: 'Jazzy, sophisticated',
+      color: '#9C27B0',
+      examples: ['Cmaj7', 'Gmaj7', 'Fmaj7'],
+      category: 'Sevenths'
+    },
+    {
+      id: 'minor7',
+      name: 'Minor 7th',
+      symbol: 'm7',
+      description: 'Smooth, jazzy minor',
+      color: '#673AB7',
+      examples: ['Am7', 'Em7', 'Dm7'],
+      category: 'Sevenths'
+    },
+    {
+      id: 'dominant7',
+      name: 'Dominant 7th',
+      symbol: '7',
+      description: 'Bluesy, resolves tension',
+      color: '#FF9800',
+      examples: ['C7', 'G7', 'F7'],
+      category: 'Sevenths'
+    },
+    {
+      id: 'dim7',
+      name: 'Diminished 7th',
+      symbol: 'dim7',
+      description: 'Very tense, symmetrical',
+      color: '#5D4037',
+      examples: ['Bdim7', 'F#dim7'],
+      category: 'Sevenths'
+    },
+    {
+      id: 'minor7b5',
+      name: 'Minor 7♭5',
+      symbol: 'm7♭5',
+      description: 'Half-diminished, tense',
+      color: '#795548',
+      examples: ['Bm7♭5', 'F#m7♭5'],
+      category: 'Sevenths'
+    },
+    
+    // Add Chords
     {
       id: 'add9',
       name: 'Add9',
       symbol: 'add9',
       description: 'Extended, colorful',
       color: '#8BC34A',
-      examples: ['Cadd9', 'Gadd9']
+      examples: ['Cadd9', 'Gadd9'],
+      category: 'Add Chords'
     },
+    {
+      id: 'add11',
+      name: 'Add11',
+      symbol: 'add11',
+      description: 'Bright, open sound',
+      color: '#AED581',
+      examples: ['Cadd11', 'Gadd11'],
+      category: 'Add Chords'
+    },
+    {
+      id: 'add13',
+      name: 'Add13',
+      symbol: 'add13',
+      description: 'Rich, extended',
+      color: '#C5E1A5',
+      examples: ['Cadd13', 'Gadd13'],
+      category: 'Add Chords'
+    },
+    
+    // Ninth Chords
     {
       id: 'major9',
       name: 'Major 9th',
       symbol: 'maj9',
       description: 'Rich, complex major',
       color: '#CDDC39',
-      examples: ['Cmaj9', 'Gmaj9']
+      examples: ['Cmaj9', 'Gmaj9'],
+      category: 'Ninths'
+    },
+    {
+      id: 'm9',
+      name: 'Minor 9th',
+      symbol: 'm9',
+      description: 'Smooth, jazzy minor',
+      color: '#DCE775',
+      examples: ['Am9', 'Em9'],
+      category: 'Ninths'
+    },
+    {
+      id: '9',
+      name: 'Dominant 9th',
+      symbol: '9',
+      description: 'Bluesy, extended',
+      color: '#FFF176',
+      examples: ['C9', 'G9'],
+      category: 'Ninths'
+    },
+    
+    // Eleventh Chords
+    {
+      id: 'm11',
+      name: 'Minor 11th',
+      symbol: 'm11',
+      description: 'Complex minor',
+      color: '#FFEB3B',
+      examples: ['Am11', 'Em11'],
+      category: 'Elevenths'
+    },
+    {
+      id: '11',
+      name: 'Dominant 11th',
+      symbol: '11',
+      description: 'Extended dominant',
+      color: '#FFC107',
+      examples: ['C11', 'G11'],
+      category: 'Elevenths'
+    },
+    
+    // Thirteenth Chords
+    {
+      id: 'm13',
+      name: 'Minor 13th',
+      symbol: 'm13',
+      description: 'Complex minor',
+      color: '#FF9800',
+      examples: ['Am13', 'Em13'],
+      category: 'Thirteenths'
+    },
+    {
+      id: '13',
+      name: 'Dominant 13th',
+      symbol: '13',
+      description: 'Full extended dominant',
+      color: '#FF5722',
+      examples: ['C13', 'G13'],
+      category: 'Thirteenths'
+    },
+    
+    // Altered Dominants
+    {
+      id: '7b9',
+      name: '7♭9',
+      symbol: '7♭9',
+      description: 'Dark, altered',
+      color: '#D32F2F',
+      examples: ['C7♭9', 'G7♭9'],
+      category: 'Altered'
+    },
+    {
+      id: '7#9',
+      name: '7♯9',
+      symbol: '7♯9',
+      description: 'Hendrix chord',
+      color: '#F44336',
+      examples: ['C7♯9', 'G7♯9'],
+      category: 'Altered'
+    },
+    {
+      id: '7#11',
+      name: '7♯11',
+      symbol: '7♯11',
+      description: 'Lydian dominant',
+      color: '#E91E63',
+      examples: ['C7♯11', 'G7♯11'],
+      category: 'Altered'
+    },
+    {
+      id: '7b13',
+      name: '7♭13',
+      symbol: '7♭13',
+      description: 'Altered dominant',
+      color: '#C2185B',
+      examples: ['C7♭13', 'G7♭13'],
+      category: 'Altered'
+    },
+    {
+      id: 'maj7#11',
+      name: 'Maj7♯11',
+      symbol: 'maj7♯11',
+      description: 'Lydian major',
+      color: '#AD1457',
+      examples: ['Cmaj7♯11', 'Gmaj7♯11'],
+      category: 'Altered'
     }
   ];
 
@@ -140,8 +358,9 @@ export default function ChordQualitySelector({
       <div 
         className="chord-quality-selector"
         style={{
-          left: position.x,
-          top: position.y,
+          left: '50%',
+          top: '50%',
+          transform: 'translate(-50%, -50%)',
         }}
       >
         {/* Header */}
@@ -156,26 +375,41 @@ export default function ChordQualitySelector({
           </button>
         </div>
 
-        {/* Quality Grid */}
-        <div className="chord-quality-grid">
-          {chordQualities.map((quality) => (
-            <button
-              key={quality.id}
-              className={`chord-quality-option ${selectedQuality === quality.id ? 'selected' : ''}`}
-              onClick={() => handleQualitySelect(quality)}
-              style={{ '--quality-color': quality.color }}
-              title={quality.description}
-            >
-              <div className="chord-quality-symbol">
-                {quality.symbol || 'M'}
+        {/* Quality Grid with Categories */}
+        <div className="chord-quality-content">
+          {Object.entries(
+            chordQualities.reduce((acc, quality) => {
+              if (!acc[quality.category]) {
+                acc[quality.category] = [];
+              }
+              acc[quality.category].push(quality);
+              return acc;
+            }, {})
+          ).map(([category, qualities]) => (
+            <div key={category} className="chord-quality-category">
+              <h4 className="chord-quality-category-title">{category}</h4>
+              <div className="chord-quality-grid">
+                {qualities.map((quality) => (
+                  <button
+                    key={quality.id}
+                    className={`chord-quality-option ${selectedQuality === quality.id ? 'selected' : ''}`}
+                    onClick={() => handleQualitySelect(quality)}
+                    style={{ '--quality-color': quality.color }}
+                    title={quality.description}
+                  >
+                    <div className="chord-quality-symbol">
+                      {quality.symbol || 'M'}
+                    </div>
+                    <div className="chord-quality-name">
+                      {quality.name}
+                    </div>
+                    <div className="chord-quality-examples">
+                      {quality.examples.slice(0, 2).join(', ')}
+                    </div>
+                  </button>
+                ))}
               </div>
-              <div className="chord-quality-name">
-                {quality.name}
-              </div>
-              <div className="chord-quality-examples">
-                {quality.examples.slice(0, 2).join(', ')}
-              </div>
-            </button>
+            </div>
           ))}
         </div>
 
@@ -183,27 +417,39 @@ export default function ChordQualitySelector({
         <div className="chord-quality-actions">
           <button 
             className="chord-quality-action"
-            onClick={() => handleQualitySelect(chordQualities[0])} // Major
+            onClick={() => handleQualitySelect(chordQualities.find(q => q.id === 'major'))} // Major
           >
             🎵 Major
           </button>
           <button 
             className="chord-quality-action"
-            onClick={() => handleQualitySelect(chordQualities[1])} // Minor
+            onClick={() => handleQualitySelect(chordQualities.find(q => q.id === 'minor'))} // Minor
           >
             🎶 Minor
           </button>
           <button 
             className="chord-quality-action"
-            onClick={() => handleQualitySelect(chordQualities[4])} // Dominant 7th
+            onClick={() => handleQualitySelect(chordQualities.find(q => q.id === 'dominant7'))} // Dominant 7th
           >
             🎸 7th
+          </button>
+          <button 
+            className="chord-quality-action"
+            onClick={() => handleQualitySelect(chordQualities.find(q => q.id === 'maj7'))} // Major 7th
+          >
+            🎼 Maj7
+          </button>
+          <button 
+            className="chord-quality-action"
+            onClick={() => handleQualitySelect(chordQualities.find(q => q.id === 'sus4'))} // Sus4
+          >
+            🎵 Sus4
           </button>
         </div>
 
         {/* Help Text */}
         <div className="chord-quality-help">
-          <p>💡 <strong>Tip:</strong> Click any quality to instantly change your chord. Use Shift+click on chord names to open this selector anytime!</p>
+          <p>💡 <strong>Tip:</strong> Choose from {chordQualities.length} chord qualities organized by category. Use Shift+click on chord names to open this selector anytime!</p>
         </div>
       </div>
 
@@ -226,8 +472,9 @@ export default function ChordQualitySelector({
           box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
           border: 1px solid rgba(0, 186, 186, 0.3);
           z-index: 1001;
-          max-width: 500px;
-          max-height: 80vh;
+          max-width: 800px;
+          width: 90vw;
+          max-height: 85vh;
           overflow-y: auto;
           animation: slideIn 0.3s ease-out;
         }
@@ -268,11 +515,36 @@ export default function ChordQualitySelector({
           color: white;
         }
 
+        .chord-quality-content {
+          padding: 20px 25px;
+          max-height: 60vh;
+          overflow-y: auto;
+        }
+
+        .chord-quality-category {
+          margin-bottom: 25px;
+        }
+
+        .chord-quality-category:last-child {
+          margin-bottom: 0;
+        }
+
+        .chord-quality-category-title {
+          color: #00baba;
+          font-size: 16px;
+          font-weight: 600;
+          margin: 0 0 15px 0;
+          padding-bottom: 8px;
+          border-bottom: 2px solid rgba(0, 186, 186, 0.3);
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
         .chord-quality-grid {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
           gap: 12px;
-          padding: 20px 25px;
+          margin-bottom: 20px;
         }
 
         .chord-quality-option {
@@ -396,16 +668,44 @@ export default function ChordQualitySelector({
 
         @media (max-width: 768px) {
           .chord-quality-selector {
-            left: 10px !important;
-            right: 10px !important;
+            left: 5px !important;
+            right: 5px !important;
             top: 50% !important;
-            transform: translateY(-50%);
+            transform: translate(-50%, -50%);
             max-width: none;
+            width: calc(100vw - 10px);
+            max-height: 90vh;
+          }
+          
+          .chord-quality-content {
+            padding: 15px 20px;
+            max-height: 70vh;
           }
           
           .chord-quality-grid {
             grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
             gap: 10px;
+          }
+
+          .chord-quality-category-title {
+            font-size: 14px;
+            margin-bottom: 12px;
+          }
+
+          .chord-quality-option {
+            padding: 12px 8px;
+          }
+
+          .chord-quality-symbol {
+            font-size: 20px;
+          }
+
+          .chord-quality-name {
+            font-size: 12px;
+          }
+
+          .chord-quality-examples {
+            font-size: 10px;
           }
         }
       `}</style>
