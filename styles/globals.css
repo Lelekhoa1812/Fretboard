@@ -181,11 +181,11 @@ label {
     height: calc(var(--fretboard-height) * 1px);
     margin: 20px auto;
     max-width: 1200px;
+    opacity: 1;
+    visibility: visible;
     overflow-x: auto;
     border-radius: 12px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    opacity: 1;
-    visibility: visible;
     min-height: 300px;
 }
 

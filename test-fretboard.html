@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fretboard Test</title>
+    <link rel="stylesheet" href="./styles/globals.css">
+</head>
+<body>
+    <div class="settings" id="app-root" style="opacity: 1; pointer-events: auto;">
+        <div class="fretboard" id="test-fretboard"></div>
+        <div class="note-name-section" id="test-note-names"></div>
+    </div>
+
+    <script>
+        // Test fretboard generation
+        function generateTestFretboard() {
+            const fretboard = document.getElementById('test-fretboard');
+            const tuning = [4, 11, 7, 2, 9, 4]; // Guitar tuning
+            const numberOfFrets = 8;
+            const accidentals = 'flats';
+            
+            // Set CSS variables
+            document.documentElement.style.setProperty('--number-of-strings', tuning.length);
+            document.documentElement.style.setProperty('--noteDotOpacity', '0.3');
+            
+            const notesFlat = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
+            
+            function getNoteNameByIndex(idx, acc) {
+                idx = ((idx % 12) + 12) % 12;
+                return acc === 'sharps' ? notesSharp[idx] : notesFlat[idx];
+            }
+            
+            const notesSharp = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+            
+            fretboard.innerHTML = '';
+            
+            tuning.forEach((openNote, stringIndex) => {
+                const stringDiv = document.createElement('div');
+                stringDiv.className = 'string';
+                
+                const singleFretMarkPositions = [3, 5, 7, 9, 15, 17, 19, 21];
+                const doubleFretMarkPositions = [12, 24];
+                
+                for (let fret = 0; fret <= numberOfFrets; fret++) {
+                    const fretDiv = document.createElement('div');
+                    fretDiv.className = 'note-fret';
+                    
+                    // Add fret marks
+                    if (stringIndex === 0 && singleFretMarkPositions.includes(fret)) {
+                        fretDiv.classList.add('single-fretmark');
+                    } else if (stringIndex === 0 && doubleFretMarkPositions.includes(fret)) {
+                        fretDiv.classList.add('double-fretmark');
+                    }
+                    
+                    // Calculate note for this fret
+                    const noteIndex = (openNote + fret) % 12;
+                    const noteName = getNoteNameByIndex(noteIndex, accidentals);
+                    fretDiv.setAttribute('data-note', noteName);
+                    fretDiv.setAttribute('data-fret', fret);
+                    fretDiv.setAttribute('data-string', stringIndex);
+                    fretDiv.setAttribute('data-string-index', stringIndex + 1);
+                    fretDiv.setAttribute('data-fret-index', fret);
+                    
+                    stringDiv.appendChild(fretDiv);
+                }
+                
+                fretboard.appendChild(stringDiv);
+            });
+        }
+        
+        // Test note names
+        function generateTestNoteNames() {
+            const noteNameSection = document.getElementById('test-note-names');
+            const notes = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
+            
+            noteNameSection.innerHTML = '';
+            notes.forEach(noteName => {
+                const span = document.createElement('span');
+                span.textContent = noteName;
+                span.style.cursor = 'pointer';
+                span.style.padding = '10px';
+                span.style.margin = '5px';
+                span.style.borderRadius = '8px';
+                span.style.transition = 'all 0.3s ease';
+                noteNameSection.appendChild(span);
+            });
+        }
+        
+        // Initialize test
+        document.addEventListener('DOMContentLoaded', () => {
+            generateTestFretboard();
+            generateTestNoteNames();
+            console.log('Test fretboard generated');
+        });
+    </script>
+</body>
+</html>

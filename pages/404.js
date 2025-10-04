@@ -1,7 +1,9 @@
-import React from 'react';
+import { useRouter } from 'next/router';
 import Head from 'next/head';
 
 export default function Custom404() {
+  const router = useRouter();
+
   return (
     <>
       <Head>

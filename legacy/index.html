@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="./styles/globals.css">
+    <link rel="icon" type="image/svg+xml" href="../public/logo.svg">
+    <link rel="icon" type="image/svg+xml" sizes="16x16" href="../public/logo.svg">
+    <link rel="apple-touch-icon" href="../public/logo.svg">
+    <title>Fretboard Lookup</title>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loading-screen">
+        <div class="loading-spinner"></div>
+    </div>
+    
+    <!-- Help Modal -->
+    <div class="modal-overlay" id="help-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>How to Use Fretboard Lookup</h2>
+                <button class="modal-close" id="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="help-section">
+                    <h3>🎵 Notes Mode</h3>
+                    <p>Hover over any note name below the fretboard to highlight all positions of that note. Toggle "Show multiple notes" to compare different notes simultaneously.</p>
+                </div>
+                
+                <div class="help-section">
+                    <h3>🎸 Chords Mode</h3>
+                    <p>Select a chord quality from the dropdown, then hover over root notes to see chord shapes. Use "Hand Position" to focus on specific fret ranges (5-fret windows).</p>
+                </div>
+                
+                <div class="help-section">
+                    <h3>🎼 Scales Mode</h3>
+                    <p>Choose a scale family (Major, Minor, Pentatonic, Blues, Modes), then hover over root notes to visualize scale patterns across the fretboard.</p>
+                </div>
+                
+                <div class="help-section">
+                    <h3>⚙️ Controls</h3>
+                    <ul>
+                        <li><strong>Instrument:</strong> Switch between Guitar, Bass, and Ukulele</li>
+                        <li><strong>Accidentals:</strong> Choose between flats (♭) and sharps (♯)</li>
+                        <li><strong>Number of Frets:</strong> Adjust fretboard length (5-30 frets)</li>
+                        <li><strong>Hand Position:</strong> Focus on specific fret ranges for easier playing</li>
+                    </ul>
+                </div>
+                
+                <div class="help-section">
+                    <h3>💡 Tips</h3>
+                    <ul>
+                        <li>Use the accidental selector to match your music theory preference</li>
+                        <li>Hand positions help you find playable chord voicings</li>
+                        <li>Try different instruments to see how patterns transpose</li>
+                        <li>Experiment with multiple notes to understand intervals</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <section id="hero" class="page-transition">
+        <div class="hero-inner">
+            <div class="logo-container">
+                <img src="../public/logo.svg" alt="Fretboard Lookup Logo" class="app-logo">
+            </div>
+            <h1>Fretboard Lookup</h1>
+            <p class="lead" id="hero-typed" data-text="Visualize notes, chords, and scales on guitar, bass, and ukulele. Choose a mode, hover a root, see every position instantly."> </p>
+            <div class="hero-grid">
+                <div class="card slide-in" data-feature="notes">
+                    <div class="card-icon">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 3V21M8 7L12 3L16 7M8 17L12 21L16 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <strong>Notes</strong>
+                    <p>Hover any note name to light up all fret positions. Toggle multiple to compare.</p>
+                    <img src="https://images.unsplash.com/photo-1510915361894-db8b60106cb1?q=80&w=1200&auto=format&fit=crop" alt="Guitar neck">
+                    <div class="card-overlay">
+                        <span class="card-action">Explore Notes →</span>
+                    </div>
+                </div>
+                <div class="card slide-in" data-feature="chords">
+                    <div class="card-icon">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 12L9 6L15 12L21 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M3 18L9 12L15 18L21 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="6" cy="9" r="2" fill="currentColor"/>
+                            <circle cx="12" cy="15" r="2" fill="currentColor"/>
+                            <circle cx="18" cy="9" r="2" fill="currentColor"/>
+                        </svg>
+                    </div>
+                    <strong>Chords</strong>
+                    <p>Pick a chord quality, hover a root to see chord tones and try Hand Position presets.</p>
+                    <img src="https://artiumacademy.mo.cloudinary.net/v1n/blogs/how-to-read-guitar-chord-charts-a-simple-guide.webp?q=80&w=1200&auto=format&fit=crop" alt="Chord shapes">
+                    <div class="card-overlay">
+                        <span class="card-action">Learn Chords →</span>
+                    </div>
+                </div>
+                <div class="card slide-in" data-feature="scales">
+                    <div class="card-icon">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9 6L9 12L9 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M15 6L15 12L15 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <circle cx="9" cy="9" r="2" fill="currentColor"/>
+                            <circle cx="15" cy="15" r="2" fill="currentColor"/>
+                        </svg>
+                    </div>
+                    <strong>Scales</strong>
+                    <p>Choose a family (major/minor, pentatonic, blues, modes) and hover a root to light up scale tones.</p>
+                    <img src="https://appliedguitartheory.com/wp-content/uploads/2020/07/minor-scale-structure-intervals-fretboard.png?q=80&w=1200&auto=format&fit=crop" alt="Scales walkthrough">
+                    <div class="card-overlay">
+                        <span class="card-action">Master Scales →</span>
+                    </div>
+                </div>
+                <div class="card slide-in" data-feature="help">
+                    <div class="card-icon">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                            <path d="M9.09 9C9.3251 8.33167 9.78915 7.76811 10.4 7.40913C11.0108 7.05016 11.7289 6.91894 12.4272 7.03871C13.1255 7.15849 13.7588 7.52152 14.2151 8.06353C14.6713 8.60553 14.9211 9.29152 14.92 10C14.92 12 11.92 13 11.92 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12 17H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <strong>Controls</strong>
+                    <p>Use the controls below to switch mode, root, and qualities. Hand Position shows 5 fret windows.</p>
+                    <img src="https://images.unsplash.com/photo-1511379938547-c1f69419868d?q=80&w=1200&auto=format&fit=crop" alt="Getting started">
+                    <div class="card-overlay">
+                        <span class="card-action">Get Started →</span>
+                    </div>
+                </div>
+            </div>
+            <!-- <button id="start-app">Start Exploring</button> -->
+            <div class="scroll-indicator"></div>
+        </div>
+    </section>
+    <div class="settings" id="app-root">
+        <div class="app-header">
+            <div class="header-logo">
+                <img src="/logo.svg" alt="Fretboard Lookup Logo" class="header-logo-img">
+            </div>
+            <button id="back-to-landing" class="back-button">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M19 12H5M12 19L5 12L12 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Back to Landing
+            </button>
+        </div>
+        <div class="controls-row">
+            <div class="control">
+                <label for="instrument-selector">Selected instrument:</label>
+                <select name="instrument-selector" id="instrument-selector"></select>
+            </div>
+            <div class="control">
+                <label for="search-by">Search by:</label>
+                <select name="search-by" id="search-by">
+                    <option value="notes" selected>Notes</option>
+                    <option value="chords">Chords</option>
+                    <option value="scales">Scales</option>
+                </select>
+            </div>
+            <div class="control accidental-selector">
+                <span class="control-label">Accidentals</span>
+                <input type="radio" class="acc-select" id="flats" name="accidentals" value="flats" checked>
+                <label for="flats">♭</label>
+                <input type="radio" class="acc-select" id="sharps" name="accidentals" value="sharps">
+                <label for="flats">♯</label>
+            </div>
+            <div class="control">
+                <label for="number-of-frets">Number of frets: </label>
+                <input type="number" id="number-of-frets" min="5" max="30" value="8">
+            </div>
+        </div>
+
+        <!-- Toggle amongst Major, Minor and more -->
+        <div class="controls-row">
+            <label for="scale" id="scale-label" style="display: none;">Chord quality</label>
+            <div class="scale-container" id="scale-container" style="display: none;">
+                <select name="scale" id="scale">
+                    <optgroup label="Triads & Power">
+                        <option value="major" selected>major</option>
+                        <option value="minor">minor</option>
+                        <option value="dim">dim</option>
+                        <option value="aug">aug</option>
+                        <option value="5">5 (power)</option>
+                    </optgroup>
+                    <optgroup label="Suspended">
+                        <option value="sus2">sus2</option>
+                        <option value="sus4">sus4</option>
+                        <option value="7sus4">7sus4</option>
+                        <option value="9sus4">9sus4</option>
+                    </optgroup>
+                    <optgroup label="Sixths">
+                        <option value="6">6</option>
+                        <option value="m6">m6</option>
+                        <option value="6add9">6add9</option>
+                        <option value="m6add9">m6add9</option>
+                    </optgroup>
+                    <optgroup label="Sevenths">
+                        <option value="7">7</option>
+                        <option value="m7">m7</option>
+                        <option value="maj7">maj7</option>
+                        <option value="dim7">dim7</option>
+                        <option value="m7b5">m7b5</option>
+                    </optgroup>
+                    <optgroup label="Add9/Add11/Add13">
+                        <option value="add9">add9</option>
+                        <option value="add11">add11</option>
+                        <option value="add13">add13</option>
+                    </optgroup>
+                    <optgroup label="Extensions">
+                        <option value="9">9</option>
+                        <option value="m9">m9</option>
+                        <option value="maj9">maj9</option>
+                        <option value="m11">m11</option>
+                        <option value="11">11</option>
+                        <option value="m13">m13</option>
+                        <option value="13">13</option>
+                    </optgroup>
+                    <optgroup label="Altered Dominants">
+                        <option value="7b9">7b9</option>
+                        <option value="7#9">7#9</option>
+                        <option value="7#11">7#11</option>
+                        <option value="7b13">7b13</option>
+                        <option value="maj7#11">maj7#11</option>
+                    </optgroup>
+                </select>
+            </div>
+
+            <!-- Toggle amongst Major and Minor -->
+            <label for="scale-set" id="scale-set-label" style="display: none;">Scale family</label>
+            <div class="scale-set-container" id="scale-set-container" style="display: none;">
+                <select name="scale-set" id="scale-set">
+                    <option value="major" selected>Major</option>
+                    <option value="minor">Minor</option>
+                    <option value="modes">Church (Gregorian)</option>
+                    <option value="pentatonicMajor">Pentatonic Major</option>
+                    <option value="pentatonicMinor">Pentatonic Minor</option>
+                    <option value="blues">Blues</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Chord voicing and filtering (disabled for simplicity) -->
+        <!--
+        <div class="voicing-controls" id="voicing-controls" style="display: none;">
+            <div class="control">
+                <label for="string-set">Strings</label>
+                <select name="string-set" id="string-set">
+                    <option value="any" selected>any</option>
+                    <option value="1-3">1-3</option>
+                    <option value="2-4">2-4</option>
+                    <option value="3-5">3-5</option>
+                    <option value="4-6">4-6</option>
+                </select>
+            </div>
+            <div class="control">
+                <label for="min-fret">Fret range</label>
+                <input type="number" id="min-fret" min="0" max="24" value="0">
+                <span>to</span>
+                <input type="number" id="max-fret" min="0" max="24" value="24">
+            </div>
+        </div>
+        -->
+
+        <!-- Hand positions (voicing windows) -->
+        <div class="hand-position-controls" id="hand-position-controls" style="display: none;">
+            <div class="control">
+                <label for="hand-positions">Hand Position</label>
+                <input type="checkbox" id="hand-positions">
+            </div>
+            <div class="control" id="hand-position-picker" style="display: none;">
+                <label for="hand-position-index" id="hand-position-index-label">Position</label>
+                <select id="hand-position-index"></select>
+            </div>
+        </div>
+
+        <div class="controls-row">
+            <div class="control">
+                <label for="show-all-notes" id="show-all-notes-label">Show all notes </label>
+                <div class="checkbox-container" id="show-all-notes-container">
+                    <input type="checkbox" id="show-all-notes">
+                </div>
+            </div>
+            <div class="control">
+                <label for="show-multiple-notes" id="show-multiple-notes-label">Show multiple notes </label>
+                <div class="checkbox-container" id="show-multiple-notes-container">
+                    <input type="checkbox" id="show-multiple-notes">
+                </div>
+            </div>
+        </div>
+        <!-- Show frame -->
+        <div class="fretboard"></div>
+        <!-- Switch node / main node -->
+        <div class="note-name-section"></div>
+
+
+    </div>
+    <!-- Functionality -->
+    <!-- Next.js will handle JavaScript -->
+</body>
+</html>

@@ -22,11 +22,14 @@ export default function FretboardApp() {
 
   // Card click handler
   const handleCardClick = (feature) => {
+    console.log('Card clicked:', feature);
     if (feature === 'help') {
       setShowHelpModal(true);
     } else {
       // Set the search mode and show main app
+      console.log('Setting current mode to:', feature);
       setCurrentMode(feature);
+      console.log('Setting showMainApp to true');
       setShowMainApp(true);
     }
   };
@@ -94,8 +97,12 @@ export default function FretboardApp() {
       
       {/* Help Modal */}
       {showHelpModal && (
-        <div className="modal-overlay" id="help-modal">
-          <div className="modal-content">
+        <div className="modal-overlay active" id="help-modal" onClick={(e) => {
+          if (e.target.id === 'help-modal') {
+            setShowHelpModal(false);
+          }
+        }}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h2>How to Use Fretboard Lookup</h2>
               <button className="modal-close" id="modal-close" onClick={() => setShowHelpModal(false)}>&times;</button>
@@ -226,7 +233,8 @@ export default function FretboardApp() {
 
       {/* Main App */}
       {showMainApp && (
-        <div className="settings" id="app-root">
+        <div className="settings visible" id="app-root">
+          {console.log('Rendering main app with showMainApp:', showMainApp)}
           <div className="app-header">
             <div className="header-logo">
               <img src="/logo.svg" alt="Fretboard Lookup Logo" className="header-logo-img" />
