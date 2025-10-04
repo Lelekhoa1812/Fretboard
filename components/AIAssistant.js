@@ -54,8 +54,8 @@ export default function AIAssistant({
       });
 
       // Initialize voice assistant
-      if (voiceAssistant.isSupported()) {
-        voiceAssistant.setCallbacks({
+      if (voiceAssistant.instance && voiceAssistant.instance.isSupported()) {
+        voiceAssistant.instance.setCallbacks({
           onCommand: handleVoiceCommand,
           onError: (error) => console.error('Voice command error:', error),
           onStart: () => setIsListening(true),
@@ -86,7 +86,9 @@ export default function AIAssistant({
   // Cleanup AI features
   const cleanupAIFeatures = () => {
     audioAnalyzer.cleanup();
-    voiceAssistant.cleanup();
+    if (voiceAssistant.instance) {
+      voiceAssistant.instance.cleanup();
+    }
     musicGenerator.cleanup();
   };
 
@@ -457,7 +459,7 @@ export default function AIAssistant({
     },
     {
       label: isListening ? '🎤 Stop Listening' : '🎤 Voice Control',
-      action: () => isListening ? voiceAssistant.stopListening() : voiceAssistant.startListening()
+      action: () => isListening ? voiceAssistant.instance?.stopListening() : voiceAssistant.instance?.startListening()
     },
     {
       label: isAnalyzing ? '🎵 Stop Analysis' : '🎵 Start Audio Analysis',
