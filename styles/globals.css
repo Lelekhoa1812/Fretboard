@@ -239,6 +239,16 @@ label {
     transition: opacity 180ms ease;
 }
 
+.note-fret.highlighted:before {
+    background: #00baba;
+    box-shadow: 0 0 15px rgba(0, 186, 186, 0.6);
+    transform: scale(1.1);
+}
+
+.note-fret.highlighted {
+    background: rgba(0, 186, 186, 0.1);
+}
+
 .single-fretmark:after, .double-fretmark:before, .double-fretmark:after {
     content: "";
     position: absolute;

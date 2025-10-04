@@ -1,16 +1,48 @@
 import { useState, useEffect } from 'react';
 import AIAssistant from './AIAssistant';
+import Fretboard from './Fretboard';
 
 export default function FretboardApp() {
   const [currentMode, setCurrentMode] = useState('notes');
   const [selectedChords, setSelectedChords] = useState([]);
   const [selectedScales, setSelectedScales] = useState([]);
   const [showMainApp, setShowMainApp] = useState(false);
+  const [showHelpModal, setShowHelpModal] = useState(false);
+  
+  // App state
+  const [instrument, setInstrument] = useState('Guitar');
+  const [accidentals, setAccidentals] = useState('flats');
+  const [numberOfFrets, setNumberOfFrets] = useState(8);
+  const [chordQuality, setChordQuality] = useState('major');
+  const [scaleFamily, setScaleFamily] = useState('major');
+  const [showAllNotes, setShowAllNotes] = useState(false);
+  const [showMultipleNotes, setShowMultipleNotes] = useState(false);
+  const [handPositions, setHandPositions] = useState(false);
+  const [handPositionIndex, setHandPositionIndex] = useState(0);
 
-  // This will be populated with the existing JavaScript logic
+  // Card click handler
+  const handleCardClick = (feature) => {
+    if (feature === 'help') {
+      setShowHelpModal(true);
+    } else {
+      // Set the search mode and show main app
+      setCurrentMode(feature);
+      setShowMainApp(true);
+    }
+  };
+
+  // Initialize app
   useEffect(() => {
-    // Initialize the existing fretboard app logic here
-    // We'll migrate the existing app.js functionality
+    // Show loading screen initially
+    const loadingScreen = document.getElementById('loading-screen');
+    if (loadingScreen) {
+      setTimeout(() => {
+        loadingScreen.classList.add('fade-out');
+        setTimeout(() => {
+          loadingScreen.style.display = 'none';
+        }, 500);
+      }, 1500);
+    }
   }, []);
 
   return (
@@ -21,55 +53,57 @@ export default function FretboardApp() {
       </div>
       
       {/* Help Modal */}
-      <div className="modal-overlay" id="help-modal">
-        <div className="modal-content">
-          <div className="modal-header">
-            <h2>How to Use Fretboard Lookup</h2>
-            <button className="modal-close" id="modal-close">&times;</button>
-          </div>
-          <div className="modal-body">
-            <div className="help-section">
-              <h3>🎵 Notes Mode</h3>
-              <p>Hover over any note name below the fretboard to highlight all positions of that note. Toggle "Show multiple notes" to compare different notes simultaneously.</p>
+      {showHelpModal && (
+        <div className="modal-overlay" id="help-modal">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h2>How to Use Fretboard Lookup</h2>
+              <button className="modal-close" id="modal-close" onClick={() => setShowHelpModal(false)}>&times;</button>
             </div>
-            
-            <div className="help-section">
-              <h3>🎸 Chords Mode</h3>
-              <p>Select a chord quality from the dropdown, then hover over root notes to see chord shapes. Use "Hand Position" to focus on specific fret ranges (5-fret windows).</p>
-            </div>
-            
-            <div className="help-section">
-              <h3>🎼 Scales Mode</h3>
-              <p>Choose a scale family (Major, Minor, Pentatonic, Blues, Modes), then hover over root notes to visualize scale patterns across the fretboard.</p>
-            </div>
-            
-            <div className="help-section">
-              <h3>🤖 AI Assistant</h3>
-              <p>Click the AI Assistant button to get personalized music theory help, chord analysis, practice recommendations, and answers to your questions.</p>
-            </div>
-            
-            <div className="help-section">
-              <h3>⚙️ Controls</h3>
-              <ul>
-                <li><strong>Instrument:</strong> Switch between Guitar, Bass, and Ukulele</li>
-                <li><strong>Accidentals:</strong> Choose between flats (♭) and sharps (♯)</li>
-                <li><strong>Number of Frets:</strong> Adjust fretboard length (5-30 frets)</li>
-                <li><strong>Hand Position:</strong> Focus on specific fret ranges for easier playing</li>
-              </ul>
-            </div>
-            
-            <div className="help-section">
-              <h3>💡 Tips</h3>
-              <ul>
-                <li>Use the AI Assistant for personalized learning guidance</li>
-                <li>Try different instruments to see how patterns transpose</li>
-                <li>Experiment with multiple notes to understand intervals</li>
-                <li>Ask the AI about chord progressions and scale relationships</li>
-              </ul>
+            <div className="modal-body">
+              <div className="help-section">
+                <h3>🎵 Notes Mode</h3>
+                <p>Hover over any note name below the fretboard to highlight all positions of that note. Toggle "Show multiple notes" to compare different notes simultaneously.</p>
+              </div>
+              
+              <div className="help-section">
+                <h3>🎸 Chords Mode</h3>
+                <p>Select a chord quality from the dropdown, then hover over root notes to see chord shapes. Use "Hand Position" to focus on specific fret ranges (5-fret windows).</p>
+              </div>
+              
+              <div className="help-section">
+                <h3>🎼 Scales Mode</h3>
+                <p>Choose a scale family (Major, Minor, Pentatonic, Blues, Modes), then hover over root notes to visualize scale patterns across the fretboard.</p>
+              </div>
+              
+              <div className="help-section">
+                <h3>🤖 AI Assistant</h3>
+                <p>Click the AI Assistant button to get personalized music theory help, chord analysis, practice recommendations, and answers to your questions.</p>
+              </div>
+              
+              <div className="help-section">
+                <h3>⚙️ Controls</h3>
+                <ul>
+                  <li><strong>Instrument:</strong> Switch between Guitar, Bass, and Ukulele</li>
+                  <li><strong>Accidentals:</strong> Choose between flats (♭) and sharps (♯)</li>
+                  <li><strong>Number of Frets:</strong> Adjust fretboard length (5-30 frets)</li>
+                  <li><strong>Hand Position:</strong> Focus on specific fret ranges for easier playing</li>
+                </ul>
+              </div>
+              
+              <div className="help-section">
+                <h3>💡 Tips</h3>
+                <ul>
+                  <li>Use the AI Assistant for personalized learning guidance</li>
+                  <li>Try different instruments to see how patterns transpose</li>
+                  <li>Experiment with multiple notes to understand intervals</li>
+                  <li>Ask the AI about chord progressions and scale relationships</li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
       
       {/* Landing Screen */}
       {!showMainApp && (
@@ -161,7 +195,12 @@ export default function FretboardApp() {
           <div className="controls-row">
             <div className="control">
               <label htmlFor="instrument-selector">Selected instrument:</label>
-              <select name="instrument-selector" id="instrument-selector">
+              <select 
+                name="instrument-selector" 
+                id="instrument-selector"
+                value={instrument}
+                onChange={(e) => setInstrument(e.target.value)}
+              >
                 <option value="Guitar">Guitar</option>
                 <option value="Bass (4 strings)">Bass (4 strings)</option>
                 <option value="Bass (5 strings)">Bass (5 strings)</option>
@@ -170,7 +209,12 @@ export default function FretboardApp() {
             </div>
             <div className="control">
               <label htmlFor="search-by">Search by:</label>
-              <select name="search-by" id="search-by" value={currentMode} onChange={(e) => setCurrentMode(e.target.value)}>
+              <select 
+                name="search-by" 
+                id="search-by" 
+                value={currentMode} 
+                onChange={(e) => setCurrentMode(e.target.value)}
+              >
                 <option value="notes">Notes</option>
                 <option value="chords">Chords</option>
                 <option value="scales">Scales</option>
@@ -178,23 +222,51 @@ export default function FretboardApp() {
             </div>
             <div className="control accidental-selector">
               <span className="control-label">Accidentals</span>
-              <input type="radio" className="acc-select" id="flats" name="accidentals" value="flats" defaultChecked/>
+              <input 
+                type="radio" 
+                className="acc-select" 
+                id="flats" 
+                name="accidentals" 
+                value="flats" 
+                checked={accidentals === 'flats'}
+                onChange={(e) => setAccidentals(e.target.value)}
+              />
               <label htmlFor="flats">♭</label>
-              <input type="radio" className="acc-select" id="sharps" name="accidentals" value="sharps"/>
+              <input 
+                type="radio" 
+                className="acc-select" 
+                id="sharps" 
+                name="accidentals" 
+                value="sharps"
+                checked={accidentals === 'sharps'}
+                onChange={(e) => setAccidentals(e.target.value)}
+              />
               <label htmlFor="sharps">♯</label>
             </div>
             <div className="control">
               <label htmlFor="number-of-frets">Number of frets: </label>
-              <input type="number" id="number-of-frets" min="5" max="30" defaultValue="8"/>
+              <input 
+                type="number" 
+                id="number-of-frets" 
+                min="5" 
+                max="30" 
+                value={numberOfFrets}
+                onChange={(e) => setNumberOfFrets(parseInt(e.target.value))}
+              />
             </div>
           </div>
 
           <div className="controls-row">
             <label htmlFor="scale" id="scale-label" style={{display: currentMode === 'chords' ? 'block' : 'none'}}>Chord quality</label>
             <div className="scale-container" id="scale-container" style={{display: currentMode === 'chords' ? 'block' : 'none'}}>
-              <select name="scale" id="scale">
+              <select 
+                name="scale" 
+                id="scale"
+                value={chordQuality}
+                onChange={(e) => setChordQuality(e.target.value)}
+              >
                 <optgroup label="Triads & Power">
-                  <option value="major" selected>major</option>
+                  <option value="major">major</option>
                   <option value="minor">minor</option>
                   <option value="dim">dim</option>
                   <option value="aug">aug</option>
@@ -245,8 +317,13 @@ export default function FretboardApp() {
 
             <label htmlFor="scale-set" id="scale-set-label" style={{display: currentMode === 'scales' ? 'block' : 'none'}}>Scale family</label>
             <div className="scale-set-container" id="scale-set-container" style={{display: currentMode === 'scales' ? 'block' : 'none'}}>
-              <select name="scale-set" id="scale-set">
-                <option value="major" selected>Major</option>
+              <select 
+                name="scale-set" 
+                id="scale-set"
+                value={scaleFamily}
+                onChange={(e) => setScaleFamily(e.target.value)}
+              >
+                <option value="major">Major</option>
                 <option value="minor">Minor</option>
                 <option value="modes">Church (Gregorian)</option>
                 <option value="pentatonicMajor">Pentatonic Major</option>
@@ -259,11 +336,26 @@ export default function FretboardApp() {
           <div className="hand-position-controls" id="hand-position-controls" style={{display: currentMode === 'chords' ? 'flex' : 'none'}}>
             <div className="control">
               <label htmlFor="hand-positions">Hand Position</label>
-              <input type="checkbox" id="hand-positions"/>
+              <input 
+                type="checkbox" 
+                id="hand-positions"
+                checked={handPositions}
+                onChange={(e) => setHandPositions(e.target.checked)}
+              />
             </div>
-            <div className="control" id="hand-position-picker" style={{display: 'none'}}>
+            <div className="control" id="hand-position-picker" style={{display: handPositions ? 'block' : 'none'}}>
               <label htmlFor="hand-position-index" id="hand-position-index-label">Position</label>
-              <select id="hand-position-index"></select>
+              <select 
+                id="hand-position-index"
+                value={handPositionIndex}
+                onChange={(e) => setHandPositionIndex(parseInt(e.target.value))}
+              >
+                <option value="0">0-4</option>
+                <option value="1">1-5</option>
+                <option value="2">2-6</option>
+                <option value="3">3-7</option>
+                <option value="4">4-8</option>
+              </select>
             </div>
           </div>
 
@@ -271,28 +363,51 @@ export default function FretboardApp() {
             <div className="control">
               <label htmlFor="show-all-notes" id="show-all-notes-label">Show all notes </label>
               <div className="checkbox-container" id="show-all-notes-container">
-                <input type="checkbox" id="show-all-notes"/>
+                <input 
+                  type="checkbox" 
+                  id="show-all-notes"
+                  checked={showAllNotes}
+                  onChange={(e) => setShowAllNotes(e.target.checked)}
+                />
               </div>
             </div>
             <div className="control">
               <label htmlFor="show-multiple-notes" id="show-multiple-notes-label">Show multiple notes </label>
               <div className="checkbox-container" id="show-multiple-notes-container">
-                <input type="checkbox" id="show-multiple-notes"/>
+                <input 
+                  type="checkbox" 
+                  id="show-multiple-notes"
+                  checked={showMultipleNotes}
+                  onChange={(e) => setShowMultipleNotes(e.target.checked)}
+                />
               </div>
             </div>
           </div>
+
+          {/* Fretboard Component */}
+          <Fretboard
+            currentMode={currentMode}
+            instrument={instrument}
+            accidentals={accidentals}
+            numberOfFrets={numberOfFrets}
+            chordQuality={chordQuality}
+            scaleFamily={scaleFamily}
+            showAllNotes={showAllNotes}
+            showMultipleNotes={showMultipleNotes}
+            handPositions={handPositions}
+            handPositionIndex={handPositionIndex}
+            onNoteClick={(note, fret, string) => {
+              console.log('Note clicked:', note, fret, string);
+            }}
+            onChordSelect={(chord) => {
+              console.log('Chord selected:', chord);
+            }}
+            onScaleSelect={(scale) => {
+              console.log('Scale selected:', scale);
+            }}
+          />
         </div>
       )}
-
-      {/* Fretboard */}
-      <div className="fretboard" id="fretboard">
-        {/* Fretboard will be rendered here by the existing JavaScript */}
-      </div>
-
-      {/* Note Name Section */}
-      <div className="note-name-section" id="note-name-section">
-        {/* Note names will be rendered here */}
-      </div>
 
       {/* AI Assistant */}
       <AIAssistant 
@@ -306,18 +421,4 @@ export default function FretboardApp() {
       />
     </div>
   );
-
-  function handleCardClick(feature) {
-    if (feature === 'help') {
-      // Open help modal
-      const modal = document.getElementById('help-modal');
-      if (modal) {
-        modal.classList.add('active');
-      }
-    } else {
-      // Set the search mode and show main app
-      setCurrentMode(feature);
-      setShowMainApp(true);
-    }
-  }
 }
