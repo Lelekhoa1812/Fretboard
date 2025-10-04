@@ -1,5 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
+import { audioAnalyzer } from '../lib/audio-analyzer.js';
+import { adaptiveLearning } from '../lib/adaptive-learning.js';
+import { gamificationEngine } from '../lib/gamification-engine.js';
+import { voiceAssistant } from '../lib/voice-assistant.js';
+import { musicGenerator } from '../lib/music-generator.js';
+import { progressTracker } from '../lib/progress-tracker.js';
 
 export default function AIAssistant({ 
   currentMode, 
@@ -14,6 +20,11 @@ export default function AIAssistant({
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [sessionId] = useState(() => `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
+  const [userId] = useState(() => `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
+  const [isListening, setIsListening] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [userStats, setUserStats] = useState(null);
+  const [recentInsights, setRecentInsights] = useState(null);
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -23,6 +34,112 @@ export default function AIAssistant({
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Initialize AI features on component mount
+  useEffect(() => {
+    initializeAIFeatures();
+    return () => cleanupAIFeatures();
+  }, []);
+
+  // Initialize AI features
+  const initializeAIFeatures = async () => {
+    try {
+      // Initialize adaptive learning
+      adaptiveLearning.createUserProfile(userId, {
+        skillLevel: 'beginner',
+        learningStyle: 'mixed',
+        interests: ['rock', 'pop', 'blues'],
+        practiceTime: 30,
+        goals: ['learn basic chords', 'play songs']
+      });
+
+      // Initialize voice assistant
+      if (voiceAssistant.isSupported()) {
+        voiceAssistant.setCallbacks({
+          onCommand: handleVoiceCommand,
+          onError: (error) => console.error('Voice command error:', error),
+          onStart: () => setIsListening(true),
+          onEnd: () => setIsListening(false)
+        });
+      }
+
+      // Initialize audio analyzer
+      const audioInitialized = await audioAnalyzer.initialize();
+      if (audioInitialized) {
+        audioAnalyzer.setCallbacks({
+          onChordDetected: handleChordDetected,
+          onTimingFeedback: handleTimingFeedback,
+          onPitchFeedback: handlePitchFeedback,
+          onTechniqueFeedback: handleTechniqueFeedback
+        });
+      }
+
+      // Initialize music generator
+      await musicGenerator.initialize();
+
+      console.log('🤖 AI Assistant: All features initialized successfully');
+    } catch (error) {
+      console.error('🤖 AI Assistant: Failed to initialize features:', error);
+    }
+  };
+
+  // Cleanup AI features
+  const cleanupAIFeatures = () => {
+    audioAnalyzer.cleanup();
+    voiceAssistant.cleanup();
+    musicGenerator.cleanup();
+  };
+
+  // Handle voice commands
+  const handleVoiceCommand = async (command, transcript) => {
+    console.log('🎤 Voice command received:', command, transcript);
+    
+    let message = '';
+    switch (command) {
+      case 'analyze_chord':
+        message = 'Analyze the current chord selection';
+        break;
+      case 'show_scales':
+        message = 'Show scales for the current chord';
+        break;
+      case 'practice_plan':
+        message = 'Create a practice plan for me';
+        break;
+      case 'music_theory':
+        message = 'Explain music theory concepts';
+        break;
+      case 'help':
+        message = 'Show me available voice commands';
+        break;
+      default:
+        message = transcript;
+    }
+    
+    if (message) {
+      await sendMessage(message);
+    }
+  };
+
+  // Handle audio analysis callbacks
+  const handleChordDetected = (chordData) => {
+    console.log('🎵 Chord detected:', chordData);
+    // Update UI with detected chord
+  };
+
+  const handleTimingFeedback = (timingData) => {
+    console.log('🎵 Timing feedback:', timingData);
+    // Update UI with timing feedback
+  };
+
+  const handlePitchFeedback = (pitchData) => {
+    console.log('🎵 Pitch feedback:', pitchData);
+    // Update UI with pitch feedback
+  };
+
+  const handleTechniqueFeedback = (techniqueData) => {
+    console.log('🎵 Technique feedback:', techniqueData);
+    // Update UI with technique feedback
+  };
 
   const sendMessage = async (message) => {
     if (!message.trim()) return;
@@ -184,6 +301,22 @@ export default function AIAssistant({
     {
       label: '🎨 Creative Ideas',
       action: () => sendMessage('Give me creative ideas for using these chords in songwriting')
+    },
+    {
+      label: isListening ? '🎤 Stop Listening' : '🎤 Voice Control',
+      action: () => isListening ? voiceAssistant.stopListening() : voiceAssistant.startListening()
+    },
+    {
+      label: isAnalyzing ? '🎵 Stop Analysis' : '🎵 Start Audio Analysis',
+      action: () => isAnalyzing ? stopAudioAnalysis() : startAudioAnalysis()
+    },
+    {
+      label: '🎶 Generate Backing Track',
+      action: () => generateBackingTrack()
+    },
+    {
+      label: '📊 My Progress',
+      action: () => showProgress()
     }
   ];
 
