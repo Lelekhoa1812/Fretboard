@@ -12,6 +12,7 @@ import {
   getNoteNameByIndex,
   resolveRootInMap
 } from '../lib/music-data';
+import ChordQualitySelector from './ChordQualitySelector';
 
 export default function Fretboard({ 
   currentMode, 
@@ -33,6 +34,9 @@ export default function Fretboard({
   const [selectedNotes, setSelectedNotes] = useState([]);
   const [hoveredNote, setHoveredNote] = useState(null);
   const [selectedRoot, setSelectedRoot] = useState(null);
+  const [showQualitySelector, setShowQualitySelector] = useState(false);
+  const [qualitySelectorPosition, setQualitySelectorPosition] = useState({ x: 0, y: 0 });
+  const [selectedChordForQuality, setSelectedChordForQuality] = useState(null);
 
   // Memoized note map calculation for performance
   const notesForMode = useMemo(() => {
