@@ -519,11 +519,82 @@ const app = {
              setTimeout(() => {
                  ripple.remove();
              }, 600);
+             
+             // Handle card functionality
+             const feature = card.getAttribute('data-feature');
+             this.handleCardClick(feature);
          });
      });
      
      // Add smooth scroll behavior for better UX
      document.documentElement.style.scrollBehavior = 'smooth';
+     
+     // Setup modal functionality
+     this.setupModal();
+    },
+    
+    handleCardClick(feature) {
+        const appRoot = document.getElementById('app-root');
+        
+        if (feature === 'help') {
+            // Open help modal
+            this.openModal();
+        } else {
+            // Set the search mode and scroll to app
+            if (searchSelector) {
+                searchSelector.value = feature;
+                // Trigger the change event to update the UI
+                const event = new Event('change', { bubbles: true });
+                searchSelector.dispatchEvent(event);
+            }
+            
+            // Scroll to the main app
+            if (appRoot) {
+                appRoot.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+    },
+    
+    setupModal() {
+        const modal = document.getElementById('help-modal');
+        const closeBtn = document.getElementById('modal-close');
+        
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                this.closeModal();
+            });
+        }
+        
+        if (modal) {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    this.closeModal();
+                }
+            });
+        }
+        
+        // Close modal with Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modal && modal.classList.contains('active')) {
+                this.closeModal();
+            }
+        });
+    },
+    
+    openModal() {
+        const modal = document.getElementById('help-modal');
+        if (modal) {
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        }
+    },
+    
+    closeModal() {
+        const modal = document.getElementById('help-modal');
+        if (modal) {
+            modal.classList.remove('active');
+            document.body.style.overflow = ''; // Restore scrolling
+        }
     },
     setupFretboard() {
         fretboard.innerHTML = '';

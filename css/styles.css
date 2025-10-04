@@ -85,6 +85,15 @@ body {
     background: rgba(24,24,24,0.9);
     backdrop-filter: blur(4px);
 }
+
+/* Main app container */
+#app-root {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 20px 0;
+}
 .controls-row {
     display: flex;
     gap: 16px;
@@ -115,8 +124,11 @@ label {
     width: 100%;
     min-width: 0;
     height: calc(var(--fretboard-height) * 1px);
-    margin-top: 50px;
+    margin: 20px auto;
+    max-width: 1200px;
     overflow-x: auto;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 .string {
     width: 100%;
@@ -197,6 +209,9 @@ label {
     font-size: 2.5em;
     display: flex;
     justify-content: center;
+    margin: 20px auto;
+    max-width: 1200px;
+    padding: 0 20px;
 }
 .note-name-section span {
     padding: 10px;
