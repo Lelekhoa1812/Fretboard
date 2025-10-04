@@ -8,7 +8,7 @@
     --string-top-position: calc(var(--fretboard-height) / var(--number-of-strings) / 2 - var(--half-string-height));
     --double-fretmark-position-1: calc(var(--fretboard-height) * 0.25);
     --double-fretmark-position-2: calc(var(--fretboard-height) * 0.75);
-    --noteDotOpacity: 0;
+    --noteDotOpacity: 0.3;
 }
 
 * {
@@ -186,6 +186,7 @@ label {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     opacity: 1;
     visibility: visible;
+    min-height: 300px;
 }
 
 .string {
@@ -203,7 +204,6 @@ label {
     box-shadow: 76px 3px 10px #806233;
     z-index: 1;
     position: absolute;
-    top: 22px;
     top: calc(var(--string-top-position) * 1px);
 }
 
