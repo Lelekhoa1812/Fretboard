@@ -1,4 +1,16 @@
 import { useState, useEffect, useRef } from 'react';
+import { 
+  notesFlat, 
+  notesSharp, 
+  instrumentTuningPresets, 
+  chordDefinitions, 
+  scaleDefinitions,
+  getSelectedChordMap,
+  getSelectedScaleMap,
+  toPreferredAccidental,
+  getNoteIndexByName,
+  getNoteNameByIndex
+} from '../lib/music-data';
 
 export default function Fretboard({ 
   currentMode, 
@@ -19,84 +31,14 @@ export default function Fretboard({
   const noteNameSectionRef = useRef(null);
   const [selectedNotes, setSelectedNotes] = useState([]);
   const [hoveredNote, setHoveredNote] = useState(null);
+  const [selectedRoot, setSelectedRoot] = useState(null);
 
-  // Music theory data
-  const notesFlat = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
-  const notesSharp = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
-  const enharmonicToFlats = {"C#":"Db","D#":"Eb","F#":"Gb","G#":"Ab","A#":"Bb"};
-  const enharmonicToSharps = {"Db":"C#","Eb":"D#","Gb":"F#","Ab":"G#","Bb":"A#"};
-
-  const instrumentTuningPresets = {
-    'Guitar': [4, 11, 7, 2, 9, 4],
-    'Bass (4 strings)': [7, 2, 9, 4],
-    'Bass (5 strings)': [7, 2, 9, 4, 11],
-    'Ukulele': [9, 4, 0, 7]
-  };
-
-  // Chord definitions
-  const chordDefinitions = {
-    'major': { intervals: [0, 4, 7], name: 'Major' },
-    'minor': { intervals: [0, 3, 7], name: 'Minor' },
-    '7': { intervals: [0, 4, 7, 10], name: 'Dominant 7th' },
-    'm7': { intervals: [0, 3, 7, 10], name: 'Minor 7th' },
-    'maj7': { intervals: [0, 4, 7, 11], name: 'Major 7th' },
-    'sus2': { intervals: [0, 2, 7], name: 'Sus2' },
-    'sus4': { intervals: [0, 5, 7], name: 'Sus4' },
-    'dim': { intervals: [0, 3, 6], name: 'Diminished' },
-    'aug': { intervals: [0, 4, 8], name: 'Augmented' },
-    '5': { intervals: [0, 7], name: 'Power Chord' }
-  };
-
-  // Scale definitions
-  const scaleDefinitions = {
-    'major': { intervals: [0, 2, 4, 5, 7, 9, 11], name: 'Major' },
-    'minor': { intervals: [0, 2, 3, 5, 7, 8, 10], name: 'Minor' },
-    'pentatonicMajor': { intervals: [0, 2, 4, 7, 9], name: 'Major Pentatonic' },
-    'pentatonicMinor': { intervals: [0, 3, 5, 7, 10], name: 'Minor Pentatonic' },
-    'blues': { intervals: [0, 3, 5, 6, 7, 10], name: 'Blues' }
-  };
-
-  // Helper functions
-  const toPreferredAccidental = (root, acc) => {
-    return acc === 'sharps' ? (enharmonicToSharps[root] || root) : (enharmonicToFlats[root] || root);
-  };
-
-  const getNoteIndexByName = (name) => {
-    let idx = notesFlat.indexOf(name);
-    if (idx !== -1) return idx;
-    return notesSharp.indexOf(name);
-  };
-
-  const getNoteNameByIndex = (idx, acc) => {
-    idx = ((idx % 12) + 12) % 12;
-    return acc === 'sharps' ? notesSharp[idx] : notesFlat[idx];
-  };
-
-  const buildMapForIntervals = (intervals, acc = 'flats') => {
-    const roots = acc === 'sharps' ? notesSharp : notesFlat;
-    const map = {};
-    roots.forEach((root) => {
-      const rootIdx = getNoteIndexByName(root);
-      map[root] = intervals.map(semi => getNoteNameByIndex(rootIdx + semi, acc));
-    });
-    return map;
-  };
-
-  const getSelectedChordMap = () => {
-    const definition = chordDefinitions[chordQuality] || chordDefinitions['major'];
-    return buildMapForIntervals(definition.intervals, accidentals);
-  };
-
-  const getSelectedScaleMap = () => {
-    const definition = scaleDefinitions[scaleFamily] || scaleDefinitions['major'];
-    return buildMapForIntervals(definition.intervals, accidentals);
-  };
-
+  // Get the appropriate note map based on current mode
   const getNotesForMode = () => {
     if (currentMode === 'chords') {
-      return getSelectedChordMap();
+      return getSelectedChordMap(chordQuality, accidentals);
     } else if (currentMode === 'scales') {
-      return getSelectedScaleMap();
+      return getSelectedScaleMap(scaleFamily, accidentals);
     } else {
       // Notes mode - return all notes
       const roots = accidentals === 'sharps' ? notesSharp : notesFlat;
@@ -224,6 +166,15 @@ export default function Fretboard({
       } else {
         setSelectedNotes([noteName]);
       }
+    } else if (currentMode === 'chords' || currentMode === 'scales') {
+      // For chords and scales, set the root note
+      setSelectedRoot(noteName);
+      if (onChordSelect && currentMode === 'chords') {
+        onChordSelect(noteName);
+      }
+      if (onScaleSelect && currentMode === 'scales') {
+        onScaleSelect(noteName);
+      }
     }
     
     if (onNoteClick) {
@@ -251,21 +202,23 @@ export default function Fretboard({
     if (!fretboardRef.current) return;
 
     const frets = fretboardRef.current.querySelectorAll('.note-fret');
-    const notesToHighlight = hoveredNote ? [hoveredNote] : selectedNotes;
     const notesForMode = getNotesForMode();
+    let notesToHighlight = [];
+
+    if (currentMode === 'notes') {
+      notesToHighlight = hoveredNote ? [hoveredNote] : selectedNotes;
+    } else if (currentMode === 'chords' || currentMode === 'scales') {
+      // For chords and scales, highlight based on hovered root note
+      if (hoveredNote && notesForMode[hoveredNote]) {
+        notesToHighlight = notesForMode[hoveredNote];
+      } else if (selectedRoot && notesForMode[selectedRoot]) {
+        notesToHighlight = notesForMode[selectedRoot];
+      }
+    }
 
     frets.forEach(fret => {
       const noteName = fret.getAttribute('data-note');
-      let shouldHighlight = false;
-
-      if (currentMode === 'notes') {
-        shouldHighlight = notesToHighlight.includes(noteName);
-      } else if (currentMode === 'chords' || currentMode === 'scales') {
-        // For chords and scales, we need to check if this note is part of the current selection
-        // This would require more complex logic based on the selected root note
-        // For now, we'll highlight based on hover
-        shouldHighlight = notesToHighlight.includes(noteName);
-      }
+      const shouldHighlight = notesToHighlight.includes(noteName);
 
       if (shouldHighlight) {
         fret.style.setProperty('--noteDotOpacity', '1');
@@ -288,7 +241,13 @@ export default function Fretboard({
 
   useEffect(() => {
     highlightNotes();
-  }, [selectedNotes, hoveredNote, currentMode, chordQuality, scaleFamily]);
+  }, [selectedNotes, hoveredNote, selectedRoot, currentMode, chordQuality, scaleFamily, accidentals]);
+
+  // Reset selected root when mode changes
+  useEffect(() => {
+    setSelectedRoot(null);
+    setSelectedNotes([]);
+  }, [currentMode, chordQuality, scaleFamily]);
 
   return (
     <>
