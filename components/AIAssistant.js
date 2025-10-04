@@ -87,6 +87,10 @@ export default function AIAssistant({
           focusArea: currentMode,
           context: data.context
         };
+      } else if (message.toLowerCase().includes('fretboard') || message.toLowerCase().includes('navigate') || message.toLowerCase().includes('guide')) {
+        // For fretboard navigation guidance
+        analysisType = 'fretboard-guidance';
+        data = { context: data.context };
       } else if (message.toLowerCase().includes('select') || message.toLowerCase().includes('chord') || message.toLowerCase().includes('help')) {
         // For general questions about selecting chords or getting help
         analysisType = 'ask-question';
@@ -156,22 +160,30 @@ export default function AIAssistant({
 
   const quickActions = [
     {
-      label: 'Analyze Current Chords',
+      label: selectedChords.length > 0 ? `Analyze ${selectedChords.length} Chord${selectedChords.length > 1 ? 's' : ''}` : 'Select Chords First',
       action: () => selectedChords.length > 0 ? 
-        sendMessage(`Analyze this chord progression: ${selectedChords.join(' - ')}`) :
+        sendMessage(`Analyze this chord progression: ${selectedChords.map(c => `${c.root}${c.quality}`).join(' - ')}`) :
         sendMessage('I need some chords selected first. Please select some chords on the fretboard.')
     },
     {
-      label: 'Explain Music Theory',
+      label: '🎸 Fretboard Guide',
+      action: () => sendMessage('Show me how to navigate the fretboard and select meaningful chords')
+    },
+    {
+      label: '🎵 Chord Progressions',
+      action: () => sendMessage('Suggest some beautiful chord progressions I can try')
+    },
+    {
+      label: '🎼 Music Theory',
       action: () => sendMessage('Explain the music theory behind what I\'m playing')
     },
     {
-      label: 'Practice Suggestions',
-      action: () => sendMessage('Give me practice suggestions for improving my guitar skills')
+      label: '🎯 Practice Plan',
+      action: () => sendMessage('Create a practice plan for improving my guitar skills')
     },
     {
-      label: 'Scale Recommendations',
-      action: () => sendMessage('What scales work well with the chords I\'m playing?')
+      label: '🎨 Creative Ideas',
+      action: () => sendMessage('Give me creative ideas for using these chords in songwriting')
     }
   ];
 

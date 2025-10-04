@@ -55,7 +55,7 @@ export default async function handler(req, res) {
         console.log('🎵 Music Analysis API: Processing question');
         result = await MusicTheoryAI.askMusicQuestion(
           data.question,
-          data.context,
+          data.context || '',
           sessionId
         );
         break;
@@ -73,6 +73,14 @@ export default async function handler(req, res) {
         console.log('🎵 Music Analysis API: Processing chord voicings');
         result = await MusicTheoryAI.suggestChordVoicings(
           data.chord,
+          data.context,
+          sessionId
+        );
+        break;
+
+      case 'fretboard-guidance':
+        console.log('🎵 Music Analysis API: Processing fretboard guidance');
+        result = await MusicTheoryAI.provideFretboardGuidance(
           data.context,
           sessionId
         );
