@@ -5,16 +5,16 @@
     }
   },
   "env": {
-    "NVIDIA_API_1": "@nvidia_api_1",
-    "NVIDIA_API_2": "@nvidia_api_2", 
-    "NVIDIA_API_3": "@nvidia_api_3",
-    "NVIDIA_API_4": "@nvidia_api_4",
-    "NVIDIA_API_5": "@nvidia_api_5",
-    "NVIDIA_API_6": "@nvidia_api_6",
-    "NVIDIA_SMALL": "@nvidia_small",
-    "NVIDIA_MEDIUM": "@nvidia_medium",
-    "NVIDIA_LARGE": "@nvidia_large",
-    "NVIDIA_RERANK": "@nvidia_rerank"
+    "NVIDIA_API_1": "NVIDIA_API_1",
+    "NVIDIA_API_2": "NVIDIA_API_2", 
+    "NVIDIA_API_3": "NVIDIA_API_3",
+    "NVIDIA_API_4": "NVIDIA_API_4",
+    "NVIDIA_API_5": "NVIDIA_API_5",
+    "NVIDIA_API_6": "NVIDIA_API_6",
+    "NVIDIA_SMALL": "NVIDIA_SMALL",
+    "NVIDIA_MEDIUM": "NVIDIA_MEDIUM",
+    "NVIDIA_LARGE": "NVIDIA_LARGE",
+    "NVIDIA_RERANK": "NVIDIA_RERANK"
   },
   "build": {
     "env": {

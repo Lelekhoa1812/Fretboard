@@ -143,6 +143,9 @@ export default function FretboardApp() {
       {!showMainApp && (
         <section id="hero" className="page-transition">
           <div className="hero-inner">
+            <div className="logo-container">
+              <img src="/logo.svg" alt="Fretboard Lookup Logo" className="app-logo" />
+            </div>
             <h1>Fretboard Lookup</h1>
             <p className="lead" id="hero-typed" data-text="Visualize notes, chords, and scales on guitar, bass, and ukulele. Choose a mode, hover a root, see every position instantly."> </p>
             <div className="hero-grid">
@@ -219,6 +222,9 @@ export default function FretboardApp() {
       {showMainApp && (
         <div className="settings" id="app-root">
           <div className="app-header">
+            <div className="header-logo">
+              <img src="/logo.svg" alt="Fretboard Lookup Logo" className="header-logo-img" />
+            </div>
             <button id="back-to-landing" className="back-button" onClick={() => setShowMainApp(false)}>
               <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M19 12H5M12 19L5 12L12 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>

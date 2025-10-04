@@ -17,7 +17,9 @@ export default function Home() {
         <title>Fretboard Lookup - AI-Powered Music Theory</title>
         <meta name="description" content="Visualize notes, chords, and scales on guitar, bass, and ukulele with AI-powered music theory assistance." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+        <link rel="icon" type="image/svg+xml" sizes="16x16" href="/logo.svg" />
+        <link rel="apple-touch-icon" href="/logo.svg" />
       </Head>
       <FretboardApp />
     </>

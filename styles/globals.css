@@ -110,7 +110,8 @@ body {
 
 .app-header {
     display: flex;
-    justify-content: flex-start;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 16px;
 }
 
@@ -369,6 +370,56 @@ label {
     position: relative;
     z-index: 2;
     animation: heroFadeIn 1.2s ease-out;
+}
+
+/* Logo styles */
+.logo-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+    animation: logoFadeIn 1.5s ease-out;
+}
+
+.app-logo {
+    height: 80px;
+    width: auto;
+    filter: drop-shadow(0 0 20px rgba(0,186,186,0.3));
+    transition: all 0.3s ease;
+}
+
+.app-logo:hover {
+    transform: scale(1.05);
+    filter: drop-shadow(0 0 25px rgba(0,186,186,0.5));
+}
+
+@keyframes logoFadeIn {
+    0% { 
+        opacity: 0; 
+        transform: translateY(-20px) scale(0.9); 
+    }
+    100% { 
+        opacity: 1; 
+        transform: translateY(0) scale(1); 
+    }
+}
+
+/* Header logo styles */
+.header-logo {
+    display: flex;
+    align-items: center;
+    margin-right: 20px;
+}
+
+.header-logo-img {
+    height: 40px;
+    width: auto;
+    filter: drop-shadow(0 0 10px rgba(0,186,186,0.2));
+    transition: all 0.3s ease;
+}
+
+.header-logo-img:hover {
+    transform: scale(1.05);
+    filter: drop-shadow(0 0 15px rgba(0,186,186,0.4));
 }
 
 @keyframes heroFadeIn {
@@ -949,6 +1000,16 @@ label {
     #hero .card { padding: 20px; }
     #hero .card img { height: 120px; }
     #start-app { padding: 14px 28px; font-size: 16px; }
+    
+    /* Mobile logo adjustments */
+    .app-logo { height: 60px; }
+    .header-logo-img { height: 30px; }
+    .app-header { 
+        flex-direction: column; 
+        gap: 12px; 
+        align-items: flex-start;
+    }
+    .header-logo { margin-right: 0; margin-bottom: 8px; }
 }
 
 @media (max-width: 480px) {
@@ -978,4 +1039,8 @@ label {
     #start-app:hover {
         transform: translateY(-1px) scale(1.02);
     }
+    
+    /* Extra small screen logo adjustments */
+    .app-logo { height: 50px; }
+    .header-logo-img { height: 25px; }
 }
