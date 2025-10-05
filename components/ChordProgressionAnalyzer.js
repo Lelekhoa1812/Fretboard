@@ -396,6 +396,51 @@ export default function ChordProgressionAnalyzer({
           </div>
         </div>
 
+        {/* Fretboard Visualization */}
+        {currentChord && currentChord.fretboardPositions && currentChord.fretboardPositions.length > 0 && (
+          <div className="fretboard-visualization">
+            <h4>🎸 Chord Positions</h4>
+            <div className="fretboard-display">
+              <div className="fretboard-strings">
+                {[6, 5, 4, 3, 2, 1].map(string => (
+                  <div key={string} className="guitar-string">
+                    <div className="string-label">E{string === 6 ? '6' : string === 5 ? '5' : string === 4 ? '4' : string === 3 ? '3' : string === 2 ? '2' : '1'}</div>
+                    <div className="string-line"></div>
+                    {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(fret => {
+                      const position = currentChord.fretboardPositions.find(
+                        pos => pos.string === string && pos.fret === fret
+                      );
+                      return (
+                        <div 
+                          key={fret} 
+                          className={`fret-marker ${position ? 'active' : ''}`}
+                          style={{ 
+                            left: `${fret * 25 + 30}px`,
+                            backgroundColor: position ? (currentChord.color || '#00baba') : 'transparent'
+                          }}
+                        >
+                          {position && (
+                            <div className="finger-number">
+                              {position.finger}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ))}
+              </div>
+              <div className="fret-numbers">
+                {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(fret => (
+                  <div key={fret} className="fret-number" style={{ left: `${fret * 25 + 30}px` }}>
+                    {fret}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Detailed thoughts panel (collapsible) */}
         {showDetailedThoughts && currentChord && currentChord.fullExplanation && (
           <div className="detailed-thoughts-panel">
@@ -424,24 +469,53 @@ export default function ChordProgressionAnalyzer({
           </div>
         )}
 
+        {/* Debug Info */}
+        {currentChord && (
+          <div style={{ color: 'white', fontSize: '10px', padding: '5px', background: 'rgba(255,0,0,0.1)' }}>
+            Debug: {JSON.stringify(currentChord, null, 2)}
+          </div>
+        )}
+
         {/* Enhanced Alternatives Display */}
-        {currentChord && currentChord.alternatives && currentChord.alternatives.length > 0 && (
+        {currentChord && (
           <div className="alternatives-section">
             <h4>🎵 Alternative Chords</h4>
             <div className="alternatives-grid">
-              {currentChord.alternatives.map((alt, index) => (
-                <div key={index} className="alternative-chord">
-                  <div className="alternative-name" style={{ color: alt.color || '#00baba' }}>
-                    {alt.chord}
+              {currentChord.alternatives && currentChord.alternatives.length > 0 ? (
+                currentChord.alternatives.map((alt, index) => {
+                  // Handle both old format (strings) and new format (objects)
+                  const chordName = typeof alt === 'string' ? alt : alt.chord || alt;
+                  const emotion = typeof alt === 'object' ? alt.emotion : 'Alternative';
+                  const reason = typeof alt === 'object' ? alt.reason : 'Creative alternative';
+                  const color = typeof alt === 'object' ? alt.color : '#00baba';
+                  
+                  return (
+                    <div key={index} className="alternative-chord">
+                      <div className="alternative-name" style={{ color: color }}>
+                        {chordName}
+                      </div>
+                      <div className="alternative-emotion">
+                        {emotion}
+                      </div>
+                      <div className="alternative-reason">
+                        {reason}
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="alternative-chord">
+                  <div className="alternative-name" style={{ color: '#00baba' }}>
+                    Cmaj7
                   </div>
                   <div className="alternative-emotion">
-                    {alt.emotion}
+                    Warm & Dreamy
                   </div>
                   <div className="alternative-reason">
-                    {alt.reason}
+                    Creates a more sophisticated jazz feel
                   </div>
                 </div>
-              ))}
+              )}
             </div>
           </div>
         )}
@@ -775,6 +849,111 @@ export default function ChordProgressionAnalyzer({
           color: #e9f3ff;
           font-size: 12px;
           line-height: 1.4;
+        }
+
+        /* Fretboard Visualization */
+        .fretboard-visualization {
+          padding: 15px 20px;
+          background: rgba(0, 0, 0, 0.2);
+          border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .fretboard-visualization h4 {
+          color: #00baba;
+          margin: 0 0 15px 0;
+          font-size: 16px;
+          font-weight: bold;
+        }
+
+        .fretboard-display {
+          position: relative;
+          background: linear-gradient(90deg, #2a2a3e 0%, #3a3a4e 100%);
+          border-radius: 8px;
+          padding: 20px;
+          border: 2px solid #4a4a5e;
+          overflow-x: auto;
+        }
+
+        .fretboard-strings {
+          position: relative;
+          height: 120px;
+        }
+
+        .guitar-string {
+          position: absolute;
+          width: 100%;
+          height: 2px;
+          background: #8a8a9e;
+          display: flex;
+          align-items: center;
+        }
+
+        .guitar-string:nth-child(1) { top: 10px; }
+        .guitar-string:nth-child(2) { top: 30px; }
+        .guitar-string:nth-child(3) { top: 50px; }
+        .guitar-string:nth-child(4) { top: 70px; }
+        .guitar-string:nth-child(5) { top: 90px; }
+        .guitar-string:nth-child(6) { top: 110px; }
+
+        .string-label {
+          position: absolute;
+          left: -25px;
+          color: #8a8a9e;
+          font-size: 12px;
+          font-weight: bold;
+          top: 50%;
+          transform: translateY(-50%);
+        }
+
+        .string-line {
+          position: absolute;
+          left: 0;
+          right: 0;
+          height: 2px;
+          background: #8a8a9e;
+        }
+
+        .fret-marker {
+          position: absolute;
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          top: 50%;
+          transform: translateY(-50%);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border: 2px solid transparent;
+          transition: all 0.3s ease;
+        }
+
+        .fret-marker.active {
+          border: 2px solid white;
+          box-shadow: 0 0 10px rgba(0, 186, 186, 0.5);
+          z-index: 10;
+        }
+
+        .finger-number {
+          color: white;
+          font-weight: bold;
+          font-size: 10px;
+        }
+
+        .fret-numbers {
+          position: absolute;
+          top: -25px;
+          left: 0;
+          right: 0;
+          height: 20px;
+        }
+
+        .fret-number {
+          position: absolute;
+          color: #8a8a9e;
+          font-size: 10px;
+          font-weight: bold;
+          top: 0;
+          transform: translateX(-50%);
         }
 
         .typing-cursor {
