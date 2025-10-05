@@ -469,13 +469,6 @@ export default function ChordProgressionAnalyzer({
           </div>
         )}
 
-        {/* Debug Info */}
-        {currentChord && (
-          <div style={{ color: 'white', fontSize: '10px', padding: '5px', background: 'rgba(255,0,0,0.1)' }}>
-            Debug: {JSON.stringify(currentChord, null, 2)}
-          </div>
-        )}
-
         {/* Enhanced Alternatives Display */}
         {currentChord && (
           <div className="alternatives-section">
