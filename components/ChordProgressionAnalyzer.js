@@ -16,6 +16,8 @@ export default function ChordProgressionAnalyzer({
   const [chordAnalysis, setChordAnalysis] = useState({});
   const [isGeneratingAnalysis, setIsGeneratingAnalysis] = useState(false);
   const [progressionVibe, setProgressionVibe] = useState('');
+  const [showDetailedThoughts, setShowDetailedThoughts] = useState(false);
+  const [summarizedAnalysis, setSummarizedAnalysis] = useState({});
   
   const typingTimeoutRef = useRef(null);
   const stepTimeoutRef = useRef(null);
@@ -29,6 +31,32 @@ export default function ChordProgressionAnalyzer({
       const validChordPattern = /^[A-G][#♭]?(?:maj|min|m|M|dim|aug|sus|add|6|7|9|11|13|♭5|♯5|♭9|♯9|♭13|♯13|♯11|♭11|5|b5|#5|b9|#9|b13|#13|#11|b11)*\d*$/;
       return validChordPattern.test(chord) && chord.length > 0;
     });
+
+  // Summarize AI responses using Llama
+  const summarizeAIResponse = async (fullResponse, chordName) => {
+    try {
+      const response = await fetch('/api/music-analysis', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'summarize-analysis',
+          data: { 
+            fullResponse: fullResponse,
+            chordName: chordName,
+            context: 'Summarize this chord analysis to be concise and instructional'
+          }
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        return data.data;
+      }
+    } catch (error) {
+      console.error('Failed to summarize response:', error);
+    }
+    return fullResponse; // Fallback to original
+  };
 
   // Generate AI analysis for the entire progression
   const generateProgressionAnalysis = async () => {
@@ -75,7 +103,18 @@ export default function ChordProgressionAnalyzer({
           try {
             // Try to parse the JSON response
             const parsedAnalysis = JSON.parse(chordData.data);
-            return { chord, analysis: parsedAnalysis };
+            
+            // Summarize the explanation for concise display
+            const summarizedExplanation = await summarizeAIResponse(parsedAnalysis.explanation, chord);
+            
+            return { 
+              chord, 
+              analysis: {
+                ...parsedAnalysis,
+                explanation: summarizedExplanation,
+                fullExplanation: parsedAnalysis.explanation // Keep original for detailed view
+              }
+            };
           } catch (error) {
             console.error('Failed to parse chord analysis JSON:', error);
             // Fallback to basic analysis
@@ -263,29 +302,40 @@ export default function ChordProgressionAnalyzer({
           </button>
         </div>
 
-        {/* Subtitle Container */}
-        <div className="progression-subtitle">
-          <div className="subtitle-content">
+        {/* Compact Subtitle Container at Bottom */}
+        <div className="progression-subtitle-compact">
+          <div className="subtitle-content-compact">
             <ReactMarkdown 
               components={{
-                h1: ({children}) => <h1 className="markdown-h1">{children}</h1>,
-                h2: ({children}) => <h2 className="markdown-h2">{children}</h2>,
-                h3: ({children}) => <h3 className="markdown-h3">{children}</h3>,
-                h4: ({children}) => <h4 className="markdown-h4">{children}</h4>,
-                p: ({children}) => <p className="markdown-p">{children}</p>,
-                ul: ({children}) => <ul className="markdown-ul">{children}</ul>,
-                ol: ({children}) => <ol className="markdown-ol">{children}</ol>,
-                li: ({children}) => <li className="markdown-li">{children}</li>,
-                strong: ({children}) => <strong className="markdown-strong">{children}</strong>,
-                em: ({children}) => <em className="markdown-em">{children}</em>,
-                code: ({children}) => <code className="markdown-code">{children}</code>,
-                blockquote: ({children}) => <blockquote className="markdown-blockquote">{children}</blockquote>,
-                hr: () => <hr className="markdown-hr" />
+                h1: ({children}) => <h1 className="markdown-h1-compact">{children}</h1>,
+                h2: ({children}) => <h2 className="markdown-h2-compact">{children}</h2>,
+                h3: ({children}) => <h3 className="markdown-h3-compact">{children}</h3>,
+                h4: ({children}) => <h4 className="markdown-h4-compact">{children}</h4>,
+                p: ({children}) => <p className="markdown-p-compact">{children}</p>,
+                ul: ({children}) => <ul className="markdown-ul-compact">{children}</ul>,
+                ol: ({children}) => <ol className="markdown-ol-compact">{children}</ol>,
+                li: ({children}) => <li className="markdown-li-compact">{children}</li>,
+                strong: ({children}) => <strong className="markdown-strong-compact">{children}</strong>,
+                em: ({children}) => <em className="markdown-em-compact">{children}</em>,
+                code: ({children}) => <code className="markdown-code-compact">{children}</code>,
+                blockquote: ({children}) => <blockquote className="markdown-blockquote-compact">{children}</blockquote>,
+                hr: () => <hr className="markdown-hr-compact" />
               }}
             >
               {displayText}
             </ReactMarkdown>
             {isTyping && <span className="typing-cursor">|</span>}
+          </div>
+          
+          {/* Toggle for detailed thoughts */}
+          <div className="thoughts-toggle">
+            <button 
+              className={`thoughts-button ${showDetailedThoughts ? 'active' : ''}`}
+              onClick={() => setShowDetailedThoughts(!showDetailedThoughts)}
+              title={showDetailedThoughts ? 'Hide detailed thoughts' : 'Show detailed thoughts'}
+            >
+              💭 {showDetailedThoughts ? 'Hide Details' : 'Show Details'}
+            </button>
           </div>
         </div>
 
@@ -302,39 +352,30 @@ export default function ChordProgressionAnalyzer({
           </div>
         </div>
 
-        {/* Fretboard Display */}
-        {showFretboard && currentChord && (
-          <div className="progression-fretboard">
-            <div className="fretboard-container">
-              <div className="fretboard">
-                {/* Guitar strings */}
-                {[6, 5, 4, 3, 2, 1].map(string => (
-                  <div key={string} className="guitar-string">
-                    {/* Frets */}
-                    {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(fret => {
-                      const position = currentChord.fretboardPositions?.find(
-                        pos => pos.string === string && pos.fret === fret
-                      );
-                      return (
-                        <div 
-                          key={fret} 
-                          className={`fret-position ${position ? 'active' : ''}`}
-                          style={{ 
-                            left: `${fret * 30 + 20}px`,
-                            backgroundColor: position ? (currentChord.color || '#00baba') : 'transparent'
-                          }}
-                        >
-                          {position && (
-                            <div className="finger-indicator">
-                              {position.finger}
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                ))}
-              </div>
+        {/* Detailed thoughts panel (collapsible) */}
+        {showDetailedThoughts && currentChord && currentChord.fullExplanation && (
+          <div className="detailed-thoughts-panel">
+            <div className="thoughts-content">
+              <h4>💭 Detailed Analysis</h4>
+              <ReactMarkdown 
+                components={{
+                  h1: ({children}) => <h1 className="markdown-h1">{children}</h1>,
+                  h2: ({children}) => <h2 className="markdown-h2">{children}</h2>,
+                  h3: ({children}) => <h3 className="markdown-h3">{children}</h3>,
+                  h4: ({children}) => <h4 className="markdown-h4">{children}</h4>,
+                  p: ({children}) => <p className="markdown-p">{children}</p>,
+                  ul: ({children}) => <ul className="markdown-ul">{children}</ul>,
+                  ol: ({children}) => <ol className="markdown-ol">{children}</ol>,
+                  li: ({children}) => <li className="markdown-li">{children}</li>,
+                  strong: ({children}) => <strong className="markdown-strong">{children}</strong>,
+                  em: ({children}) => <em className="markdown-em">{children}</em>,
+                  code: ({children}) => <code className="markdown-code">{children}</code>,
+                  blockquote: ({children}) => <blockquote className="markdown-blockquote">{children}</blockquote>,
+                  hr: () => <hr className="markdown-hr" />
+                }}
+              >
+                {currentChord.fullExplanation}
+              </ReactMarkdown>
             </div>
           </div>
         )}
@@ -380,19 +421,19 @@ export default function ChordProgressionAnalyzer({
 
         .progression-analyzer {
           position: fixed;
-          top: 50%;
+          bottom: 20px;
           left: 50%;
-          transform: translate(-50%, -50%);
+          transform: translateX(-50%);
           background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-          border-radius: 20px;
-          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+          border-radius: 15px;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
           border: 2px solid rgba(0, 186, 186, 0.3);
           z-index: 2001;
-          max-width: 900px;
+          max-width: 800px;
           width: 90vw;
-          max-height: 85vh;
+          max-height: 40vh;
           overflow-y: auto;
-          animation: slideIn 0.4s ease;
+          animation: slideUp 0.4s ease;
         }
 
         .progression-header {
@@ -431,20 +472,48 @@ export default function ChordProgressionAnalyzer({
           color: white;
         }
 
-        .progression-subtitle {
-          padding: 20px 25px;
+        .progression-subtitle-compact {
+          padding: 15px 20px;
           background: rgba(0, 186, 186, 0.05);
           border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-          min-height: 80px;
           display: flex;
           align-items: center;
+          justify-content: space-between;
+          gap: 15px;
         }
 
-        .subtitle-content {
+        .subtitle-content-compact {
           color: #e9f3ff;
-          font-size: 16px;
-          line-height: 1.6;
+          font-size: 14px;
+          line-height: 1.4;
           font-weight: 500;
+          flex: 1;
+        }
+
+        .thoughts-toggle {
+          flex-shrink: 0;
+        }
+
+        .thoughts-button {
+          background: rgba(0, 186, 186, 0.1);
+          border: 1px solid rgba(0, 186, 186, 0.3);
+          color: #00baba;
+          padding: 6px 12px;
+          border-radius: 15px;
+          font-size: 12px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+
+        .thoughts-button:hover {
+          background: rgba(0, 186, 186, 0.2);
+          border-color: rgba(0, 186, 186, 0.5);
+        }
+
+        .thoughts-button.active {
+          background: rgba(0, 186, 186, 0.2);
+          border-color: #00baba;
+          color: #00d4d4;
         }
 
         /* Markdown Styling */
@@ -529,6 +598,59 @@ export default function ChordProgressionAnalyzer({
           height: 2px;
           background: linear-gradient(90deg, transparent, #00baba, transparent);
           margin: 15px 0;
+        }
+
+        /* Compact Markdown Styling */
+        .markdown-h1-compact {
+          color: #00baba;
+          font-size: 16px;
+          font-weight: bold;
+          margin: 8px 0 6px 0;
+        }
+
+        .markdown-h2-compact {
+          color: #00d4d4;
+          font-size: 14px;
+          font-weight: bold;
+          margin: 6px 0 4px 0;
+        }
+
+        .markdown-h3-compact {
+          color: #4dd0e1;
+          font-size: 13px;
+          font-weight: 600;
+          margin: 4px 0 3px 0;
+        }
+
+        .markdown-p-compact {
+          margin: 4px 0;
+          line-height: 1.4;
+          font-size: 13px;
+        }
+
+        .markdown-strong-compact {
+          color: #00baba;
+          font-weight: bold;
+        }
+
+        .markdown-em-compact {
+          color: #4dd0e1;
+          font-style: italic;
+        }
+
+        /* Detailed thoughts panel */
+        .detailed-thoughts-panel {
+          padding: 15px 20px;
+          background: rgba(0, 0, 0, 0.2);
+          border-top: 1px solid rgba(255, 255, 255, 0.1);
+          max-height: 200px;
+          overflow-y: auto;
+        }
+
+        .thoughts-content h4 {
+          color: #00baba;
+          margin: 0 0 10px 0;
+          font-size: 14px;
         }
 
         .typing-cursor {
@@ -688,14 +810,14 @@ export default function ChordProgressionAnalyzer({
           to { opacity: 1; }
         }
 
-        @keyframes slideIn {
-          from { 
+        @keyframes slideUp {
+          from {
             opacity: 0;
-            transform: translate(-50%, -50%) scale(0.9);
+            transform: translateX(-50%) translateY(100%);
           }
-          to { 
+          to {
             opacity: 1;
-            transform: translate(-50%, -50%) scale(1);
+            transform: translateX(-50%) translateY(0);
           }
         }
 
