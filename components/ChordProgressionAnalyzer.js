@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import ReactMarkdown from 'react-markdown';
 
 export default function ChordProgressionAnalyzer({ 
   chordProgression, 
@@ -12,135 +13,96 @@ export default function ChordProgressionAnalyzer({
   const [currentChord, setCurrentChord] = useState(null);
   const [showFretboard, setShowFretboard] = useState(false);
   const [analysisComplete, setAnalysisComplete] = useState(false);
+  const [chordAnalysis, setChordAnalysis] = useState({});
+  const [isGeneratingAnalysis, setIsGeneratingAnalysis] = useState(false);
+  const [progressionVibe, setProgressionVibe] = useState('');
   
   const typingTimeoutRef = useRef(null);
   const stepTimeoutRef = useRef(null);
 
   // Parse chord progression string into array
   const chords = chordProgression.split(' - ').map(chord => chord.trim());
-  
-  // AI-Generated chord analysis data (will be populated dynamically)
-  const [chordAnalysis, setChordAnalysis] = useState({});
-  const [isGeneratingAnalysis, setIsGeneratingAnalysis] = useState(false);
-    'E7': {
-      name: 'E7',
-      emotion: 'Strong, resolving, bluesy',
-      impact: 'The dominant chord that demands resolution',
-      fretboardPositions: [
-        { fret: 0, string: 6, finger: 0 }, // E
-        { fret: 2, string: 5, finger: 2 }, // B
-        { fret: 1, string: 4, finger: 1 }, // D
-        { fret: 0, string: 3, finger: 0 }, // G
-        { fret: 0, string: 2, finger: 0 }, // B
-        { fret: 0, string: 1, finger: 0 }  // E
-      ],
-      explanation: 'The E7 is your "homecoming" chord. It creates tension that desperately wants to resolve to A minor, making the progression feel complete.',
-      alternatives: ['For jazz: try E9', 'For blues: try E7♯9', 'For rock: try E5']
-    },
-    'Am7': {
-      name: 'Am7',
-      emotion: 'Melancholic, smooth, jazzy',
-      impact: 'The emotional center of the progression',
-      fretboardPositions: [
-        { fret: 0, string: 5, finger: 0 }, // A
-        { fret: 2, string: 4, finger: 2 }, // C
-        { fret: 0, string: 3, finger: 0 }, // A
-        { fret: 2, string: 2, finger: 1 }, // E
-        { fret: 0, string: 1, finger: 0 }, // A
-        { fret: 0, string: 0, finger: 0 }  // A
-      ],
-      explanation: 'Am7 is the heart of this progression. It\'s smooth, sophisticated, and creates the perfect emotional backdrop for storytelling.',
-      alternatives: ['For classical: try Am', 'For jazz: try Am9', 'For pop: try Am6']
-    },
-    'Fmaj7': {
-      name: 'Fmaj7',
-      emotion: 'Warm, comforting, resolved',
-      impact: 'Brings warmth and stability to the progression',
-      fretboardPositions: [
-        { fret: 1, string: 6, finger: 1 }, // F
-        { fret: 0, string: 5, finger: 0 }, // A
-        { fret: 0, string: 4, finger: 0 }, // C
-        { fret: 2, string: 3, finger: 2 }, // E
-        { fret: 1, string: 2, finger: 1 }, // F
-        { fret: 0, string: 1, finger: 0 }  // A
-      ],
-      explanation: 'Fmaj7 is like a warm hug in music. It provides comfort and stability, perfect for the emotional journey of this progression.',
-      alternatives: ['For jazz: try Fmaj9', 'For pop: try F', 'For classical: try F6']
-    },
-    'G6': {
-      name: 'G6',
-      emotion: 'Bright, optimistic, open',
-      impact: 'Adds brightness and forward momentum',
-      fretboardPositions: [
-        { fret: 3, string: 6, finger: 3 }, // G
-        { fret: 0, string: 5, finger: 0 }, // G
-        { fret: 0, string: 4, finger: 0 }, // B
-        { fret: 0, string: 3, finger: 0 }, // D
-        { fret: 2, string: 2, finger: 1 }, // E (6th)
-        { fret: 3, string: 1, finger: 2 }  // G
-      ],
-      explanation: 'G6 brings sunshine to the progression. The E note adds brightness and creates a sense of optimism and forward movement.',
-      alternatives: ['For jazz: try G6/9', 'For pop: try G', 'For classical: try Gmaj7']
-    },
-    'Em9': {
-      name: 'Em9',
-      emotion: 'Sophisticated, jazzy, complex',
-      impact: 'Adds jazz sophistication and harmonic richness',
-      fretboardPositions: [
-        { fret: 0, string: 6, finger: 0 }, // E
-        { fret: 2, string: 5, finger: 2 }, // F# (9th)
-        { fret: 0, string: 4, finger: 0 }, // E
-        { fret: 2, string: 3, finger: 1 }, // G
-        { fret: 0, string: 2, finger: 0 }, // B
-        { fret: 0, string: 1, finger: 0 }  // E
-      ],
-      explanation: 'Em9 is the jazz master\'s choice. The F# adds sophistication and creates beautiful tension that resolves beautifully.',
-      alternatives: ['For classical: try Em', 'For jazz: try Em11', 'For pop: try Em7']
-    },
-    'Dm7': {
-      name: 'Dm7',
-      emotion: 'Soft, gentle, introspective',
-      impact: 'Creates a gentle, introspective moment',
-      fretboardPositions: [
-        { fret: 0, string: 6, finger: 0 }, // D
-        { fret: 0, string: 5, finger: 0 }, // A
-        { fret: 0, string: 4, finger: 0 }, // D
-        { fret: 0, string: 3, finger: 0 }, // F
-        { fret: 1, string: 2, finger: 1 }, // A
-        { fret: 0, string: 1, finger: 0 }  // D
-      ],
-      explanation: 'Dm7 is the gentle whisper in your progression. It\'s soft, introspective, and perfect for moments of reflection.',
-      alternatives: ['For classical: try Dm', 'For jazz: try Dm9', 'For pop: try Dm6']
-    },
-    'G7sus4': {
-      name: 'G7sus4',
-      emotion: 'Suspended, unresolved, building',
-      impact: 'Creates anticipation and builds toward resolution',
-      fretboardPositions: [
-        { fret: 3, string: 6, finger: 3 }, // G
-        { fret: 0, string: 5, finger: 0 }, // G
-        { fret: 0, string: 4, finger: 0 }, // B
-        { fret: 0, string: 3, finger: 0 }, // D
-        { fret: 3, string: 2, finger: 2 }, // C (4th)
-        { fret: 3, string: 1, finger: 1 }  // G
-      ],
-      explanation: 'G7sus4 is the "almost there" chord. It creates anticipation and builds excitement before the final resolution.',
-      alternatives: ['For jazz: try G7', 'For pop: try Gsus4', 'For classical: try G']
-    },
-    'Cmaj7': {
-      name: 'Cmaj7',
-      emotion: 'Peaceful, resolved, complete',
-      impact: 'The perfect resolution that brings everything together',
-      fretboardPositions: [
-        { fret: 0, string: 6, finger: 0 }, // C
-        { fret: 3, string: 5, finger: 3 }, // E
-        { fret: 0, string: 4, finger: 0 }, // C
-        { fret: 0, string: 3, finger: 0 }, // G
-        { fret: 0, string: 2, finger: 0 }, // B
-        { fret: 0, string: 1, finger: 0 }  // E
-      ],
-      explanation: 'Cmaj7 is the perfect ending. It\'s peaceful, resolved, and brings the entire emotional journey to a satisfying conclusion.',
-      alternatives: ['For jazz: try Cmaj9', 'For pop: try C', 'For classical: try C6']
+
+  // Generate AI analysis for the entire progression
+  const generateProgressionAnalysis = async () => {
+    setIsGeneratingAnalysis(true);
+    
+    try {
+      // First, get the overall vibe and analysis
+      const vibeResponse = await fetch('/api/music-analysis', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'progression-vibe',
+          data: { 
+            progression: chordProgression,
+            context: 'Generate creative vibe analysis and emotional journey for this chord progression'
+          }
+        })
+      });
+
+      if (vibeResponse.ok) {
+        const vibeData = await vibeResponse.json();
+        setProgressionVibe(vibeData.data);
+      }
+
+      // Then generate individual chord analysis
+      const analysisPromises = chords.map(async (chord, index) => {
+        const chordResponse = await fetch('/api/music-analysis', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'chord-analysis',
+            data: { 
+              chord: chord,
+              progression: chordProgression,
+              position: index + 1,
+              totalChords: chords.length,
+              context: `Analyze this chord in the context of the progression: ${chordProgression}`
+            }
+          })
+        });
+
+        if (chordResponse.ok) {
+          const chordData = await chordResponse.json();
+          try {
+            // Try to parse the JSON response
+            const parsedAnalysis = JSON.parse(chordData.data);
+            return { chord, analysis: parsedAnalysis };
+          } catch (error) {
+            console.error('Failed to parse chord analysis JSON:', error);
+            // Fallback to basic analysis
+            return { 
+              chord, 
+              analysis: {
+                name: chord,
+                emotion: 'Analyzing...',
+                impact: 'Processing chord analysis...',
+                explanation: chordData.data || 'Processing chord analysis...',
+                alternatives: ['Alternative 1', 'Alternative 2', 'Alternative 3'],
+                fretboardPositions: [],
+                color: '#00baba'
+              }
+            };
+          }
+        }
+        return { chord, analysis: null };
+      });
+
+      const results = await Promise.all(analysisPromises);
+      const analysisMap = {};
+      
+      results.forEach(({ chord, analysis }) => {
+        if (analysis) {
+          analysisMap[chord] = analysis;
+        }
+      });
+
+      setChordAnalysis(analysisMap);
+    } catch (error) {
+      console.error('Failed to generate progression analysis:', error);
+    } finally {
+      setIsGeneratingAnalysis(false);
     }
   };
 
@@ -177,20 +139,39 @@ export default function ChordProgressionAnalyzer({
       
       // Step 1: Show chord on fretboard
       setShowFretboard(true);
-      typeText(`🎸 **${chordName}** - ${chordData.emotion}`, () => {
+      typeText(`🎸 **${chordName}** - ${chordData.emotion || 'Analyzing...'}`, () => {
         setTimeout(() => {
           // Step 2: Explain the chord
-          typeText(`💡 ${chordData.explanation}`, () => {
+          typeText(`💡 ${chordData.explanation || 'Processing chord analysis...'}`, () => {
             setTimeout(() => {
               // Step 3: Show alternatives
-              typeText(`🎵 **Alternatives:** ${chordData.alternatives.join(' | ')}`, () => {
+              if (chordData.alternatives && chordData.alternatives.length > 0) {
+                typeText(`🎵 **Alternatives:** ${chordData.alternatives.join(' | ')}`, () => {
+                  setTimeout(() => {
+                    setShowFretboard(false);
+                    setCurrentChord(null);
+                    setCurrentStep(stepIndex + 1);
+                  }, 2000);
+                });
+              } else {
                 setTimeout(() => {
                   setShowFretboard(false);
                   setCurrentChord(null);
                   setCurrentStep(stepIndex + 1);
                 }, 2000);
-              });
+              }
             }, 3000);
+          });
+        }, 2000);
+      });
+    } else {
+      // Fallback if chord analysis not available
+      typeText(`🎸 **${chordName}** - Processing...`, () => {
+        setTimeout(() => {
+          typeText(`💡 Analyzing this chord in the context of your progression...`, () => {
+            setTimeout(() => {
+              setCurrentStep(stepIndex + 1);
+            }, 2000);
           });
         }, 2000);
       });
@@ -204,29 +185,40 @@ export default function ChordProgressionAnalyzer({
       setAnalysisComplete(false);
       setDisplayText('');
       
-      // Initial explanation
-      typeText(`🎼 **Analyzing your chord progression:** ${chordProgression}`, () => {
-        setTimeout(() => {
-          typeText(`🎵 **This progression has a sophisticated, jazzy feel with smooth voice leading and emotional depth.**`, () => {
-            setTimeout(() => {
-              processStep(0);
-            }, 2000);
-          });
-        }, 2000);
+      // Generate AI analysis first
+      generateProgressionAnalysis().then(() => {
+        // Initial explanation
+        typeText(`🎼 **Analyzing your chord progression:** ${chordProgression}`, () => {
+          setTimeout(() => {
+            if (progressionVibe) {
+              typeText(`🎵 **${progressionVibe}**`, () => {
+                setTimeout(() => {
+                  processStep(0);
+                }, 2000);
+              });
+            } else {
+              typeText(`🎵 **This progression has a unique character with interesting harmonic relationships.**`, () => {
+                setTimeout(() => {
+                  processStep(0);
+                }, 2000);
+              });
+            }
+          }, 2000);
+        });
       });
     }
   }, [isVisible, chordProgression]);
 
   // Auto-advance to next chord
   useEffect(() => {
-    if (currentStep < chords.length && !isTyping && !showFretboard) {
+    if (currentStep < chords.length && !isTyping && !showFretboard && !isGeneratingAnalysis) {
       const timeout = setTimeout(() => {
         processStep(currentStep);
       }, 1000);
       
       return () => clearTimeout(timeout);
     }
-  }, [currentStep, isTyping, showFretboard]);
+  }, [currentStep, isTyping, showFretboard, isGeneratingAnalysis]);
 
   if (!isVisible) return null;
 
@@ -242,7 +234,7 @@ export default function ChordProgressionAnalyzer({
       <div className="progression-analyzer">
         {/* Header */}
         <div className="progression-header">
-          <h3>🎸 Interactive Chord Analysis</h3>
+          <h3>🎸 AI-Powered Chord Analysis</h3>
           <button 
             className="progression-close"
             onClick={onClose}
@@ -254,7 +246,25 @@ export default function ChordProgressionAnalyzer({
         {/* Subtitle Container */}
         <div className="progression-subtitle">
           <div className="subtitle-content">
-            {displayText}
+            <ReactMarkdown 
+              components={{
+                h1: ({children}) => <h1 className="markdown-h1">{children}</h1>,
+                h2: ({children}) => <h2 className="markdown-h2">{children}</h2>,
+                h3: ({children}) => <h3 className="markdown-h3">{children}</h3>,
+                h4: ({children}) => <h4 className="markdown-h4">{children}</h4>,
+                p: ({children}) => <p className="markdown-p">{children}</p>,
+                ul: ({children}) => <ul className="markdown-ul">{children}</ul>,
+                ol: ({children}) => <ol className="markdown-ol">{children}</ol>,
+                li: ({children}) => <li className="markdown-li">{children}</li>,
+                strong: ({children}) => <strong className="markdown-strong">{children}</strong>,
+                em: ({children}) => <em className="markdown-em">{children}</em>,
+                code: ({children}) => <code className="markdown-code">{children}</code>,
+                blockquote: ({children}) => <blockquote className="markdown-blockquote">{children}</blockquote>,
+                hr: () => <hr className="markdown-hr" />
+              }}
+            >
+              {displayText}
+            </ReactMarkdown>
             {isTyping && <span className="typing-cursor">|</span>}
           </div>
         </div>
@@ -268,7 +278,7 @@ export default function ChordProgressionAnalyzer({
             />
           </div>
           <div className="progress-text">
-            {currentStep} of {chords.length} chords analyzed
+            {isGeneratingAnalysis ? 'Generating AI analysis...' : `${currentStep} of ${chords.length} chords analyzed`}
           </div>
         </div>
 
@@ -277,19 +287,21 @@ export default function ChordProgressionAnalyzer({
           <div className="progression-fretboard">
             <div className="fretboard-container">
               <div className="fretboard">
+                {/* Guitar strings */}
                 {[6, 5, 4, 3, 2, 1].map(string => (
-                  <div key={string} className="string">
+                  <div key={string} className="guitar-string">
+                    {/* Frets */}
                     {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(fret => {
-                      const position = currentChord.fretboardPositions.find(
+                      const position = currentChord.fretboardPositions?.find(
                         pos => pos.string === string && pos.fret === fret
                       );
                       return (
                         <div 
                           key={fret} 
-                          className={`fret ${position ? 'active' : ''}`}
+                          className={`fret-position ${position ? 'active' : ''}`}
                           style={{ 
-                            left: `${fret * 40}px`,
-                            backgroundColor: position ? currentChord.color || '#00baba' : 'transparent'
+                            left: `${fret * 30 + 20}px`,
+                            backgroundColor: position ? (currentChord.color || '#00baba') : 'transparent'
                           }}
                         >
                           {position && (
@@ -311,14 +323,14 @@ export default function ChordProgressionAnalyzer({
         {analysisComplete && (
           <div className="progression-complete">
             <h4>🎉 Analysis Complete!</h4>
-            <p>You've mastered a sophisticated chord progression with beautiful voice leading and emotional depth.</p>
+            <p>You've explored a unique chord progression with AI-generated insights and personalized guidance.</p>
             <div className="completion-actions">
               <button 
                 className="action-button primary"
                 onClick={() => {
                   setCurrentStep(0);
                   setAnalysisComplete(false);
-                  processStep(0);
+                  generateProgressionAnalysis().then(() => processStep(0));
                 }}
               >
                 🔄 Analyze Again
@@ -415,6 +427,90 @@ export default function ChordProgressionAnalyzer({
           font-weight: 500;
         }
 
+        /* Markdown Styling */
+        .markdown-h1 {
+          color: #00baba;
+          font-size: 20px;
+          font-weight: bold;
+          margin: 15px 0 10px 0;
+          border-bottom: 2px solid rgba(0, 186, 186, 0.3);
+          padding-bottom: 5px;
+        }
+
+        .markdown-h2 {
+          color: #00d4d4;
+          font-size: 18px;
+          font-weight: bold;
+          margin: 12px 0 8px 0;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .markdown-h3 {
+          color: #4dd0e1;
+          font-size: 16px;
+          font-weight: 600;
+          margin: 10px 0 6px 0;
+        }
+
+        .markdown-h4 {
+          color: #81d4fa;
+          font-size: 15px;
+          font-weight: 600;
+          margin: 8px 0 4px 0;
+        }
+
+        .markdown-p {
+          margin: 8px 0;
+          line-height: 1.6;
+        }
+
+        .markdown-ul, .markdown-ol {
+          margin: 8px 0;
+          padding-left: 20px;
+        }
+
+        .markdown-li {
+          margin: 4px 0;
+          line-height: 1.5;
+        }
+
+        .markdown-strong {
+          color: #00baba;
+          font-weight: bold;
+        }
+
+        .markdown-em {
+          color: #4dd0e1;
+          font-style: italic;
+        }
+
+        .markdown-code {
+          background: rgba(0, 186, 186, 0.1);
+          color: #00d4d4;
+          padding: 2px 6px;
+          border-radius: 4px;
+          font-family: 'Courier New', monospace;
+          font-size: 13px;
+        }
+
+        .markdown-blockquote {
+          border-left: 4px solid #00baba;
+          background: rgba(0, 186, 186, 0.05);
+          padding: 10px 15px;
+          margin: 10px 0;
+          border-radius: 0 8px 8px 0;
+          font-style: italic;
+        }
+
+        .markdown-hr {
+          border: none;
+          height: 2px;
+          background: linear-gradient(90deg, transparent, #00baba, transparent);
+          margin: 15px 0;
+        }
+
         .typing-cursor {
           animation: blink 1s infinite;
           color: #00baba;
@@ -466,33 +562,26 @@ export default function ChordProgressionAnalyzer({
           background: linear-gradient(90deg, #3a3a4e 0%, #4a4a5e 100%);
           border-radius: 8px;
           border: 2px solid #5a5a6e;
+          padding: 20px;
         }
 
-        .string {
+        .guitar-string {
           position: absolute;
-          width: 100%;
+          width: calc(100% - 40px);
           height: 2px;
           background: #8a8a9e;
-          top: 50%;
-          transform: translateY(-50%);
+          left: 20px;
         }
 
-        .string:nth-child(1) { top: 20%; }
-        .string:nth-child(2) { top: 30%; }
-        .string:nth-child(3) { top: 40%; }
-        .string:nth-child(4) { top: 50%; }
-        .string:nth-child(5) { top: 60%; }
-        .string:nth-child(6) { top: 70%; }
+        .guitar-string:nth-child(1) { top: 20px; }
+        .guitar-string:nth-child(2) { top: 50px; }
+        .guitar-string:nth-child(3) { top: 80px; }
+        .guitar-string:nth-child(4) { top: 110px; }
+        .guitar-string:nth-child(5) { top: 140px; }
+        .guitar-string:nth-child(6) { top: 170px; }
 
-        .fret {
+        .fret-position {
           position: absolute;
-          width: 2px;
-          height: 100%;
-          background: #6a6a7e;
-          top: 0;
-        }
-
-        .fret.active {
           width: 20px;
           height: 20px;
           border-radius: 50%;
@@ -501,8 +590,14 @@ export default function ChordProgressionAnalyzer({
           display: flex;
           align-items: center;
           justify-content: center;
+          border: 2px solid transparent;
+          transition: all 0.3s ease;
+        }
+
+        .fret-position.active {
           border: 2px solid white;
           box-shadow: 0 0 10px rgba(0, 186, 186, 0.5);
+          z-index: 10;
         }
 
         .finger-indicator {

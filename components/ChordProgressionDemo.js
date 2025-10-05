@@ -1,31 +1,68 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function ChordProgressionDemo() {
   const [showDemo, setShowDemo] = useState(false);
   const [progression, setProgression] = useState('Cadd9 - Bm7b5 - E7 - Am7 - Fmaj7 - G6 - Em9 - Am7 - Dm7 - G7sus4 - Cmaj7');
 
-  const exampleProgressions = [
-    {
-      name: 'Jazz Ballad',
-      progression: 'Cmaj7 - Am7 - Dm7 - G7 - Cmaj7',
-      description: 'A smooth, romantic progression perfect for ballads'
-    },
-    {
-      name: 'Blues Rock',
-      progression: 'A7 - D7 - A7 - E7 - D7 - A7 - E7',
-      description: 'Classic blues progression with dominant 7th chords'
-    },
-    {
-      name: 'Modern Pop',
-      progression: 'F - Am - Dm - Bb - F - Am - Bb - C',
-      description: 'Contemporary pop progression with emotional depth'
-    },
-    {
-      name: 'Jazz Sophisticated',
-      progression: 'Cadd9 - Bm7b5 - E7 - Am7 - Fmaj7 - G6 - Em9 - Am7 - Dm7 - G7sus4 - Cmaj7',
-      description: 'Complex jazz progression with smooth voice leading'
+  const [exampleProgressions, setExampleProgressions] = useState([]);
+  const [isGeneratingExamples, setIsGeneratingExamples] = useState(false);
+
+  // Generate AI examples based on user's style
+  const generateAIExamples = async () => {
+    setIsGeneratingExamples(true);
+    try {
+      const response = await fetch('/api/music-analysis', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'generate-progression-examples',
+          data: { 
+            context: 'Generate 4 creative chord progression examples with different styles and vibes',
+            userStyle: 'creative and diverse'
+          }
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        // Parse the AI response to extract progressions
+        const examples = JSON.parse(data.data || '[]');
+        setExampleProgressions(examples);
+      }
+    } catch (error) {
+      console.error('Failed to generate AI examples:', error);
+      // Fallback to static examples
+      setExampleProgressions([
+        {
+          name: 'Jazz Ballad',
+          progression: 'Cmaj7 - Am7 - Dm7 - G7 - Cmaj7',
+          description: 'A smooth, romantic progression perfect for ballads'
+        },
+        {
+          name: 'Blues Rock',
+          progression: 'A7 - D7 - A7 - E7 - D7 - A7 - E7',
+          description: 'Classic blues progression with dominant 7th chords'
+        },
+        {
+          name: 'Modern Pop',
+          progression: 'F - Am - Dm - Bb - F - Am - Bb - C',
+          description: 'Contemporary pop progression with emotional depth'
+        },
+        {
+          name: 'Jazz Sophisticated',
+          progression: 'Cadd9 - Bm7b5 - E7 - Am7 - Fmaj7 - G6 - Em9 - Am7 - Dm7 - G7sus4 - Cmaj7',
+          description: 'Complex jazz progression with smooth voice leading'
+        }
+      ]);
+    } finally {
+      setIsGeneratingExamples(false);
     }
-  ];
+  };
+
+  // Generate examples on component mount
+  useEffect(() => {
+    generateAIExamples();
+  }, []);
 
   if (!showDemo) {
     return (
@@ -34,7 +71,7 @@ export default function ChordProgressionDemo() {
           className="demo-button"
           onClick={() => setShowDemo(true)}
         >
-          🎸 Try Interactive Chord Analysis
+           Try Interactive Chord Analysis
         </button>
       </div>
     );
@@ -43,7 +80,7 @@ export default function ChordProgressionDemo() {
   return (
     <div className="chord-progression-demo">
       <div className="demo-header">
-        <h3>🎸 Interactive Chord Progression Analyzer</h3>
+        <h3> Interactive Chord Progression Analyzer</h3>
         <button 
           className="demo-close"
           onClick={() => setShowDemo(false)}
@@ -85,10 +122,10 @@ export default function ChordProgressionDemo() {
           <h4>Ready to Analyze?</h4>
           <p>This will open an interactive analyzer that shows each chord on the fretboard with:</p>
           <ul>
-            <li>🎸 Visual fretboard positions</li>
-            <li>💡 Emotional impact explanations</li>
-            <li>🎵 Alternative chord suggestions</li>
-            <li>🎼 Step-by-step guidance</li>
+            <li> Visual fretboard positions</li>
+            <li>Emotional impact explanations</li>
+            <li>Alternative chord suggestions</li>
+            <li>Step-by-step guidance</li>
           </ul>
           
           <button 
@@ -99,7 +136,7 @@ export default function ChordProgressionDemo() {
               // In a real implementation, this would open the ChordProgressionAnalyzer
             }}
           >
-            🎸 Start Interactive Analysis
+             Start Interactive Analysis
           </button>
         </div>
       </div>

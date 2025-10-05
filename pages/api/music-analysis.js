@@ -86,6 +86,36 @@ export default async function handler(req, res) {
         );
         break;
 
+      case 'progression-vibe':
+        console.log('🎵 Music Analysis API: Processing progression vibe analysis');
+        result = await MusicTheoryAI.analyzeProgressionVibe(
+          data.progression,
+          data.context,
+          sessionId
+        );
+        break;
+
+      case 'chord-analysis':
+        console.log('🎵 Music Analysis API: Processing individual chord analysis');
+        result = await MusicTheoryAI.analyzeIndividualChord(
+          data.chord,
+          data.progression,
+          data.position,
+          data.totalChords,
+          data.context,
+          sessionId
+        );
+        break;
+
+      case 'generate-progression-examples':
+        console.log('🎵 Music Analysis API: Processing progression examples generation');
+        result = await MusicTheoryAI.generateProgressionExamples(
+          data.context,
+          data.userStyle,
+          sessionId
+        );
+        break;
+
       default:
         console.error('🎵 Music Analysis API: Invalid analysis type:', type);
         return res.status(400).json({ error: 'Invalid analysis type' });
