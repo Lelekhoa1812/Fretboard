@@ -61,6 +61,57 @@ export default function ChordProgressionAnalyzer({
     return fullResponse; // Fallback to original
   };
 
+  // --- Alternative chords normalization/validation ---
+  const allowedQualities = new Set([
+    '', 'maj', 'major', 'm', 'min', '7', 'm7', 'maj7', 'sus2', 'sus4', '7sus4', '9sus4', '5',
+    'dim', 'aug', 'm7b5', 'dim7', '6', 'm6', 'add9', 'add11', 'add13', '6add9', 'm6add9',
+    '9', 'm9', 'maj9', '11', 'm11', '13', 'm13', '7b9', '7#9', '7#11', '7b13', 'maj7#11'
+  ]);
+
+  const normalizeAltChord = (name) => {
+    if (!name || typeof name !== 'string') return null;
+    const raw = name.trim().replace(/\s+/g, '');
+    const m = raw.match(/^([A-G](?:#|b)?)(.*)$/);
+    if (!m) return null;
+    let root = m[1];
+    let suf = (m[2] || '').toLowerCase();
+    // common normalizations
+    suf = suf
+      .replace(/^maj$/, 'maj')
+      .replace(/^major$/, 'maj')
+      .replace(/^min$/, 'm')
+      .replace(/^minor$/, 'm')
+      .replace(/^m7b5$/, 'm7b5');
+    // reject weird numeric strings like "79" -> try to map to 7 or 9, prefer 7
+    if (!allowedQualities.has(suf)) {
+      if (suf.includes('7') && allowedQualities.has('7')) suf = '7';
+      else if (suf.includes('9') && allowedQualities.has('9')) suf = '9';
+    }
+    if (!allowedQualities.has(suf)) return null;
+    const candidate = `${root}${suf}`;
+    // verify shape availability if possible
+    try {
+      // lazy import validator from chord library (already in app scope via getChordShape/hasChordShape path)
+      // We use getChordShape (aliased) path through analyzer usage
+      // As a cheap validator, ensure getChordShape returns non-empty positions
+      const positions = getChordShape(candidate);
+      if (!positions || positions.length === 0) return null;
+    } catch {}
+    return candidate;
+  };
+
+  const enrichAlt = (alt) => {
+    const palette = ['#00baba', '#4dd0e1', '#81d4fa', '#ffb74d', '#ef9a9a', '#a5d6a7'];
+    const color = palette[Math.floor(Math.random() * palette.length)];
+    return {
+      chord: alt,
+      emotion: 'Colorful & complementary',
+      vibe: 'Adds contrast and movement',
+      reason: 'Works as a functional substitution that preserves voice-leading while shifting mood.',
+      color
+    };
+  };
+
   // Get chord shape from library or Llama
   const getChordShapeData = async (chordName) => {
     console.log(`Getting chord shape for: ${chordName}`);
@@ -188,10 +239,32 @@ export default function ChordProgressionAnalyzer({
               // Summarize the explanation for concise display
               const summarizedExplanation = await summarizeAIResponse(parsedAnalysis.explanation, chord);
               
+              // Normalize alternatives into rich objects and validate chords
+              let alts = parsedAnalysis.alternatives || [];
+              alts = (Array.isArray(alts) ? alts : []).map((a) => {
+                if (typeof a === 'string') {
+                  const norm = normalizeAltChord(a);
+                  return norm ? enrichAlt(norm) : null;
+                }
+                if (a && typeof a === 'object') {
+                  const norm = normalizeAltChord(a.chord || '');
+                  if (!norm) return null;
+                  return {
+                    chord: norm,
+                    emotion: a.emotion || 'Colorful & complementary',
+                    vibe: a.vibe || a.mood || 'Adds contrast and movement',
+                    reason: a.reason || 'Works as a functional substitution with a distinct color.',
+                    color: a.color || '#00baba'
+                  };
+                }
+                return null;
+              }).filter(Boolean);
+
               return { 
                 chord, 
                 analysis: {
                   ...parsedAnalysis,
+                  alternatives: alts,
                   explanation: summarizedExplanation,
                   fullExplanation: parsedAnalysis.explanation,
                   fretboardPositions: fretboardPositions // Use real chord shapes
