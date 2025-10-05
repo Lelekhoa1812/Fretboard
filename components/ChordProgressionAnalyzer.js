@@ -640,7 +640,7 @@ export default function ChordProgressionAnalyzer({
               {[0, 1, 2, 3, 4, 5].map(fret => (
                 <div key={`g${fret}`} className="fret-guide" style={{ left: `calc(var(--leftOffset) + (var(--fretWidth) * ${fret}))` }}>
                   <div className="fret-left-line" />
-                  <div className="fret-left-label">{Math.max(0, fret - 1)}</div>
+                  <div className="fret-left-label">{fret}</div>
                 </div>
               ))}
             </div>
