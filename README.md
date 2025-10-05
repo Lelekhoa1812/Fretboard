@@ -8,6 +8,24 @@ Fretboard AI is a comprehensive music education platform that combines advanced 
 
 Fretboard AI represents the next generation of music education technology, featuring:
 
+## Screenshots
+
+### Interactive Fretboard Interface
+![Fretboard Interface](img/demo.png)
+*Main fretboard interface with real-time note highlighting and chord visualization*
+
+### AI-Powered Chord Analysis
+![Chord Analysis](img/chords.png)
+*Advanced chord progression analysis with AI-generated insights and harmonic relationships*
+
+### Scale Visualization
+![Scale Patterns](img/scales.png)
+*Comprehensive scale patterns with interactive fretboard positioning and theory explanations*
+
+### AI Assistant Interface
+![AI Assistant](img/chatbot.png)
+*Intelligent music theory assistant with voice control and personalized learning guidance*
+
 - **Advanced AI Integration**: NVIDIA NIM API with intelligent model selection and load balancing
 - **Real-Time Audio Processing**: Web Audio API integration for live chord detection and feedback
 - **Interactive Fretboard Visualization**: Multi-instrument support with dynamic note highlighting
