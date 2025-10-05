@@ -43,12 +43,29 @@ export default async function handler(req, res) {
 
       case 'practice-plan':
         console.log('🎵 Music Analysis API: Processing practice plan generation');
-        result = await MusicTheoryAI.generatePracticePlan(
-          data.skillLevel,
-          data.timeAvailable,
-          data.focusArea,
-          sessionId
-        );
+        try {
+          result = await Promise.race([
+            MusicTheoryAI.generatePracticePlan(
+              data.skillLevel,
+              data.timeAvailable,
+              data.focusArea,
+              sessionId
+            ),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 10000))
+          ]);
+        } catch (error) {
+          console.error('Practice plan generation failed:', error);
+          result = {
+            response: JSON.stringify({
+              warmup: "5-minute finger exercises and chord changes",
+              mainPractice: `Practice ${data.focusArea} for 20 minutes`,
+              coolDown: "Play a simple song you know",
+              nextSteps: "Focus on smooth chord transitions"
+            }),
+            model: 'fallback',
+            usage: { prompt_tokens: 0, total_tokens: 0, completion_tokens: 0 }
+          };
+        }
         break;
 
       case 'ask-question':
@@ -62,11 +79,29 @@ export default async function handler(req, res) {
 
       case 'scale-analysis':
         console.log('🎵 Music Analysis API: Processing scale analysis');
-        result = await MusicTheoryAI.analyzeScalePattern(
-          data.scale,
-          data.key,
-          sessionId
-        );
+        try {
+          result = await Promise.race([
+            MusicTheoryAI.analyzeScalePattern(
+              data.scale,
+              data.key,
+              sessionId
+            ),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 10000))
+          ]);
+        } catch (error) {
+          console.error('Scale analysis failed:', error);
+          result = {
+            response: JSON.stringify({
+              notes: ["C", "D", "E", "F", "G", "A", "B"],
+              pattern: `${data.scale} scale pattern`,
+              fretboard: "Practice on frets 0-12",
+              chords: ["Related chords"],
+              practice: "Play scale up and down slowly"
+            }),
+            model: 'fallback',
+            usage: { prompt_tokens: 0, total_tokens: 0, completion_tokens: 0 }
+          };
+        }
         break;
 
       case 'chord-voicings':
