@@ -40,15 +40,39 @@ export default function AIAssistant({
 
   // Detect chord progressions in user input
   const detectChordProgression = (message) => {
-    const chordPattern = /([A-G][#♭]?(?:maj|min|m|M|dim|aug|sus|add|6|7|9|11|13|♭5|♯5|♭9|♯9|♭13|♯13|♯11|♭11|5|b5|#5|b9|#9|b13|#13|#11|b11)*\d*)/g;
+    // More precise chord pattern that avoids false positives
+    const chordPattern = /\b([A-G][#♭]?(?:maj|min|m|M|dim|aug|sus|add|6|7|9|11|13|♭5|♯5|♭9|♯9|♭13|♯13|♯11|♭11|5|b5|#5|b9|#9|b13|#13|#11|b11)*\d*)\b/g;
     const matches = message.match(chordPattern);
     
+    console.log('🔍 Chord detection debug:', { 
+      message: message.substring(0, 50) + '...', 
+      matches, 
+      matchCount: matches?.length 
+    });
+    
     if (matches && matches.length >= 3) {
-      // Check if it looks like a chord progression
-      const progression = matches.join(' - ');
-      setCurrentProgression(progression);
-      setShowProgressionAnalyzer(true);
-      return true;
+      // Additional validation: check if it's actually a chord progression
+      // by looking for common chord progression patterns
+      const progressionText = message.toLowerCase();
+      const hasChordSeparators = progressionText.includes(' - ') || progressionText.includes(' → ') || progressionText.includes(' -> ');
+      const hasChordKeywords = progressionText.includes('chord') || progressionText.includes('progression') || progressionText.includes('sequence');
+      
+      console.log('🔍 Validation check:', { 
+        hasChordSeparators, 
+        hasChordKeywords, 
+        matchCount: matches.length 
+      });
+      
+      // Only trigger if it looks like an intentional chord progression
+      if (hasChordSeparators || hasChordKeywords || matches.length >= 4) {
+        const progression = matches.join(' - ');
+        console.log('✅ Chord progression detected:', progression);
+        setCurrentProgression(progression);
+        setShowProgressionAnalyzer(true);
+        return true;
+      } else {
+        console.log('❌ False positive avoided - not a chord progression');
+      }
     }
     return false;
   };

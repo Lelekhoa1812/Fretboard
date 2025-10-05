@@ -20,8 +20,15 @@ export default function ChordProgressionAnalyzer({
   const typingTimeoutRef = useRef(null);
   const stepTimeoutRef = useRef(null);
 
-  // Parse chord progression string into array
-  const chords = chordProgression.split(' - ').map(chord => chord.trim());
+  // Parse chord progression string into array with better validation
+  const chords = chordProgression
+    .split(/ - | → | -> |,/)
+    .map(chord => chord.trim())
+    .filter(chord => {
+      // Filter out invalid chords and common false positives
+      const validChordPattern = /^[A-G][#♭]?(?:maj|min|m|M|dim|aug|sus|add|6|7|9|11|13|♭5|♯5|♭9|♯9|♭13|♯13|♯11|♭11|5|b5|#5|b9|#9|b13|#13|#11|b11)*\d*$/;
+      return validChordPattern.test(chord) && chord.length > 0;
+    });
 
   // Generate AI analysis for the entire progression
   const generateProgressionAnalysis = async () => {
@@ -181,6 +188,12 @@ export default function ChordProgressionAnalyzer({
   // Start analysis
   useEffect(() => {
     if (isVisible && chords.length > 0) {
+      console.log('🎸 Starting chord progression analysis:', { 
+        originalProgression: chordProgression, 
+        parsedChords: chords, 
+        chordCount: chords.length 
+      });
+      
       setCurrentStep(0);
       setAnalysisComplete(false);
       setDisplayText('');
@@ -205,6 +218,13 @@ export default function ChordProgressionAnalyzer({
             }
           }, 2000);
         });
+      });
+    } else if (isVisible && chords.length === 0) {
+      console.log('❌ No valid chords found in progression:', chordProgression);
+      typeText(`❌ **No valid chord progression detected.** Please enter chords like: C - Am - F - G`, () => {
+        setTimeout(() => {
+          onClose();
+        }, 3000);
       });
     }
   }, [isVisible, chordProgression]);
