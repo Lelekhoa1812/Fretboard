@@ -572,22 +572,22 @@ export default function ChordProgressionAnalyzer({
         {currentChord && currentChord.fretboardPositions && currentChord.fretboardPositions.length > 0 && (
           <div className="fretboard-visualization">
             <h4>Chord Positions</h4>
+            {/* Per-fret left-side guides for first 6 frets with index-1 labeling (0 stays 0) */}
+            <div className="fret-guides">
+              {[0, 1, 2, 3, 4, 5].map(fret => (
+                <div key={`g${fret}`} className="fret-guide" style={{ left: `${fret * 25 + 30}px` }}>
+                  <div className="fret-left-line" />
+                  <div className="fret-left-label">{Math.max(0, fret - 1)}</div>
+                </div>
+              ))}
+            </div>
             <div className="fretboard-display">
-              {/* Fret guides with left-side labels (0-based: 0=open, 1=fret 1, ...) */}
-              <div className="fret-guides">
-                {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(fret => (
-                  <div key={`g${fret}`} className="fret-guide" style={{ left: `${fret * 25 + 30}px` }}>
-                    <div className="fret-left-line" />
-                    <div className="fret-left-label">{fret}</div>
-                  </div>
-                ))}
-              </div>
               <div className="fretboard-strings">
                 {[6, 5, 4, 3, 2, 1].map(string => (
                   <div key={string} className="guitar-string">
                     <div className="string-label">E{string === 6 ? '6' : string === 5 ? '5' : string === 4 ? '4' : string === 3 ? '3' : string === 2 ? '2' : '1'}</div>
                     <div className="string-line"></div>
-                    {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(fret => {
+                    {[0, 1, 2, 3, 4, 5].map(fret => {
                       const position = currentChord.fretboardPositions.find(
                         pos => pos.string === string && pos.fret === fret
                       );
@@ -608,13 +608,6 @@ export default function ChordProgressionAnalyzer({
                         </div>
                       );
                     })}
-                  </div>
-                ))}
-              </div>
-              <div className="fret-numbers">
-                {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(fret => (
-                  <div key={fret} className="fret-number" style={{ left: `${fret * 25 + 30}px` }}>
-                    {fret}
                   </div>
                 ))}
               </div>
@@ -1074,7 +1067,6 @@ export default function ChordProgressionAnalyzer({
           font-size: 16px;
           font-weight: bold;
         }
-
         .fret-guides { position: absolute; top: 20px; left: 0; right: 0; bottom: 20px; pointer-events: none; }
         .fret-guide { position: absolute; top: 0; bottom: 0; transform: translateX(-1px); }
         .fret-left-line { position: absolute; top: 0; bottom: 0; width: 2px; background: rgba(255,255,255,0.2); }
