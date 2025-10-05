@@ -286,7 +286,6 @@ export default function ChordProgressionAnalyzer({
       {/* Backdrop */}
       <div 
         className="progression-backdrop"
-        onClick={onClose}
       />
       
       {/* Main Container */}
@@ -414,9 +413,10 @@ export default function ChordProgressionAnalyzer({
           left: 0;
           right: 0;
           bottom: 0;
-          background: rgba(0, 0, 0, 0.8);
+          background: rgba(0, 0, 0, 0.2);
           z-index: 2000;
           animation: fadeIn 0.3s ease;
+          pointer-events: none;
         }
 
         .progression-analyzer {
@@ -434,6 +434,7 @@ export default function ChordProgressionAnalyzer({
           max-height: 40vh;
           overflow-y: auto;
           animation: slideUp 0.4s ease;
+          pointer-events: auto;
         }
 
         .progression-header {

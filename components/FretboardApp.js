@@ -484,6 +484,7 @@ export default function FretboardApp() {
             console.log('AI Suggestion:', suggestion);
             // You can add more sophisticated suggestion handling here
           }}
+          onClearSelectedChords={() => setSelectedChords([])}
         />
       )}
     </div>

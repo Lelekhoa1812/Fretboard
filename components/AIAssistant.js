@@ -14,7 +14,8 @@ export default function AIAssistant({
   selectedScales = [],
   instrument = 'Guitar',
   accidentals = 'flats',
-  onSuggestion 
+  onSuggestion,
+  onClearSelectedChords
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([]);
@@ -559,22 +560,24 @@ export default function AIAssistant({
 
   return (
     <>
-      {/* AI Assistant Toggle Button */}
-      <button
-        className="ai-assistant-toggle"
-        onClick={() => setIsOpen(!isOpen)}
-        title="Open AI Music Assistant"
-      >
+      {/* AI Assistant Toggle Button - Hide when progression analyzer is open */}
+      {!showProgressionAnalyzer && (
+        <button
+          className="ai-assistant-toggle"
+          onClick={() => setIsOpen(!isOpen)}
+          title="Open AI Music Assistant"
+        >
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
         AI Assistant
-      </button>
+        </button>
+      )}
 
-      {/* AI Assistant Panel */}
-      {isOpen && (
+      {/* AI Assistant Panel - Hide when progression analyzer is open */}
+      {isOpen && !showProgressionAnalyzer && (
         <div className="ai-assistant-panel">
           <div className="ai-assistant-header">
             <div className="ai-header-content">
@@ -596,6 +599,35 @@ export default function AIAssistant({
               ×
             </button>
           </div>
+
+          {/* Selected Chords Display */}
+          {selectedChords.length > 0 && (
+            <div className="selected-chords-display">
+              <div className="selected-chords-header">
+                <span className="selected-chords-title">
+                  Selected Chords ({selectedChords.length})
+                </span>
+                <button 
+                  className="clear-chords-button"
+                  onClick={() => {
+                    if (onClearSelectedChords) {
+                      onClearSelectedChords();
+                    }
+                  }}
+                  title="Clear all selected chords"
+                >
+                  ✕
+                </button>
+              </div>
+              <div className="selected-chords-list">
+                {selectedChords.map((chord, index) => (
+                  <span key={index} className="selected-chord-item">
+                    {chord.root}{chord.quality}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Quick Actions */}
           <div className="ai-quick-actions">
@@ -831,6 +863,62 @@ export default function AIAssistant({
         .ai-assistant-close:hover {
           background: rgba(255,255,255,0.1);
           color: white;
+        }
+
+        .selected-chords-display {
+          background: rgba(0, 186, 186, 0.05);
+          border-bottom: 1px solid rgba(0, 186, 186, 0.2);
+          padding: 12px 20px;
+        }
+
+        .selected-chords-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 8px;
+        }
+
+        .selected-chords-title {
+          color: #00baba;
+          font-size: 14px;
+          font-weight: 600;
+        }
+
+        .clear-chords-button {
+          background: rgba(255, 0, 0, 0.1);
+          border: 1px solid rgba(255, 0, 0, 0.3);
+          color: #ff6b6b;
+          width: 24px;
+          height: 24px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 12px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+
+        .clear-chords-button:hover {
+          background: rgba(255, 0, 0, 0.2);
+          border-color: rgba(255, 0, 0, 0.5);
+          color: #ff5252;
+        }
+
+        .selected-chords-list {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 6px;
+        }
+
+        .selected-chord-item {
+          background: rgba(0, 186, 186, 0.15);
+          border: 1px solid rgba(0, 186, 186, 0.4);
+          color: #00d4d4;
+          padding: 4px 8px;
+          border-radius: 12px;
+          font-size: 12px;
+          font-weight: 500;
         }
 
         .ai-quick-actions {
