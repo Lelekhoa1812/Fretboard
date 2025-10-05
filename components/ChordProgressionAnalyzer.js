@@ -424,6 +424,28 @@ export default function ChordProgressionAnalyzer({
           </div>
         )}
 
+        {/* Enhanced Alternatives Display */}
+        {currentChord && currentChord.alternatives && currentChord.alternatives.length > 0 && (
+          <div className="alternatives-section">
+            <h4>🎵 Alternative Chords</h4>
+            <div className="alternatives-grid">
+              {currentChord.alternatives.map((alt, index) => (
+                <div key={index} className="alternative-chord">
+                  <div className="alternative-name" style={{ color: alt.color || '#00baba' }}>
+                    {alt.chord}
+                  </div>
+                  <div className="alternative-emotion">
+                    {alt.emotion}
+                  </div>
+                  <div className="alternative-reason">
+                    {alt.reason}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Completion Message */}
         {analysisComplete && (
           <div className="progression-complete">
@@ -573,7 +595,7 @@ export default function ChordProgressionAnalyzer({
         }
 
         .markdown-h2 {
-          color: #00d4d4;
+          color: white;
           font-size: 18px;
           font-weight: bold;
           margin: 12px 0 8px 0;
@@ -583,30 +605,33 @@ export default function ChordProgressionAnalyzer({
         }
 
         .markdown-h3 {
-          color: #4dd0e1;
+          color: white;
           font-size: 16px;
           font-weight: 600;
           margin: 10px 0 6px 0;
         }
 
         .markdown-h4 {
-          color: #81d4fa;
+          color: white;
           font-size: 15px;
           font-weight: 600;
           margin: 8px 0 4px 0;
         }
 
         .markdown-p {
+          color: white;
           margin: 8px 0;
           line-height: 1.6;
         }
 
         .markdown-ul, .markdown-ol {
+          color: white;
           margin: 8px 0;
           padding-left: 20px;
         }
 
         .markdown-li {
+          color: white;
           margin: 4px 0;
           line-height: 1.5;
         }
@@ -633,6 +658,7 @@ export default function ChordProgressionAnalyzer({
         .markdown-blockquote {
           border-left: 4px solid #00baba;
           background: rgba(0, 186, 186, 0.05);
+          color: white;
           padding: 10px 15px;
           margin: 10px 0;
           border-radius: 0 8px 8px 0;
@@ -697,6 +723,58 @@ export default function ChordProgressionAnalyzer({
           color: #00baba;
           margin: 0 0 10px 0;
           font-size: 14px;
+        }
+
+        /* Alternatives Section */
+        .alternatives-section {
+          padding: 15px 20px;
+          background: rgba(0, 186, 186, 0.05);
+          border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .alternatives-section h4 {
+          color: #00baba;
+          margin: 0 0 15px 0;
+          font-size: 16px;
+          font-weight: bold;
+        }
+
+        .alternatives-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 12px;
+        }
+
+        .alternative-chord {
+          background: rgba(0, 186, 186, 0.1);
+          border: 1px solid rgba(0, 186, 186, 0.3);
+          border-radius: 8px;
+          padding: 12px;
+          transition: all 0.3s ease;
+        }
+
+        .alternative-chord:hover {
+          background: rgba(0, 186, 186, 0.15);
+          border-color: rgba(0, 186, 186, 0.5);
+        }
+
+        .alternative-name {
+          font-size: 16px;
+          font-weight: bold;
+          margin-bottom: 6px;
+        }
+
+        .alternative-emotion {
+          color: #4dd0e1;
+          font-size: 13px;
+          font-style: italic;
+          margin-bottom: 8px;
+        }
+
+        .alternative-reason {
+          color: #e9f3ff;
+          font-size: 12px;
+          line-height: 1.4;
         }
 
         .typing-cursor {
