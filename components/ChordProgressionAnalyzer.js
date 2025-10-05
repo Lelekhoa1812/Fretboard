@@ -25,16 +25,81 @@ export default function ChordProgressionAnalyzer({
   const typingTimeoutRef = useRef(null);
   const stepTimeoutRef = useRef(null);
 
-  // Parse chord progression string into array with forgiving separators and validation
+  // --- Chord normalization helpers ---
+  const normalizeAccidentals = (s) => s
+    .replace(/\s+/g, '')
+    .replace(/[♯#]/g, '#')
+    .replace(/[♭]/g, 'b');
+
+  const normalizeQualitySuffix = (suffixRaw) => {
+    if (!suffixRaw) return '';
+    let s = suffixRaw;
+    // unify common unicode/symbols first
+    s = s.replace(/Δ/g, 'maj');
+    s = s.replace(/[º°]/g, 'dim');
+    s = s.replace(/ø/g, 'm7b5');
+    s = s.replace(/\+/g, 'aug');
+    s = s.replace(/−/g, '-');
+
+    // common words to canonical forms
+    s = s.replace(/maj(or)?7?/i, (m) => m.toLowerCase().includes('7') ? 'maj7' : 'maj');
+    s = s.replace(/min(or)?/i, 'm');
+    s = s.replace(/^M(?!aj)/, 'maj');
+    s = s.replace(/^m7b5$/i, 'm7b5');
+
+    // suspended
+    s = s.replace(/sus\s*2/i, 'sus2');
+    s = s.replace(/sus\s*4/i, 'sus4');
+    s = s.replace(/7\s*sus\s*4/i, '7sus4');
+    s = s.replace(/9\s*sus\s*4/i, '9sus4');
+
+    // add tones
+    s = s.replace(/add\s*9/i, 'add9');
+    s = s.replace(/add\s*11/i, 'add11');
+    s = s.replace(/add\s*13/i, 'add13');
+    s = s.replace(/6\s*add\s*9/i, '6add9');
+    s = s.replace(/m6\s*add\s*9/i, 'm6add9');
+
+    // extensions
+    s = s.replace(/^maj9$/i, 'maj9');
+    s = s.replace(/^maj11$/i, '11');
+    s = s.replace(/^maj13$/i, '13');
+
+    // altered dominants / maj alterations
+    s = s.replace(/maj7\s*#\s*11/i, 'maj7#11');
+    s = s.replace(/7\s*b\s*9/i, '7b9');
+    s = s.replace(/7\s*#\s*9/i, '7#9');
+    s = s.replace(/7\s*#\s*11/i, '7#11');
+    s = s.replace(/7\s*b\s*13/i, '7b13');
+
+    // power & triad words
+    s = s.replace(/power|five|5th/i, '5');
+    s = s.replace(/^dim(inished)?$/i, 'dim');
+    s = s.replace(/^aug(mented)?$/i, 'aug');
+
+    // strip stray separators/spaces already handled
+    return s.toLowerCase();
+  };
+
+  const normalizeChordToken = (token) => {
+    if (!token) return '';
+    const clean = normalizeAccidentals(token);
+    const m = clean.match(/^([A-G](?:#|b)?)(.*)$/i);
+    if (!m) return '';
+    const root = m[1].toUpperCase().replace('B#', 'B#').replace('E#', 'E#');
+    const suffix = normalizeQualitySuffix(m[2]);
+    // map a few common full-word forms
+    if (suffix === 'maj' || suffix === '') return `${root}${suffix === 'maj' ? 'maj' : ''}`;
+    return `${root}${suffix}`;
+  };
+
+  // Parse chord progression string into array with normalization; allow tokens like "Cmajor"
   const chords = chordProgression
     .split(/\s*(?:-+|→|->|,|\|)\s*/)
-    .map(chord => chord.trim())
+    .map(token => token.trim())
     .filter(Boolean)
-    .filter(chord => {
-      // More tolerant validation for common chord tokens (e.g., C, Am, G7, Fmaj7, etc.)
-      const validChordPattern = /^[A-G][#♭]?(?:maj|min|m|M|dim|aug|sus|add|6|7|9|11|13|♭5|♯5|♭9|♯9|♭13|♯13|♯11|♭11|5|b5|#5|b9|#9|b13|#13|#11|b11)*\d*$/;
-      return validChordPattern.test(chord);
-    });
+    .map(normalizeChordToken)
+    .filter(token => /^[A-G][#b]?/i.test(token));
 
   // Summarize AI responses using Llama
   const summarizeAIResponse = async (fullResponse, chordName) => {

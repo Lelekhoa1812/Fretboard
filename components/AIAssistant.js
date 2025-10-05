@@ -43,7 +43,7 @@ export default function AIAssistant({
   // Detect chord progressions in user input
   const detectChordProgression = (message) => {
     // More precise chord pattern that avoids false positives
-    const chordPattern = /\b([A-G][#♭]?(?:maj|min|m|M|dim|aug|sus|add|6|7|9|11|13|♭5|♯5|♭9|♯9|♭13|♯13|♯11|♭11|5|b5|#5|b9|#9|b13|#13|#11|b11)*\d*)\b/g;
+    const chordPattern = /\b([A-G][#♭]?(?:major|minor|maj|min|m|M|dim|aug|sus|add|6|7|9|11|13|♭5|♯5|♭9|♯9|♭13|♯13|♯11|♭11|5|b5|#5|b9|#9|b13|#13|#11|b11)*\d*)\b/g;
     const matches = message.match(chordPattern);
     
     console.log('🔍 Chord detection debug:', { 
