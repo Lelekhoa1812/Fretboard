@@ -82,6 +82,16 @@ export default function Fretboard({
       for (let fret = 0; fret <= numberOfFrets; fret++) {
         const fretDiv = document.createElement('div');
         fretDiv.className = 'note-fret';
+        // Add left line & label at top string only (per-fret)
+        const leftLine = document.createElement('div');
+        leftLine.className = 'left-line';
+        fretDiv.appendChild(leftLine);
+        if (stringIndex === 0) {
+          const leftLabel = document.createElement('div');
+          leftLabel.className = 'left-label';
+          leftLabel.textContent = String(fret);
+          fretDiv.appendChild(leftLabel);
+        }
         
         // Add fret marks
         if (stringIndex === 0 && singleFretMarkPositions.includes(fret)) {
@@ -327,12 +337,13 @@ export default function Fretboard({
         
         // Apply hand position filtering if enabled
         if (handPositions) {
+          // Show 6-fret window instead of 5
           const handPositionRanges = [
-            { min: 0, max: 4 },
-            { min: 1, max: 5 },
-            { min: 2, max: 6 },
-            { min: 3, max: 7 },
-            { min: 4, max: 8 }
+            { min: 0, max: 5 },
+            { min: 1, max: 6 },
+            { min: 2, max: 7 },
+            { min: 3, max: 8 },
+            { min: 4, max: 9 }
           ];
           const range = handPositionRanges[handPositionIndex];
           if (fretIndex < range.min || fretIndex > range.max) return;
@@ -355,11 +366,11 @@ export default function Fretboard({
         // Apply hand position filtering if enabled
         if (handPositions) {
           const handPositionRanges = [
-            { min: 0, max: 4 },
-            { min: 1, max: 5 },
-            { min: 2, max: 6 },
-            { min: 3, max: 7 },
-            { min: 4, max: 8 }
+            { min: 0, max: 5 },
+            { min: 1, max: 6 },
+            { min: 2, max: 7 },
+            { min: 3, max: 8 },
+            { min: 4, max: 9 }
           ];
           const range = handPositionRanges[handPositionIndex];
           if (fretIndex < range.min || fretIndex > range.max) return;
@@ -483,6 +494,15 @@ export default function Fretboard({
   return (
     <>
       <div className="fretboard" ref={fretboardRef}></div>
+      {/* Visible fret guides with left-side labels (0=open, 1=fret 1, ...). */}
+      <div className="fret-guides">
+        {Array.from({ length: numberOfFrets + 1 }, (_, fret) => (
+          <div key={`fg-${fret}`} className="fret-guide" style={{ left: `${(100 / (numberOfFrets + 1)) * fret}%` }}>
+            <div className="fret-left-line" />
+            <div className="fret-left-label">{fret}</div>
+          </div>
+        ))}
+      </div>
       <div className="note-name-section" ref={noteNameSectionRef}></div>
       
       {/* Chord Quality Selector */}
@@ -497,6 +517,10 @@ export default function Fretboard({
         .chord-note {
           position: relative;
         }
+        .fret-guides { position: relative; height: 0; }
+        .fret-guide { position: absolute; top: -200px; bottom: 0; transform: translateX(-1px); pointer-events: none; }
+        .fret-left-line { position: absolute; top: 0; bottom: -200px; width: 2px; background: rgba(255,255,255,0.18); }
+        .fret-left-label { position: absolute; top: -218px; left: -6px; color: #8a8a9e; font-size: 10px; font-weight: bold; }
         
         .chord-note:hover::after {
           content: 'Shift+click for quality';
@@ -519,6 +543,11 @@ export default function Fretboard({
           from { opacity: 0; transform: translateX(-50%) translateY(-5px); }
           to { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
+
+        /* Per-fret left line/label inside generated .note-fret */
+        .note-fret { position: relative; }
+        .note-fret .left-line { position: absolute; left: 0; top: 0; bottom: 0; width: 1px; background: rgba(255,255,255,0.18); }
+        .note-fret .left-label { position: absolute; top: -14px; left: -6px; color: #8a8a9e; font-size: 10px; font-weight: bold; }
       `}</style>
     </>
   );

@@ -195,7 +195,7 @@ export default function ChordProgressionAnalyzer({
               }
             })
           }),
-          new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 15000))
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 60000)) // 1 min
         ]);
 
         if (vibeResponse.ok) {
@@ -389,7 +389,14 @@ export default function ChordProgressionAnalyzer({
             setTimeout(() => {
               // Step 3: Show alternatives
               if (chordData.alternatives && chordData.alternatives.length > 0) {
-                typeText(`🎵 **Alternatives:** ${chordData.alternatives.join(' | ')}`, () => {
+                const altSummaries = chordData.alternatives.map((alt) => {
+                  if (typeof alt === 'string') return alt;
+                  const parts = [alt.chord];
+                  if (alt.emotion) parts.push(alt.emotion);
+                  if (alt.vibe || alt.mood) parts.push(alt.vibe || alt.mood);
+                  return parts.filter(Boolean).join(' • ');
+                }).join(' | ');
+                typeText(`🎵 **Alternatives:** ${altSummaries}` , () => {
                   setTimeout(() => {
                     setShowFretboard(false);
                     setCurrentChord(null);
@@ -564,8 +571,17 @@ export default function ChordProgressionAnalyzer({
         {/* Fretboard Visualization */}
         {currentChord && currentChord.fretboardPositions && currentChord.fretboardPositions.length > 0 && (
           <div className="fretboard-visualization">
-            <h4>🎸 Chord Positions</h4>
+            <h4>Chord Positions</h4>
             <div className="fretboard-display">
+              {/* Fret guides with left-side labels (0-based: 0=open, 1=fret 1, ...) */}
+              <div className="fret-guides">
+                {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(fret => (
+                  <div key={`g${fret}`} className="fret-guide" style={{ left: `${fret * 25 + 30}px` }}>
+                    <div className="fret-left-line" />
+                    <div className="fret-left-label">{fret}</div>
+                  </div>
+                ))}
+              </div>
               <div className="fretboard-strings">
                 {[6, 5, 4, 3, 2, 1].map(string => (
                   <div key={string} className="guitar-string">
@@ -637,7 +653,7 @@ export default function ChordProgressionAnalyzer({
         {/* Enhanced Alternatives Display */}
         {currentChord && (
           <div className="alternatives-section">
-            <h4>🎵 Alternative Chords</h4>
+            <h4>Alternative Chords</h4>
             <div className="alternatives-grid">
               {currentChord.alternatives && currentChord.alternatives.length > 0 ? (
                 currentChord.alternatives.map((alt, index) => {
@@ -1058,6 +1074,11 @@ export default function ChordProgressionAnalyzer({
           font-size: 16px;
           font-weight: bold;
         }
+
+        .fret-guides { position: absolute; top: 20px; left: 0; right: 0; bottom: 20px; pointer-events: none; }
+        .fret-guide { position: absolute; top: 0; bottom: 0; transform: translateX(-1px); }
+        .fret-left-line { position: absolute; top: 0; bottom: 0; width: 2px; background: rgba(255,255,255,0.2); }
+        .fret-left-label { position: absolute; top: -18px; left: -6px; color: #8a8a9e; font-size: 10px; font-weight: bold; }
 
         .fretboard-display {
           position: relative;
