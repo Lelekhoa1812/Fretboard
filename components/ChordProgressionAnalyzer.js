@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { getChordShape, hasChordShape } from '../lib/chord-shapes';
+import { getChordShapeV2 as getChordShape, hasChordShape } from '../lib/chord-shapes';
 
 export default function ChordProgressionAnalyzer({ 
   chordProgression, 
