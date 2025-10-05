@@ -461,7 +461,7 @@ export default function ChordProgressionAnalyzer({
         </div>
 
         {/* Fretboard Visualization */}
-        {currentChord && currentChord.fretboardPositions && currentChord.fretboardPositions.length > 0 && (
+        {currentChord && currentChord.analysis && currentChord.analysis.fretboardPositions && currentChord.analysis.fretboardPositions.length > 0 && (
           <div className="fretboard-visualization">
             <h4>🎸 Chord Positions</h4>
             <div className="fretboard-display">
@@ -471,7 +471,7 @@ export default function ChordProgressionAnalyzer({
                     <div className="string-label">E{string === 6 ? '6' : string === 5 ? '5' : string === 4 ? '4' : string === 3 ? '3' : string === 2 ? '2' : '1'}</div>
                     <div className="string-line"></div>
                     {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(fret => {
-                      const position = currentChord.fretboardPositions.find(
+                      const position = currentChord.analysis.fretboardPositions.find(
                         pos => pos.string === string && pos.fret === fret
                       );
                       return (
@@ -480,7 +480,7 @@ export default function ChordProgressionAnalyzer({
                           className={`fret-marker ${position ? 'active' : ''}`}
                           style={{ 
                             left: `${fret * 25 + 30}px`,
-                            backgroundColor: position ? (currentChord.color || '#00baba') : 'transparent'
+                            backgroundColor: position ? (currentChord.analysis.color || '#00baba') : 'transparent'
                           }}
                         >
                           {position && (
@@ -506,7 +506,7 @@ export default function ChordProgressionAnalyzer({
         )}
 
         {/* Detailed thoughts panel (collapsible) */}
-        {showDetailedThoughts && currentChord && currentChord.fullExplanation && (
+        {showDetailedThoughts && currentChord && currentChord.analysis && currentChord.analysis.fullExplanation && (
           <div className="detailed-thoughts-panel">
             <div className="thoughts-content">
               <h4>💭 Detailed Analysis</h4>
@@ -527,19 +527,19 @@ export default function ChordProgressionAnalyzer({
                   hr: () => <hr className="markdown-hr" />
                 }}
               >
-                {currentChord.fullExplanation}
+                {currentChord.analysis.fullExplanation}
               </ReactMarkdown>
             </div>
           </div>
         )}
 
         {/* Enhanced Alternatives Display */}
-        {currentChord && (
+        {currentChord && currentChord.analysis && (
           <div className="alternatives-section">
             <h4>🎵 Alternative Chords</h4>
             <div className="alternatives-grid">
-              {currentChord.alternatives && currentChord.alternatives.length > 0 ? (
-                currentChord.alternatives.map((alt, index) => {
+              {currentChord.analysis.alternatives && currentChord.analysis.alternatives.length > 0 ? (
+                currentChord.analysis.alternatives.map((alt, index) => {
                   // Handle both old format (strings) and new format (objects)
                   const chordName = typeof alt === 'string' ? alt : alt.chord || alt;
                   const emotion = typeof alt === 'object' ? alt.emotion : 'Alternative';
