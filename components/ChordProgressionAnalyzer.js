@@ -61,20 +61,21 @@ export default function ChordProgressionAnalyzer({
 
   // Get chord shape from library or Llama
   const getChordShapeData = async (chordName) => {
-    // First try the chord library
-    const libraryShape = getChordShape(chordName);
-    if (libraryShape) {
-      return libraryShape;
+    // First try to get from chord library
+    if (hasChordShape(chordName)) {
+      return getChordShape(chordName);
     }
 
-    // If not in library, ask Llama
+    // If not in library, ask Llama for chord positions
     try {
       const response = await fetch('/api/music-analysis', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           type: 'get-chord-shape',
-          data: { chordName: chordName }
+          data: { 
+            chordName: chordName
+          }
         })
       });
 
@@ -85,9 +86,13 @@ export default function ChordProgressionAnalyzer({
         // Parse the position string from Llama
         if (positionString && typeof positionString === 'string') {
           const positions = positionString.split(',').map(pos => {
-            const [string, fret, finger] = pos.split(':').map(Number);
-            return { string, fret, finger };
-          }).filter(pos => !isNaN(pos.string) && !isNaN(pos.fret) && !isNaN(pos.finger));
+            const [string, fret, finger] = pos.trim().split(':');
+            return {
+              string: parseInt(string),
+              fret: parseInt(fret),
+              finger: parseInt(finger)
+            };
+          });
           
           if (positions.length > 0) {
             return positions;
@@ -95,10 +100,10 @@ export default function ChordProgressionAnalyzer({
         }
       }
     } catch (error) {
-      console.error('Failed to get chord shape from Llama:', error);
+      console.error('Failed to get chord positions from Llama:', error);
     }
 
-    // Fallback to a basic shape
+    // Fallback to basic positions if all else fails
     return [
       { string: 5, fret: 3, finger: 3 },
       { string: 4, fret: 2, finger: 2 },
