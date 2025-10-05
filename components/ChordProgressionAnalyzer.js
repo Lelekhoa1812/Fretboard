@@ -85,7 +85,7 @@ export default function ChordProgressionAnalyzer({
             }
           })
         }),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('Chord shape timeout')), 5000))
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Chord shape timeout')), 10000))
       ]);
 
       if (response.ok) {
@@ -142,7 +142,7 @@ export default function ChordProgressionAnalyzer({
               }
             })
           }),
-          new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 10000))
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 15000))
         ]);
 
         if (vibeResponse.ok) {
@@ -172,7 +172,7 @@ export default function ChordProgressionAnalyzer({
                 }
               })
             }),
-            new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 5000))
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 12000))
           ]);
 
           if (chordResponse.ok) {
