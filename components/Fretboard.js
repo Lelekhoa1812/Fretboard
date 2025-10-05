@@ -483,7 +483,7 @@ export default function Fretboard({
   return (
     <>
       <div className="fretboard" ref={fretboardRef}></div>
-      <div className="fret-legend" title="0 = open string, 1 = fret 1, etc.">0 = open string, 1 = fret 1, 2 = fret 2 ...</div>
+      {/* <div className="fret-legend" title="0 = open string, 1 = fret 1, etc.">0 = open string, 1 = fret 1, 2 = fret 2 ...</div> */}
       <div className="note-name-section" ref={noteNameSectionRef}></div>
       
       {/* Chord Quality Selector */}

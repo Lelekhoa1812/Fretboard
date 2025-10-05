@@ -408,6 +408,12 @@ export default function AIAssistant({
       if (!response.ok) {
         const errorText = await response.text();
         console.error('🤖 AI Assistant: API error response:', errorText);
+        // Don't break UX on 504; show analyzer if progression detected
+        if (response.status === 504) {
+          if (detectChordProgression(message)) {
+            setShowProgressionAnalyzer(true);
+          }
+        }
         throw new Error(`API request failed with status ${response.status}: ${errorText}`);
       }
 
@@ -546,9 +552,14 @@ export default function AIAssistant({
   const quickActions = [
     {
       label: selectedChords.length > 0 ? `Analyze ${selectedChords.length} Chord${selectedChords.length > 1 ? 's' : ''}` : 'Select Chords First',
-      action: () => selectedChords.length > 0 ? 
-        sendMessage(`Analyze this chord progression: ${selectedChords.map(c => `${c.root}${c.quality}`).join(' - ')}`) :
-        sendMessage('I need some chords selected first. Please select some chords on the fretboard.')
+      action: () => {
+        if (selectedChords.length === 0) {
+          return sendMessage('I need some chords selected first. Please select some chords on the fretboard.');
+        }
+        const progression = selectedChords.map(c => `${c.root}${c.quality}`).join(' - ');
+        setCurrentProgression(progression);
+        setShowProgressionAnalyzer(true); // open immediately without waiting on any API
+      }
     },
     {
       label: 'Fretboard Guide',

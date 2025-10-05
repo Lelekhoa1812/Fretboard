@@ -442,25 +442,22 @@ export default function ChordProgressionAnalyzer({
       setDisplayText('');
       
       // Generate AI analysis first
-      generateProgressionAnalysis().then(() => {
-        // Initial explanation
-        typeText(`🎼 **Analyzing your chord progression:** ${chordProgression}`, () => {
-          setTimeout(() => {
-            if (progressionVibe) {
-              typeText(`🎵 **${progressionVibe}**`, () => {
-                setTimeout(() => {
-                  processStep(0);
-                }, 2000);
-              });
-            } else {
-              typeText(`🎵 **This progression has a unique character with interesting harmonic relationships.**`, () => {
-                setTimeout(() => {
-                  processStep(0);
-                }, 2000);
-              });
-            }
-          }, 2000);
-        });
+      // Kick off analysis but don't block UI; start stepping after a short delay
+      generateProgressionAnalysis();
+      typeText(`🎼 **Analyzing your chord progression:** ${chordProgression}`, () => {
+        setTimeout(() => {
+          if (progressionVibe) {
+            typeText(`🎵 **${progressionVibe}**`, () => {
+              setTimeout(() => {
+                processStep(0);
+              }, 2000);
+            });
+          } else {
+            setTimeout(() => {
+              processStep(0);
+            }, 1000);
+          }
+        }, 1000);
       });
     } else if (isVisible && chords.length === 0) {
       console.log('❌ No valid chords found in progression:', chordProgression);
