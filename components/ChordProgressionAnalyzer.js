@@ -14,6 +14,8 @@ export default function ChordProgressionAnalyzer({
   const [currentChord, setCurrentChord] = useState(null);
   const [showFretboard, setShowFretboard] = useState(false);
   const [analysisComplete, setAnalysisComplete] = useState(false);
+  const [reviewIndex, setReviewIndex] = useState(0);
+  const [reviewMode, setReviewMode] = useState(false);
   const [chordAnalysis, setChordAnalysis] = useState({});
   const [isGeneratingAnalysis, setIsGeneratingAnalysis] = useState(false);
   const [progressionVibe, setProgressionVibe] = useState('');
@@ -294,6 +296,8 @@ export default function ChordProgressionAnalyzer({
   const processStep = (stepIndex) => {
     if (stepIndex >= chords.length) {
       setAnalysisComplete(true);
+      setReviewMode(true);
+      setReviewIndex(chords.length - 1);
       return;
     }
 
@@ -398,6 +402,19 @@ export default function ChordProgressionAnalyzer({
       return () => clearTimeout(timeout);
     }
   }, [currentStep, isTyping, showFretboard, isGeneratingAnalysis]);
+
+  // Review navigator handlers
+  const gotoReviewIndex = (idx) => {
+    if (idx < 0 || idx >= chords.length) return;
+    setReviewIndex(idx);
+    const chordName = chords[idx];
+    const analysis = chordAnalysis[chordName];
+    if (analysis) {
+      setCurrentChord({ analysis });
+      setShowFretboard(true);
+      setDisplayText(`**${chordName}** - ${analysis.emotion || ''}`);
+    }
+  };
 
   if (!isVisible) return null;
 
@@ -554,6 +571,7 @@ export default function ChordProgressionAnalyzer({
                   // Handle both old format (strings) and new format (objects)
                   const chordName = typeof alt === 'string' ? alt : alt.chord || alt;
                   const emotion = typeof alt === 'object' ? alt.emotion : 'Alternative';
+                  const vibe = typeof alt === 'object' ? (alt.vibe || alt.mood || '') : '';
                   const reason = typeof alt === 'object' ? alt.reason : 'Creative alternative';
                   const color = typeof alt === 'object' ? alt.color : '#00baba';
                   
@@ -563,7 +581,8 @@ export default function ChordProgressionAnalyzer({
                         {chordName}
                       </div>
                       <div className="alternative-emotion">
-                        {emotion}
+                        <span className="color-swatch" style={{ background: color }}></span>
+                        {emotion}{vibe ? ` • ${vibe}` : ''}
                       </div>
                       <div className="alternative-reason">
                         {reason}
@@ -588,17 +607,41 @@ export default function ChordProgressionAnalyzer({
           </div>
         )}
 
-        {/* Completion Message */}
+        {/* Completion Message + Review Navigator */}
         {analysisComplete && (
           <div className="progression-complete">
             <h4>🎉 Analysis Complete!</h4>
-            <p>You've explored a unique chord progression with AI-generated insights and personalized guidance.</p>
+            <p>Use the navigator to revisit any chord's analysis and positions.</p>
+            <div className="review-navigator" onWheel={(e) => {
+              if (!reviewMode) return;
+              if (e.deltaY > 0 || e.deltaX > 0) gotoReviewIndex(Math.min(chords.length - 1, reviewIndex + 1));
+              if (e.deltaY < 0 || e.deltaX < 0) gotoReviewIndex(Math.max(0, reviewIndex - 1));
+            }}>
+              <button className="nav-button" onClick={() => gotoReviewIndex(Math.max(0, reviewIndex - 1))}>&larr;</button>
+              <div className="review-strip" tabIndex={0} onKeyDown={(e) => {
+                if (e.key === 'ArrowLeft') gotoReviewIndex(Math.max(0, reviewIndex - 1));
+                if (e.key === 'ArrowRight') gotoReviewIndex(Math.min(chords.length - 1, reviewIndex + 1));
+              }}>
+                {chords.map((ch, idx) => (
+                  <button
+                    key={`${ch}-${idx}`}
+                    className={`review-chip ${idx === reviewIndex ? 'active' : ''}`}
+                    onClick={() => gotoReviewIndex(idx)}
+                  >
+                    {ch}
+                  </button>
+                ))}
+              </div>
+              <button className="nav-button" onClick={() => gotoReviewIndex(Math.min(chords.length - 1, reviewIndex + 1))}>&rarr;</button>
+            </div>
+
             <div className="completion-actions">
               <button 
                 className="action-button primary"
                 onClick={() => {
                   setCurrentStep(0);
                   setAnalysisComplete(false);
+                  setReviewMode(false);
                   generateProgressionAnalysis().then(() => processStep(0));
                 }}
               >
@@ -893,6 +936,16 @@ export default function ChordProgressionAnalyzer({
           border-radius: 8px;
           padding: 12px;
           transition: all 0.3s ease;
+        }
+
+        .alternative-emotion .color-swatch {
+          display: inline-block;
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          margin-right: 6px;
+          vertical-align: middle;
+          border: 1px solid rgba(255,255,255,0.4);
         }
 
         .alternative-chord:hover {
