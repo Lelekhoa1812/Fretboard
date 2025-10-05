@@ -61,23 +61,32 @@ export default function ChordProgressionAnalyzer({
 
   // Get chord shape from library or Llama
   const getChordShapeData = async (chordName) => {
+    console.log(`Getting chord shape for: ${chordName}`);
+    
     // First try to get from chord library
     if (hasChordShape(chordName)) {
-      return getChordShape(chordName);
+      const shape = getChordShape(chordName);
+      console.log(`Found chord shape in library:`, shape);
+      return shape;
     }
+    
+    console.log(`Chord ${chordName} not found in library, asking Llama...`);
 
-    // If not in library, ask Llama for chord positions
+    // If not in library, ask Llama for chord positions with timeout
     try {
-      const response = await fetch('/api/music-analysis', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          type: 'get-chord-shape',
-          data: { 
-            chordName: chordName
-          }
-        })
-      });
+      const response = await Promise.race([
+        fetch('/api/music-analysis', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'get-chord-shape',
+            data: { 
+              chordName: chordName
+            }
+          })
+        }),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Chord shape timeout')), 5000))
+      ]);
 
       if (response.ok) {
         const data = await response.json();
@@ -104,6 +113,7 @@ export default function ChordProgressionAnalyzer({
     }
 
     // Fallback to basic positions if all else fails
+    console.log(`Using fallback positions for ${chordName}`);
     return [
       { string: 5, fret: 3, finger: 3 },
       { string: 4, fret: 2, finger: 2 },
@@ -207,19 +217,20 @@ export default function ChordProgressionAnalyzer({
           }
         } catch (error) {
           console.error(`Failed to analyze chord ${chord}:`, error);
+          
+          // Always get chord shape even when AI fails
+          const fretboardPositions = await getChordShapeData(chord);
+          
           // Fallback analysis
           return { 
             chord, 
             analysis: {
               name: chord,
-              emotion: 'Hopeful',
-              impact: 'Adds brightness to the progression',
-              explanation: `The ${chord} chord brings a sense of hope and brightness to this position in the progression.`,
+              emotion: 'Musical',
+              impact: 'Adds character to the progression',
+              explanation: `The ${chord} chord brings its unique character to this position in the progression.`,
               alternatives: [`${chord}m`, `${chord}7`, `${chord}sus4`],
-              fretboardPositions: [
-                {"fret": 0, "string": 5, "finger": 3},
-                {"fret": 2, "string": 4, "finger": 1}
-              ],
+              fretboardPositions: fretboardPositions, // Use real chord shapes
               color: '#00baba'
             }
           };
