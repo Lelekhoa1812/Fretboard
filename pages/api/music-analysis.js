@@ -126,6 +126,14 @@ export default async function handler(req, res) {
         );
         break;
 
+      case 'get-chord-shape':
+        console.log('🎵 Music Analysis API: Processing chord shape request');
+        result = await MusicTheoryAI.getChordShapeFromLlama(
+          data.chordName,
+          sessionId
+        );
+        break;
+
       default:
         console.error('🎵 Music Analysis API: Invalid analysis type:', type);
         return res.status(400).json({ error: 'Invalid analysis type' });

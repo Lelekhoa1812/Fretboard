@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
+import { getChordShape, hasChordShape } from '../lib/chord-shapes';
 
 export default function ChordProgressionAnalyzer({ 
   chordProgression, 
@@ -58,6 +59,55 @@ export default function ChordProgressionAnalyzer({
     return fullResponse; // Fallback to original
   };
 
+  // Get chord shape from library or Llama
+  const getChordShapeData = async (chordName) => {
+    // First try the chord library
+    const libraryShape = getChordShape(chordName);
+    if (libraryShape) {
+      return libraryShape;
+    }
+
+    // If not in library, ask Llama
+    try {
+      const response = await fetch('/api/music-analysis', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'get-chord-shape',
+          data: { chordName: chordName }
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const positionString = data.data;
+        
+        // Parse the position string from Llama
+        if (positionString && typeof positionString === 'string') {
+          const positions = positionString.split(',').map(pos => {
+            const [string, fret, finger] = pos.split(':').map(Number);
+            return { string, fret, finger };
+          }).filter(pos => !isNaN(pos.string) && !isNaN(pos.fret) && !isNaN(pos.finger));
+          
+          if (positions.length > 0) {
+            return positions;
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Failed to get chord shape from Llama:', error);
+    }
+
+    // Fallback to a basic shape
+    return [
+      { string: 5, fret: 3, finger: 3 },
+      { string: 4, fret: 2, finger: 2 },
+      { string: 3, fret: 0, finger: 0 },
+      { string: 2, fret: 1, finger: 1 },
+      { string: 1, fret: 0, finger: 0 }
+    ];
+  };
+
   // Generate AI analysis for the entire progression
   const generateProgressionAnalysis = async () => {
     setIsGeneratingAnalysis(true);
@@ -114,16 +164,28 @@ export default function ChordProgressionAnalyzer({
             const chordData = await chordResponse.json();
             try {
               const parsedAnalysis = JSON.parse(chordData.data);
+              
+              // Get real chord shape from library or Llama
+              const fretboardPositions = await getChordShapeData(chord);
+              
+              // Summarize the explanation for concise display
+              const summarizedExplanation = await summarizeAIResponse(parsedAnalysis.explanation, chord);
+              
               return { 
                 chord, 
                 analysis: {
                   ...parsedAnalysis,
-                  explanation: parsedAnalysis.explanation,
-                  fullExplanation: parsedAnalysis.explanation
+                  explanation: summarizedExplanation,
+                  fullExplanation: parsedAnalysis.explanation,
+                  fretboardPositions: fretboardPositions // Use real chord shapes
                 }
               };
             } catch (error) {
               console.error('Failed to parse chord analysis JSON:', error);
+              
+              // Get real chord shape even for fallback
+              const fretboardPositions = await getChordShapeData(chord);
+              
               return { 
                 chord, 
                 analysis: {
@@ -132,10 +194,7 @@ export default function ChordProgressionAnalyzer({
                   impact: 'Adds character to the progression',
                   explanation: `The ${chord} chord brings its unique character to this position in the progression.`,
                   alternatives: [`${chord}m`, `${chord}7`, `${chord}sus4`],
-                  fretboardPositions: [
-                    {"fret": 0, "string": 5, "finger": 3},
-                    {"fret": 2, "string": 4, "finger": 1}
-                  ],
+                  fretboardPositions: fretboardPositions,
                   color: '#00baba'
                 }
               };
