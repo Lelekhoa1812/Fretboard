@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
+import ChordProgressionAnalyzer from './ChordProgressionAnalyzer';
 import { audioAnalyzer } from '../lib/audio-analyzer.js';
 import { adaptiveLearning } from '../lib/adaptive-learning.js';
 import { gamificationEngine } from '../lib/gamification-engine.js';
@@ -25,10 +26,31 @@ export default function AIAssistant({
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [userStats, setUserStats] = useState(null);
   const [recentInsights, setRecentInsights] = useState(null);
+  const [showProgressionAnalyzer, setShowProgressionAnalyzer] = useState(false);
+  const [currentProgression, setCurrentProgression] = useState('');
   const messagesEndRef = useRef(null);
+  
+  // Add request deduplication
+  const [pendingRequest, setPendingRequest] = useState(null);
+  const requestIdRef = useRef(0);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  // Detect chord progressions in user input
+  const detectChordProgression = (message) => {
+    const chordPattern = /([A-G][#♭]?(?:maj|min|m|M|dim|aug|sus|add|6|7|9|11|13|♭5|♯5|♭9|♯9|♭13|♯13|♯11|♭11|5|b5|#5|b9|#9|b13|#13|#11|b11)*\d*)/g;
+    const matches = message.match(chordPattern);
+    
+    if (matches && matches.length >= 3) {
+      // Check if it looks like a chord progression
+      const progression = matches.join(' - ');
+      setCurrentProgression(progression);
+      setShowProgressionAnalyzer(true);
+      return true;
+    }
+    return false;
   };
 
   useEffect(() => {
@@ -231,6 +253,36 @@ export default function AIAssistant({
 
   const sendMessage = async (message) => {
     if (!message.trim()) return;
+    
+    // Prevent duplicate requests
+    if (loading || pendingRequest) {
+      console.log('🚫 AI Assistant: Request already in progress, ignoring duplicate');
+      return;
+    }
+
+    const requestId = ++requestIdRef.current;
+    console.log(`🚀 AI Assistant: Starting request ${requestId}`, { message: message.substring(0, 50) + '...' });
+
+    // Check for chord progression first
+    if (detectChordProgression(message)) {
+      const userMessage = {
+        role: 'user',
+        content: message,
+        timestamp: new Date().toISOString()
+      };
+      setMessages(prev => [...prev, userMessage]);
+      setPendingRequest(requestId);
+      
+      const aiMessage = {
+        role: 'assistant',
+        content: `🎸 **I detected a chord progression!** Let me analyze this step-by-step with interactive fretboard guidance.\n\n**Progression:** ${currentProgression}\n\nClick the analyzer below to start the interactive analysis!`,
+        timestamp: new Date().toISOString(),
+        hasProgression: true
+      };
+      setMessages(prev => [...prev, aiMessage]);
+      setPendingRequest(null);
+      return;
+    }
 
     const userMessage = {
       role: 'user',
@@ -240,6 +292,7 @@ export default function AIAssistant({
 
     setMessages(prev => [...prev, userMessage]);
     setLoading(true);
+    setPendingRequest(requestId);
 
     try {
       console.log('🤖 AI Assistant: Starting analysis...', { message, selectedChords, selectedScales, currentMode });
@@ -355,12 +408,13 @@ export default function AIAssistant({
       setMessages(prev => [...prev, errorMessage]);
     } finally {
       setLoading(false);
+      setPendingRequest(null);
     }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (input.trim() && !loading) {
+    if (input.trim() && !loading && !pendingRequest) {
       sendMessage(input);
       setInput('');
     }
@@ -456,6 +510,10 @@ export default function AIAssistant({
     {
       label: '🎨 Creative Ideas',
       action: () => sendMessage('Give me creative ideas for using these chords in songwriting')
+    },
+    {
+      label: '🎸 Analyze Progression',
+      action: () => sendMessage('Cadd9 - Bm7b5 - E7 - Am7 - Fmaj7 - G6 - Em9 - Am7 - Dm7 - G7sus4 - Cmaj7')
     },
     {
       label: isListening ? '🎤 Stop Listening' : '🎤 Voice Control',
@@ -571,6 +629,16 @@ export default function AIAssistant({
                     message.content
                   )}
                 </div>
+                {message.hasProgression && (
+                  <div className="ai-progression-action">
+                    <button 
+                      className="progression-analyzer-button"
+                      onClick={() => setShowProgressionAnalyzer(true)}
+                    >
+                      🎸 Analyze Progression Interactively
+                    </button>
+                  </div>
+                )}
                 <div className="ai-message-meta">
                   {message.timestamp && new Date(message.timestamp).toLocaleTimeString()}
                   {message.model && ` • ${message.model}`}
@@ -1004,6 +1072,30 @@ export default function AIAssistant({
           cursor: not-allowed;
         }
 
+        .ai-progression-action {
+          padding: 10px 15px;
+          border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .progression-analyzer-button {
+          background: linear-gradient(135deg, #00baba 0%, #008a8a 100%);
+          color: white;
+          border: none;
+          padding: 10px 20px;
+          border-radius: 20px;
+          font-size: 14px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          box-shadow: 0 4px 15px rgba(0, 186, 186, 0.3);
+          width: 100%;
+        }
+
+        .progression-analyzer-button:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(0, 186, 186, 0.4);
+        }
+
         @media (max-width: 768px) {
           .ai-assistant-panel {
             width: calc(100vw - 40px);
@@ -1013,6 +1105,19 @@ export default function AIAssistant({
           }
         }
       `}</style>
+
+      {/* Chord Progression Analyzer */}
+      {showProgressionAnalyzer && (
+        <ChordProgressionAnalyzer
+          chordProgression={currentProgression}
+          isVisible={showProgressionAnalyzer}
+          onClose={() => setShowProgressionAnalyzer(false)}
+          onChordSelect={(chord) => {
+            console.log('Chord selected:', chord);
+            // You can add chord selection logic here
+          }}
+        />
+      )}
     </>
   );
 }
