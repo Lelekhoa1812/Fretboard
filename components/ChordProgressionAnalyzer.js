@@ -638,13 +638,22 @@ export default function ChordProgressionAnalyzer({
             {/* Per-fret left-side guides for first 6 frets with index-1 labeling (0 stays 0) */}
             <div className="fret-guides">
               {[0, 1, 2, 3, 4, 5].map(fret => (
-                <div key={`g${fret}`} className="fret-guide" style={{ left: `${fret * 25 + 30}px` }}>
+                <div key={`g${fret}`} className="fret-guide" style={{ left: `calc(var(--leftOffset) + (var(--fretWidth) * ${fret}))` }}>
                   <div className="fret-left-line" />
                   <div className="fret-left-label">{Math.max(0, fret - 1)}</div>
                 </div>
               ))}
             </div>
-            <div className="fretboard-display">
+            <div className="fretboard-display" style={{ ['--fretCount']: '6', ['--leftOffset']: '40px', ['--fretWidth']: 'calc((100% - var(--leftOffset)) / var(--fretCount))' }}>
+              {/* Per-fret left-side guides for first 6 frets with index-1 labeling (0 stays 0) */}
+              <div className="fret-guides">
+                {[0, 1, 2, 3, 4, 5].map(fret => (
+                  <div key={`g${fret}`} className="fret-guide" style={{ left: `calc(var(--leftOffset) + (var(--fretWidth) * ${fret}))` }}>
+                    <div className="fret-left-line" />
+                    <div className="fret-left-label">{Math.max(0, fret - 1)}</div>
+                  </div>
+                ))}
+              </div>
               <div className="fretboard-strings">
                 {[6, 5, 4, 3, 2, 1].map(string => (
                   <div key={string} className="guitar-string">
@@ -659,7 +668,7 @@ export default function ChordProgressionAnalyzer({
                           key={fret} 
                           className={`fret-marker ${position ? 'active' : ''}`}
                           style={{ 
-                            left: `${fret * 25 + 30}px`,
+                            left: `calc(var(--leftOffset) + (var(--fretWidth) * ${fret}))`,
                             backgroundColor: position ? (currentChord.color || '#00baba') : 'transparent'
                           }}
                         >
@@ -1133,7 +1142,7 @@ export default function ChordProgressionAnalyzer({
         .fret-guides { position: absolute; top: 20px; left: 0; right: 0; bottom: 20px; pointer-events: none; }
         .fret-guide { position: absolute; top: 0; bottom: 0; transform: translateX(-1px); }
         .fret-left-line { position: absolute; top: 0; bottom: 0; width: 2px; background: rgba(255,255,255,0.2); }
-        .fret-left-label { position: absolute; top: -18px; left: -6px; color: #8a8a9e; font-size: 10px; font-weight: bold; }
+        .fret-left-label { position: absolute; top: -18px; left: calc(var(--leftOffset) - 6px); color: #8a8a9e; font-size: 10px; font-weight: bold; }
 
         .fretboard-display {
           position: relative;
@@ -1142,21 +1151,19 @@ export default function ChordProgressionAnalyzer({
           padding: 20px;
           border: 2px solid #4a4a5e;
           overflow: hidden;
-          width: 200px; /* Fit 6 frets using 30px left offset + 5*25px gaps + padding room */
+          height: 160px;
         }
 
         .fretboard-strings {
           position: relative;
           height: 120px;
-          width: 200px; /* Match marker/guides width */
-          margin-left: 0;
         }
 
         .guitar-string {
           position: absolute;
-          width: 200px; /* Match 6-fret lane width */
+          left: 0;
+          right: 0;
           height: 2px;
-          background: #8a8a9e;
           display: flex;
           align-items: center;
         }
@@ -1170,29 +1177,32 @@ export default function ChordProgressionAnalyzer({
 
         .string-label {
           position: absolute;
-          left: -25px;
+          left: 0;
+          width: var(--leftOffset);
           color: #8a8a9e;
           font-size: 12px;
           font-weight: bold;
           top: 50%;
           transform: translateY(-50%);
+          text-align: right;
+          padding-right: 6px;
         }
 
         .string-line {
           position: absolute;
-          left: 0;
-          width: 200px; /* keep string line within 6-fret lane */
+          left: var(--leftOffset);
+          right: 0;
           height: 2px;
           background: #8a8a9e;
         }
 
         .fret-marker {
           position: absolute;
-          width: 20px;
-          height: 20px;
+          width: 18px;
+          height: 18px;
           border-radius: 50%;
           top: 50%;
-          transform: translateY(-50%);
+          transform: translate(-50%, -50%);
           display: flex;
           align-items: center;
           justify-content: center;
