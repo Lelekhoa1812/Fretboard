@@ -1075,17 +1075,20 @@ export default function ChordProgressionAnalyzer({
           border-radius: 8px;
           padding: 20px;
           border: 2px solid #4a4a5e;
-          overflow-x: auto;
+          overflow: hidden;
+          width: 200px; /* Fit 6 frets using 30px left offset + 5*25px gaps + padding room */
         }
 
         .fretboard-strings {
           position: relative;
           height: 120px;
+          width: 200px; /* Match marker/guides width */
+          margin-left: 0;
         }
 
         .guitar-string {
           position: absolute;
-          width: 100%;
+          width: 200px; /* Match 6-fret lane width */
           height: 2px;
           background: #8a8a9e;
           display: flex;
@@ -1112,7 +1115,7 @@ export default function ChordProgressionAnalyzer({
         .string-line {
           position: absolute;
           left: 0;
-          right: 0;
+          width: 200px; /* keep string line within 6-fret lane */
           height: 2px;
           background: #8a8a9e;
         }
@@ -1143,22 +1146,7 @@ export default function ChordProgressionAnalyzer({
           font-size: 10px;
         }
 
-        .fret-numbers {
-          position: absolute;
-          top: -25px;
-          left: 0;
-          right: 0;
-          height: 20px;
-        }
-
-        .fret-number {
-          position: absolute;
-          color: #8a8a9e;
-          font-size: 10px;
-          font-weight: bold;
-          top: 0;
-          transform: translateX(-50%);
-        }
+        /* Removed bottom fret numbers for analyzer mini board */
 
         .typing-cursor {
           animation: blink 1s infinite;
