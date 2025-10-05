@@ -242,32 +242,32 @@ export default function AIAssistant({
       
       if (progress) {
         let progressMessage = `📊 **Your Progress Summary:**\n\n`;
-        progressMessage += `🎸 **Practice Stats:**\n`;
+        progressMessage += `**Practice Stats:**\n`;
         progressMessage += `• Total Practice Time: ${Math.round(progress.totalPracticeTime)} minutes\n`;
         progressMessage += `• Sessions Completed: ${progress.sessionsCompleted}\n`;
         progressMessage += `• Current Streak: ${progress.currentStreak} days\n`;
         progressMessage += `• Longest Streak: ${progress.longestStreak} days\n\n`;
         
-        progressMessage += `🎵 **Learning Progress:**\n`;
+        progressMessage += `**Learning Progress:**\n`;
         progressMessage += `• Chords Learned: ${progress.chordsLearned}\n`;
         progressMessage += `• Scales Learned: ${progress.scalesLearned}\n`;
         progressMessage += `• Songs Completed: ${progress.songsCompleted}\n\n`;
         
-        progressMessage += `⭐ **Performance:**\n`;
+        progressMessage += `**Performance:**\n`;
         progressMessage += `• Average Accuracy: ${Math.round(progress.averageAccuracy * 100)}%\n`;
         progressMessage += `• Average Speed: ${Math.round(progress.averageSpeed * 100)}%\n`;
         progressMessage += `• Average Technique: ${Math.round(progress.averageTechnique * 100)}%\n\n`;
         
-        progressMessage += `🏆 **Achievements:**\n`;
+        progressMessage += `**Achievements:**\n`;
         progressMessage += `• Milestones: ${progress.milestones}\n`;
 
         if (insights && insights.insights) {
-          progressMessage += `\n💡 **AI Insights:**\n${insights.insights}`;
+          progressMessage += `\n**AI Insights:**\n${insights.insights}`;
         }
 
         await sendMessage(progressMessage);
       } else {
-        await sendMessage('📊 No progress data available yet. Start practicing to see your progress!');
+        await sendMessage('No progress data available yet. Start practicing to see your progress!');
       }
     } catch (error) {
       console.error('Failed to show progress:', error);
@@ -299,7 +299,7 @@ export default function AIAssistant({
       
       const aiMessage = {
         role: 'assistant',
-        content: `🎸 **I detected a chord progression!** Let me analyze this step-by-step with interactive fretboard guidance.\n\n**Progression:** ${currentProgression}\n\nClick the analyzer below to start the interactive analysis!`,
+        content: `**I detected a chord progression!** Let me analyze this step-by-step with interactive fretboard guidance.\n\n**Progression:** ${currentProgression}\n\nClick the analyzer below to start the interactive analysis!`,
         timestamp: new Date().toISOString(),
         hasProgression: true
       };
@@ -319,7 +319,7 @@ export default function AIAssistant({
     setPendingRequest(requestId);
 
     try {
-      console.log('🤖 AI Assistant: Starting analysis...', { message, selectedChords, selectedScales, currentMode });
+      console.log('AI Assistant: Starting analysis...', { message, selectedChords, selectedScales, currentMode });
       
       // Build rich context for the AI
       const context = {
@@ -474,7 +474,7 @@ export default function AIAssistant({
       const gamificationResult = gamificationEngine.updateUserStats(userId, activityData);
       
       if (gamificationResult.newAchievements.length > 0) {
-        const achievementMessage = `🏆 **New Achievement${gamificationResult.newAchievements.length > 1 ? 's' : ''} Unlocked!**\n\n`;
+        const achievementMessage = `**New Achievement${gamificationResult.newAchievements.length > 1 ? 's' : ''} Unlocked!**\n\n`;
         const achievementsText = gamificationResult.newAchievements
           .map(achievement => `• ${achievement.icon} **${achievement.name}** - ${achievement.description} (+${achievement.points} points)`)
           .join('\n');
@@ -483,7 +483,7 @@ export default function AIAssistant({
       }
 
       if (gamificationResult.newBadges.length > 0) {
-        const badgeMessage = `🎖️ **New Badge${gamificationResult.newBadges.length > 1 ? 's' : ''} Earned!**\n\n`;
+        const badgeMessage = `**New Badge${gamificationResult.newBadges.length > 1 ? 's' : ''} Earned!**\n\n`;
         const badgesText = gamificationResult.newBadges
           .map(badge => `• ${badge.icon} **${badge.name}** - ${badge.description}`)
           .join('\n');
@@ -516,27 +516,27 @@ export default function AIAssistant({
         sendMessage('I need some chords selected first. Please select some chords on the fretboard.')
     },
     {
-      label: '🎸 Fretboard Guide',
+      label: 'Fretboard Guide',
       action: () => sendMessage('Show me how to navigate the fretboard and select meaningful chords')
     },
     {
-      label: '🎵 Chord Progressions',
+      label: 'Chord Progressions',
       action: () => sendMessage('Suggest some beautiful chord progressions I can try')
     },
     {
-      label: '🎼 Music Theory',
+      label: 'Music Theory',
       action: () => sendMessage('Explain the music theory behind what I\'m playing')
     },
     {
-      label: '🎯 Practice Plan',
+      label: 'Practice Plan',
       action: () => sendMessage('Create a practice plan for improving my guitar skills')
     },
     {
-      label: '🎨 Creative Ideas',
+      label: 'Creative Ideas',
       action: () => sendMessage('Give me creative ideas for using these chords in songwriting')
     },
     {
-      label: '🎸 Analyze Progression',
+      label: 'Analyze Progression',
       action: () => sendMessage('Cadd9 - Bm7b5 - E7 - Am7 - Fmaj7 - G6 - Em9 - Am7 - Dm7 - G7sus4 - Cmaj7')
     },
     {
@@ -548,11 +548,11 @@ export default function AIAssistant({
       action: () => isAnalyzing ? stopAudioAnalysis() : startAudioAnalysis()
     },
     {
-      label: '🎶 Generate Backing Track',
+      label: 'Generate Backing Track',
       action: () => generateBackingTrack()
     },
     {
-      label: '📊 My Progress',
+      label: 'My Progress',
       action: () => showProgress()
     }
   ];

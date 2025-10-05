@@ -107,27 +107,27 @@ export default function FretboardApp() {
             </div>
             <div className="modal-body">
               <div className="help-section">
-                <h3>🎵 Notes Mode</h3>
+                <h3>Notes Mode</h3>
                 <p>Hover over any note name below the fretboard to highlight all positions of that note. Toggle "Show multiple notes" to compare different notes simultaneously.</p>
               </div>
               
               <div className="help-section">
-                <h3>🎸 Chords Mode</h3>
+                <h3>Chords Mode</h3>
                 <p>Select a chord quality from the dropdown, then hover over root notes to see chord shapes. Use "Hand Position" to focus on specific fret ranges (5-fret windows).</p>
               </div>
               
               <div className="help-section">
-                <h3>🎼 Scales Mode</h3>
+                <h3>Scales Mode</h3>
                 <p>Choose a scale family (Major, Minor, Pentatonic, Blues, Modes), then hover over root notes to visualize scale patterns across the fretboard.</p>
               </div>
               
               <div className="help-section">
-                <h3>🤖 AI Assistant</h3>
+                <h3>AI Assistant</h3>
                 <p>Click the AI Assistant button to get personalized music theory help, chord analysis, practice recommendations, and answers to your questions.</p>
               </div>
               
               <div className="help-section">
-                <h3>⚙️ Controls</h3>
+                <h3>Controls</h3>
                 <ul>
                   <li><strong>Instrument:</strong> Switch between Guitar, Bass, and Ukulele</li>
                   <li><strong>Accidentals:</strong> Choose between flats (♭) and sharps (♯)</li>
@@ -137,7 +137,7 @@ export default function FretboardApp() {
               </div>
               
               <div className="help-section">
-                <h3>💡 Tips</h3>
+                <h3>Tips</h3>
                 <ul>
                   <li>Use the AI Assistant for personalized learning guidance</li>
                   <li>Try different instruments to see how patterns transpose</li>

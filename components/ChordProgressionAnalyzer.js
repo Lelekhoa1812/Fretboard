@@ -146,7 +146,7 @@ export default function ChordProgressionAnalyzer({
       
       // Step 1: Show chord on fretboard
       setShowFretboard(true);
-      typeText(`🎸 **${chordName}** - ${chordData.emotion || 'Analyzing...'}`, () => {
+      typeText(`**${chordName}** - ${chordData.emotion || 'Analyzing...'}`, () => {
         setTimeout(() => {
           // Step 2: Explain the chord
           typeText(`💡 ${chordData.explanation || 'Processing chord analysis...'}`, () => {
@@ -173,7 +173,7 @@ export default function ChordProgressionAnalyzer({
       });
     } else {
       // Fallback if chord analysis not available
-      typeText(`🎸 **${chordName}** - Processing...`, () => {
+      typeText(`**${chordName}** - Processing...`, () => {
         setTimeout(() => {
           typeText(`💡 Analyzing this chord in the context of your progression...`, () => {
             setTimeout(() => {
@@ -254,7 +254,7 @@ export default function ChordProgressionAnalyzer({
       <div className="progression-analyzer">
         {/* Header */}
         <div className="progression-header">
-          <h3>🎸 AI-Powered Chord Analysis</h3>
+          <h3>AI-Powered Chord Analysis</h3>
           <button 
             className="progression-close"
             onClick={onClose}
