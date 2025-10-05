@@ -34,6 +34,7 @@ export default function AIAssistant({
   // Add request deduplication
   const [pendingRequest, setPendingRequest] = useState(null);
   const requestIdRef = useRef(0);
+  const lastRequestTimeRef = useRef(0);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -285,6 +286,14 @@ export default function AIAssistant({
       return;
     }
 
+    // Additional check to prevent rapid-fire requests
+    const now = Date.now();
+    if (lastRequestTimeRef.current && (now - lastRequestTimeRef.current) < 10000) {
+      console.log('🚫 AI Assistant: Request too soon after last request, ignoring');
+      return;
+    }
+    lastRequestTimeRef.current = now;
+
     const requestId = ++requestIdRef.current;
     console.log(`🚀 AI Assistant: Starting request ${requestId}`, { message: message.substring(0, 50) + '...' });
 
@@ -402,10 +411,22 @@ export default function AIAssistant({
         throw new Error(`API request failed with status ${response.status}: ${errorText}`);
       }
 
-      const result = await response.json();
-      console.log('🤖 AI Assistant: API result:', result);
+      // Additional validation to ensure we have a valid response
+      if (!response.headers.get('content-type')?.includes('application/json')) {
+        console.error('🤖 AI Assistant: Invalid response content type:', response.headers.get('content-type'));
+        throw new Error('Invalid response format - expected JSON');
+      }
 
-      if (result.success) {
+      const result = await response.json();
+      console.log('🤖 AI Assistant: API result:', {
+        success: result.success,
+        hasData: !!result.data,
+        dataLength: result.data?.length,
+        model: result.model,
+        usage: result.usage
+      });
+
+      if (result.success && result.data) {
         const aiMessage = {
           role: 'assistant',
           content: result.data,
@@ -417,16 +438,29 @@ export default function AIAssistant({
         // Track progress and update gamification
         trackUserActivity(message, result.data);
       } else {
-        console.error('🤖 AI Assistant: API returned success=false:', result);
-        throw new Error(result.message || 'Analysis failed');
+        console.error('🤖 AI Assistant: API returned success=false or no data:', result);
+        throw new Error(result.message || 'Analysis failed - no data received');
       }
     } catch (error) {
       console.error('🤖 AI Assistant Error:', error);
       console.error('🤖 AI Assistant Error Stack:', error.stack);
       
+      // Check if this is a network error or API error
+      const isNetworkError = error.message.includes('fetch') || error.message.includes('network');
+      const isAPIError = error.message.includes('API request failed');
+      
+      let errorContent;
+      if (isNetworkError) {
+        errorContent = `🌐 **Network Error**\n\nI'm having trouble connecting to the AI service. This might be a temporary network issue.\n\n**What you can try:**\n- Check your internet connection\n- Refresh the page and try again\n- Wait a moment and retry\n\n*The AI service should be back online soon!*`;
+      } else if (isAPIError) {
+        errorContent = `🔧 **Service Error**\n\nI encountered an issue with the AI service. This is likely temporary.\n\n**What you can try:**\n- Try asking a different question\n- Wait a moment and retry\n- Check if the service is back online\n\n*I'll be back to full functionality soon!*`;
+      } else {
+        errorContent = `⚠️ **Technical Issue**\n\nI encountered an unexpected error: ${error.message}\n\n**What you can try:**\n- Try rephrasing your question\n- Ask about a different topic\n- Wait a moment and try again\n\n*I'm working to resolve this issue!*`;
+      }
+      
       const errorMessage = {
         role: 'assistant',
-        content: `Sorry, I encountered an error: ${error.message}. Please check the console for more details.`,
+        content: errorContent,
         timestamp: new Date().toISOString(),
         isError: true
       };
